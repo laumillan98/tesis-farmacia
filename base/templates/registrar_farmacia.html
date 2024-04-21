@@ -1,0 +1,57 @@
+{% extends "./base.html" %}
+
+{% block title %}Registar Farmacia{% endblock %}
+
+{% block body %}
+<div class="row" style="margin-top: 10px;">
+    <div class="col-sm-12 col-md-6 col-lg-4 col-xl-4">
+        <h2>Insertar Medicamento</h2>
+        <div class="card">
+            <div class="card-body">
+                <form action="/registrar_farmacia/" method="POST">{% csrf_token %}
+                    <div class="form-group">
+                        <input type="text" id="txtNombre" name="txtNombre" class="form-control" placeholder="Nombre" minlength="5"
+                        maxlength="50" required>
+                    </div>
+                    <div class="form-group" style="margin-top: 10px">
+                        <select class="form-select" aria-label="Default select example" name="idMunicipio">
+                        <option value="" selected disabled>Seleccione el municipio de la farmacia</option>
+                        {% for m in municipio %}
+                        <option value="{{ m.id_munic }}">{{ m.nombre }}</option>
+                        {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-top: 10px">
+                        <select class="form-select" aria-label="Default select example" name="idTurno">
+                        <option value="" selected disabled>Seleccione el turno de la farmacia</option>
+                        {% for t in turno %}
+                        <option value="{{ t.id_turno_farmacia }}">{{ t.nombre }}</option>
+                        {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-top: 10px">
+                        <select class="form-select" aria-label="Default select example" name="idTipo">
+                        <option value="" selected disabled>Seleccione el tipo de farmacia</option>
+                        {% for t in tipo %}
+                        <option value="{{ t.id_tipo_farmacia }}">{{ t.nombre }}</option>
+                        {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" style="margin-top: 10px;" id="txtDireccion" name="txtDireccion" class="form-control"
+                        placeholder="Dirección" minlength="5" maxlength="500" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" style="margin-top: 10px;" id="txtTelefono" name="txtTelefono" class="form-control"
+                        placeholder="Teléfono" minlength="8" maxlength="8" required>
+                    </div>
+                    <div class="form-group" style="margin-top: 10px">
+                        <button type="submit" class="btn btn-success btn-block text-white">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

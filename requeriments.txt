@@ -1,0 +1,6 @@
+django
+django-tinymce
+django-recaptcha
+pillow
+six
+django-allauth

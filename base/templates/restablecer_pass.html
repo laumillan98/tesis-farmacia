@@ -1,0 +1,16 @@
+{% autoescape off %}
+Hola {{ user.username }},
+
+Hemos recibido una solicitud para restablecer la contraseña de su cuenta para este correo electrónico. 
+Para iniciar el proceso de restablecimiento de la contraseña de su cuenta, haga click en el siguiente enlace:
+
+{{ protocol }}://{{ domain }}{% url 'cambiar_pass' uidb64=uid token=token %}
+
+Este link solo puede ser usado una sola vez. Si necesita restablecer la contraseña nuevamente, por favor visite {{ protocol }}://{{domain}} y pida otro restablecimiento.
+
+Si no hizo esta solicitud, por favor ignore este correo electrónico.
+
+Sinceramente,
+InfoFarma.
+
+{% endautoescape %}

@@ -1,0 +1,47 @@
+{% extends "./base.html" %}
+
+{% block title %}Acceder{% endblock %}
+
+{% block body %}
+
+{% load crispy_forms_tags %}
+
+<section class="vh-80" style="background-color: #ffffff;">
+    <div class="container py-3 h-80">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col col-xl-9">
+                <div class="card" style="border-radius: 1rem;">
+                    <div class="row g-0">
+                        <div class="col-md-6 col-lg-5 d-none d-md-block">
+                            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/img1.webp" alt="login form" class="img-fluid" style="border-radius: 1rem 0 0 1rem;">
+                        </div>
+                        <div class="col-md-6 col-lg-7 d-flex align-items-center">
+                            <div class="card-body p-4 p-lg-5 text-black">
+
+                                <form method="POST">{% csrf_token %}
+
+                                    <div class="d-flex align-items-center mb-3 pb-1">
+                                        <span class="h3 fw-bold mb-0">Iniciar Sesión</span>
+                                    </div>
+                                    <div class="content-section">
+                                        {% csrf_token %}
+                                        {{ form|crispy }}
+                                        <div class="form-group">
+                                            <button type="submit" class="btn btn-dark btn-md btn-block" style="margin-bottom: 10px; margin-top: 10px;">Acceder</button>
+                                            <hr>
+                                            <a href="/solicitar_restablecer_pass">¿Olvidó su contraseña?</a><br>
+                                            <a href="/registrar">Crear cuenta</a>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+    
+{% endblock %}
+

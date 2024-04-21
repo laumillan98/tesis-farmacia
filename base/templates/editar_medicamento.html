@@ -1,0 +1,65 @@
+{% extends "./base.html" %}
+
+{% block title %}Editar Medicamento{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-md-4 offset-md-4">
+        <h2>Edición de Medicamentos</h2>
+        <div class="card">
+            <div class="card-body">
+                <form action="/edicionMedicamento/" method="POST">{% csrf_token %}
+                    <div class="form-group">
+                        <input type="text" id="uuid" name="uuid" value="{{medicamento.id_medic}}"
+                            class="form-control" hidden>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="txtNombre" name="txtNombre" value="{{medicamento.nombre}}"
+                            class="form-control" placeholder="Nombre" minlength="5" maxlength="20" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" style="margin-top: 10px;" id="txtDescription" name="txtDescription" value="{{medicamento.description}}"
+                            class="form-control" placeholder="Descripción" minlength="5" maxlength="500" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="number" style="margin-top: 10px;" id="numCantidad" name="numCantidad" value="{{medicamento.cant_max}}"
+                            class="form-control" placeholder="Cantidad máxima por receta/compra" min="1" max="10"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <input type="number" style="margin-top: 10px;" step="any" id="txtPrecio" name="txtPrecio" value="{{medicamento.precio_unidad|stringformat:".2f"}}"
+                            class="form-control" placeholder="Precio por unidad" min="1" max="200" required>
+                    </div>
+                    <div class="form-group" style="margin-top: 10px;">
+                        <select class="form-select" aria-label="Default select example" name="txtRestriccion">
+                            <option value="" selected disabled>Seleccione Restricción</option>
+                            {% for tipo in tipo_medicamento %}
+                            <option value="{{ tipo.id_tipo_medicamento }}" {% if tipo == medicamento.id_restriccion %} selected="selected" {% endif %}>{{ tipo.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-top: 10px;">
+                        <label>Seleccione origen:</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="radioOrigen" id="flexRadioDefault1" value="True" {% if medicamento.origen_natural %} checked {% endif %}>
+                            <label class="form-check-label" for="flexRadioDefault1">
+                                Natural
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="radioOrigen" id="flexRadioDefault2" value="False" {% if not medicamento.origen_natural %} checked {% endif %}>
+                            <label class="form-check-label" for="flexRadioDefault2">
+                                Fármaco
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" style="margin-top: 10px;" class="btn btn-success btn-block text-white">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

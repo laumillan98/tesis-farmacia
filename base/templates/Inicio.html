@@ -1,0 +1,36 @@
+{% extends "./base.html" %}
+
+{% block title %}Bienvenido{% endblock %}
+
+{% block body %}
+
+
+{% if request.user.is_authenticated %}
+   <h3>Hola</h3>
+   <hr>
+   <h4>
+       {{ user.first_name | upper }} {{ user.last_name | upper }}, bienvenid@     
+   </h4> 
+{% endif %}  
+
+
+<div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <img src="https://images.unsplash.com/photo-1624204921625-49bb8dce6730?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"
+                class="d-block w-100" alt="...">
+        </div>
+        <div class="carousel-item">
+            <img src="https://images.unsplash.com/photo-1573883431205-98b5f10aaedb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"
+                class="d-block w-100" alt="...">
+        </div>
+        <div class="carousel-item">
+            <img src="https://images.unsplash.com/photo-1544991875-5dc1b05f607d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"
+                class="d-block w-100" alt="...">
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
