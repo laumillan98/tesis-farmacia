@@ -2,7 +2,7 @@ from os import name
 from typing import Protocol
 from django.http.response import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import CustomUser, Medicamento, TipoMedicamento, Farmacia, FarmaUser, FarmaciaMedicamento, TipoFarmacia, TurnoFarmacia, Municipio
+from .models import CustomUser, Medicamento, TipoMedicamento, Farmacia, FarmaUser, FarmaciaMedicamento, TipoFarmacia, TurnoFarmacia, Municipio, Provincia
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.decorators import login_required
@@ -29,12 +29,20 @@ def inicio(request):
     return render(request, "Inicio.html")
 
 
+@login_required(login_url='/')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def administrator(request):
+    return render(request, "index.html")
+
+
 @unauthenticated_user
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def avisoLoginRequerido(request):
     return render(request, "aviso_login_requerido.html")
 
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def salir(request):
     logout(request)
     messages.success(request, f"Su sesión se ha cerrado correctamente")
@@ -237,6 +245,7 @@ def confirmarRestablecerPass(request, uidb64, token):
     return redirect("/")
 
 
+@login_required(login_url='/')
 def perfilUsuario(request, username):
     show_alert = False
     if request.method == "POST":
@@ -371,6 +380,7 @@ def listaDeFarmacias(request):
     farmacias_list = []
     for farma in farmacias:
         farma_data = {
+            'id_farma': farma.id_farma,
             'nombre': farma.nombre,
             'id_prov': farma.id_munic.id_prov.nombre,
             'id_munic': farma.id_munic.nombre,
@@ -388,37 +398,153 @@ def listaDeFarmacias(request):
 @usuarios_permitidos(roles_permitidos=['admin'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarFarmacia(request):
-    nombre = request.POST['txtNombre']
-    id_munic = request.POST['idMunicipio']
-    id_turno = request.POST['idTurno']
-    id_tipo = request.POST['idTipo']
-    direccion = request.POST['txtDireccion']
-    telefono = request.POST['txtTelefono']
+    if request.method =='POST':
+        print(request.POST)
+        nombre = request.POST['txtNombre']
+        id_munic = request.POST['idMunicipio']
+        id_turno = request.POST['idTurno']
+        id_tipo = request.POST['idTipo']
+        direccion = request.POST['txtDireccion']
+        telefono = request.POST['txtTelefono']
 
-    municipio = Municipio.objects.get(pk=id_munic)
-    turno = TurnoFarmacia.objects.get(pk=id_turno)
-    tipo = TipoFarmacia.objects.get(pk=id_tipo)
+        municipio = Municipio.objects.get(pk=id_munic)
+        turno = TurnoFarmacia.objects.get(pk=id_turno)
+        tipo = TipoFarmacia.objects.get(pk=id_tipo)
 
-    farmacia = Farmacia.objects.create(nombre=nombre, id_munic=municipio, 
-                                       id_turno=turno, id_tipo=tipo, direccion=direccion, telefono=telefono)
-    
-    messages.success(request, 'Farmacia registrada :)')
+        farmacia = Farmacia.objects.create(nombre=nombre, id_munic=municipio, 
+                                        id_turno=turno, id_tipo=tipo, direccion=direccion, telefono=telefono)
+        
+        messages.success(request, 'Farmacia registrada :)')
 
-    return redirect('/gestionar_farmacias/')
+        return redirect('/gestionar_farmacias/')
 
 
-def eliminarFarmacia(request, nombre):
-    farma = Farmacia.objects.get(nombre = nombre)   
+def eliminarFarmacia(request, uuid):
+    farma = Farmacia.objects.get(id_farma = uuid)   
     farma.is_active = False
     farma.save()
     return JsonResponse({'status':'success'})
 
 
-def activarFarmacia(request, nombre):
-    farma = Farmacia.objects.get(nombre = nombre)   
+def activarFarmacia(request, uuid):
+    farma = Farmacia.objects.get(id_farma = uuid)   
     farma.is_active = True
     farma.save()
     return JsonResponse({'status':'success'})
+
+
+# Completarrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
+def editarFarmacia(request, uuid):
+    return redirect('/')
+
+
+@login_required(login_url='/')
+@usuarios_permitidos(roles_permitidos=['admin'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def gestionarMunicipios(request):
+    return render(request, "gestionar_municipios.html")
+
+
+def listaDeMunicipios(request):
+    municipio = Municipio.objects.all()
+    municipio_list = []
+    for munic in municipio:
+        munic_data = {
+            'id_munic': munic.id_munic,
+            'nombre': munic.nombre,
+            'id_prov': munic.id_prov.nombre,
+        }
+        municipio_list.append(munic_data)
+    data = {'municipios': municipio_list}
+    return JsonResponse(data, safe=False)
+
+
+# Completarrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
+def registrarMunicipio(request):
+    return redirect('/')
+
+
+def eliminarMunicipio(request, uuid):
+    munic = Municipio.objects.get(id_munic = uuid)   
+    munic.is_active = False
+    munic.save()
+    return JsonResponse({'status':'success'})
+
+
+def activarMunicipio(request, uuid):
+    munic = Municipio.objects.get(id_munic = uuid)   
+    munic.is_active = True
+    munic.save()
+    return JsonResponse({'status':'success'})
+
+
+# Completarrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
+def editarMunicipio(request, uuid):
+    return redirect('/')
+
+
+@login_required(login_url='/')
+@usuarios_permitidos(roles_permitidos=['admin'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def gestionarProvincias(request):
+    return render(request, "gestionar_provincias.html")
+
+
+def listaDeProvincias(request):
+    provincias = Provincia.objects.all()
+    provincias_list = []
+    for prov in provincias:
+        prov_data = {
+            'id_prov': prov.id_prov,
+            'nombre': prov.nombre,
+            'is_active': prov.is_active,
+        }
+        provincias_list.append(prov_data)
+    data = {'provincias': provincias_list}
+    return JsonResponse(data, safe=False)
+
+
+@usuarios_permitidos(roles_permitidos=['admin'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def registrarProvincia(request):
+    if request.method =='POST':
+        print(request.POST)
+        nombre = request.POST['txtNombre']
+        id_munic = request.POST['idMunicipio']
+        id_turno = request.POST['idTurno']
+        id_tipo = request.POST['idTipo']
+        direccion = request.POST['txtDireccion']
+        telefono = request.POST['txtTelefono']
+
+        municipio = Municipio.objects.get(pk=id_munic)
+        turno = TurnoFarmacia.objects.get(pk=id_turno)
+        tipo = TipoFarmacia.objects.get(pk=id_tipo)
+
+        farmacia = Farmacia.objects.create(nombre=nombre, id_munic=municipio, 
+                                        id_turno=turno, id_tipo=tipo, direccion=direccion, telefono=telefono)
+        
+        messages.success(request, 'Farmacia registrada :)')
+
+        return redirect('/gestionar_farmacias/')
+
+
+def eliminarProvincia(request, uuid):
+    prov = Provincia.objects.get(id_prov = uuid)   
+    prov.is_active = False
+    prov.save()
+    return JsonResponse({'status':'success'})
+
+
+def activarProvincia(request, uuid):
+    prov = Provincia.objects.get(id_farma = uuid)   
+    prov.is_active = True
+    prov.save()
+    return JsonResponse({'status':'success'})
+
+
+# Completarrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
+def editarProvincia(request, uuid):
+    return redirect('/')
 
 
 @login_required(login_url='/aviso_login_requerido')

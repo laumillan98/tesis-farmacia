@@ -1,47 +1,78 @@
-{% extends "./base.html" %}
-
-{% block title %}Acceder{% endblock %}
-
-{% block body %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
 {% load crispy_forms_tags %}
 
-<section class="vh-80" style="background-color: #ffffff;">
-    <div class="container py-3 h-80">
-        <div class="row d-flex justify-content-center align-items-center h-100">
-            <div class="col col-xl-9">
-                <div class="card" style="border-radius: 1rem;">
-                    <div class="row g-0">
-                        <div class="col-md-6 col-lg-5 d-none d-md-block">
-                            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/img1.webp" alt="login form" class="img-fluid" style="border-radius: 1rem 0 0 1rem;">
-                        </div>
-                        <div class="col-md-6 col-lg-7 d-flex align-items-center">
-                            <div class="card-body p-4 p-lg-5 text-black">
+    <title>Acceder</title>
+  
+    <!-- CSS only -->
+    <!-- Boostrap 5  --> 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
 
-                                <form method="POST">{% csrf_token %}
+    <!-- DataTables.js  -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css"/>
 
-                                    <div class="d-flex align-items-center mb-3 pb-1">
-                                        <span class="h3 fw-bold mb-0">Iniciar Sesión</span>
-                                    </div>
-                                    <div class="content-section">
+    <!-- Font Awesome --> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="https://unpkg.com/@trevoreyre/autocomplete-js/dist/style.css"/>
+</head>
+<body>
+    
+    <section class="vh-100 d-flex align-items-center justify-content-center" style="background-color: #d3e2e979;">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-7">
+                    <div class="card" style="border-radius: 1rem; box-shadow: 0 0 8px rgba(0, 0, 0, 0.122);">
+                        <div class="row g-0">
+                            <div class="col-md-6 col-lg-5 d-none d-md-block">
+                                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/img1.webp" alt="login form" class="img-fluid" style="border-radius: 1rem 0 0 1rem;">
+                            </div>
+                            <div class="col-md-6 col-lg-7 d-flex align-items-center">
+                                <div class="card-body p-4 p-lg-5 text-black">
+                                    <form method="POST">
                                         {% csrf_token %}
-                                        {{ form|crispy }}
-                                        <div class="form-group">
-                                            <button type="submit" class="btn btn-dark btn-md btn-block" style="margin-bottom: 10px; margin-top: 10px;">Acceder</button>
-                                            <hr>
-                                            <a href="/solicitar_restablecer_pass">¿Olvidó su contraseña?</a><br>
-                                            <a href="/registrar">Crear cuenta</a>
+                                        <div class="d-flex align-items-center mb-3 pb-1">
+                                            <span class="h3 fw-bold mb-0">Iniciar Sesión</span>
                                         </div>
-                                    </div>
-                                </form>
+                                        <div class="content-section">
+                                            {% csrf_token %}
+                                            {{ form|crispy }}
+                                            <div class="form-group">
+                                                <button type="submit" class="btn btn-dark btn-md btn-block" style="margin-bottom: 10px; margin-top: 10px;">Acceder</button>
+                                                <hr>
+                                                <a href="/solicitar_restablecer_pass">¿Olvidó su contraseña?</a><br>
+                                                <a href="/registrar">Crear cuenta</a>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
-    
-{% endblock %}
+    </section>
+
+    <!-- CSS only -->
+    <!-- Boostrap 5  --> 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+
+    <!-- DataTables.js  -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css"/>
+
+    <!-- Font Awesome --> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="https://unpkg.com/@trevoreyre/autocomplete-js/dist/style.css"/>
+</body>
+</html>
 

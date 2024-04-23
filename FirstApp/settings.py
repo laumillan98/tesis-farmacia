@@ -139,6 +139,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 RECAPTCHA_PUBLIC_KEY = '6LctYx4mAAAAACutRGWR1n_aghykJPZsVGudVMqU'
 RECAPTCHA_PRIVATE_KEY = '6LctYx4mAAAAAGd_V2kKnlmezWGetZJqGchugiZO'

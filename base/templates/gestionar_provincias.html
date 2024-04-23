@@ -1,0 +1,47 @@
+{% extends "./base.html" %}
+
+{% block title %}Gestionar Provincias{% endblock %}
+
+{% block body %}
+<head>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/data_tables.css' %}">
+</head>
+
+
+    <div class="row">
+        <div class="col-sm-12 col-md-8 col-lg-12 col-xl-12">
+            <div class="table-responsive">
+                <div>
+                    <a href="/registrar_provincia" class="btn btn-sm btn-secondary">Registrar Provincia</a>
+                </div>
+                <br>
+                <table id="datatable-provincias" class="table">
+                    <caption>
+                        Gestionar Provincias 
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th class="centered">#</th>
+                            <th class="centered">Nombre</th>
+                            <th class="centered">Apellidos</th>
+                            <th class="centered">Nombre de usuario</th>
+                            <th class="centered">Dirección de correo</th>
+                            <th class="centered">Roles</th>
+                            <th class="centered">Activo</th>
+                            <th class="centered">Opciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody_provincias"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+
+<!--Custom JS-->
+<script src="{% static 'js/lista_de_provincias.js' %}"></script>
+
+
+{% endblock %}
+

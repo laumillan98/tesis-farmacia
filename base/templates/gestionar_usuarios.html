@@ -1,25 +1,21 @@
-{% extends "./base.html" %}
+{% extends "./index.html" %}
+
+{% load static %}
+
+{% block mycss %}{% endblock %}
 
 {% block title %}Gestionar Usuarios{% endblock %}
 
-{% block body %}
-<head>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/data_tables.css' %}">
-</head>
-
-
-    <div class="row">
-        <div class="col-sm-12 col-md-8 col-lg-12 col-xl-12">
+{% block content %}
+    
+    <div class="col-12">
+        <div class="card">
             <div class="table-responsive">
                 <div>
                     <a href="/registrar_farmaceutico" class="btn btn-sm btn-secondary">Registrar farmacéutico</a>
                 </div>
                 <br>
                 <table id="datatable-usuarios" class="table">
-                    <caption>
-                        Gestionar Usuarios 
-                    </caption>
                     <thead>
                         <tr>
                             <th class="centered">#</th>
@@ -35,13 +31,14 @@
                     <tbody id="tableBody_usuarios"></tbody>
                 </table>
             </div>
-        </div>
+        </div> 
     </div>
     
+{% endblock %}   
 
-<!--Custom JS-->
+{% block subtitle %}Usuarios{% endblock %}
+
+{% block custom_scripts %}
 <script src="{% static 'js/lista_de_usuarios.js' %}"></script>
-
-
 {% endblock %}
 

@@ -55,11 +55,11 @@ class FarmaUserCreationForm(UserCreationForm):
     email = forms.EmailField(help_text='Escriba una dirección de correo válida por favor', required=True)
     first_name = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
     last_name = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Apellido no válido')], label="Apellidos", required=True)
-    #farma_name = forms.ModelChoiceField(queryset=Farmacia.objects.exclude(farmauser__isnull=False), label="Farmacia Asociada") 
+    farma_name = forms.ModelChoiceField(queryset=Farmacia.objects.exclude(farmauser__isnull=False), label="Farmacia Asociada") 
 
     class Meta:
         model = FarmaUser
-        fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2']
+        fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2','farma_name']
 
     def save(self, commit=True):
         user = super(FarmaUserCreationForm, self).save(commit=False)

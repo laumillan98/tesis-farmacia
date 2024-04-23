@@ -1,49 +1,49 @@
-{% extends "./base.html" %}
+{% extends "./index.html" %}
+
+{% load static %}
+
+{% block mycss %}{% endblock %}
 
 {% block title %}Gestionar Farmacias{% endblock %}
 
-{% block body %}
-<head>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/data_tables.css' %}">
-</head>
+{% block content %}
 
-
-    <div class="row">
-        <div class="col-sm-12 col-md-8 col-lg-12 col-xl-12">
-            <div class="table-responsive">
-                <div>
-                    <a href="/registrar_farmacia" class="btn btn-sm btn-secondary">Registrar nueva farmacia</a>
-                </div>
-                <br>
-                <table id="datatable-farmacias" class="table">
-                    <caption>
-                        Gestionar Farmacias 
-                    </caption>
-                    <thead>
-                        <tr>
-                            <th class="centered">#</th>
-                            <th class="centered">Nombre</th>
-                            <th class="centered">Provincia</th>
-                            <th class="centered">Municipio</th>
-                            <th class="centered">Dirección</th>
-                            <th class="centered">Teléfono</th>
-                            <th class="centered">Tipo</th>
-                            <th class="centered">Turno</th>
-                            <th class="centered">Activa</th>
-                            <th class="centered">Opciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody_farmacias"></tbody>
-                </table>
+    <div class="col-12">
+        <div class="table-responsive">
+            <div>
+                <a href="/registrar_farmacia" class="btn btn-sm btn-secondary">Registrar nueva farmacia</a>
             </div>
+            <br>
+            <table id="datatable-farmacias" class="table">
+                <caption>
+                    Gestionar Farmacias 
+                </caption>
+                <thead>
+                    <tr>
+                        <th class="centered">#</th>
+                        <th class="centered">Nombre</th>
+                        <th class="centered">Provincia</th>
+                        <th class="centered">Municipio</th>
+                        <th class="centered">Dirección</th>
+                        <th class="centered">Teléfono</th>
+                        <th class="centered">Tipo</th>
+                        <th class="centered">Turno</th>
+                        <th class="centered">Activa</th>
+                        <th class="centered">Opciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody_farmacias"></tbody>
+            </table>
         </div>
     </div>
-    
 
-<!--Custom JS-->
+{% endblock %}      
+
+{% block subtitle %}Farmacias{% endblock %}
+
+{% block custom_scripts %}
 <script src="{% static 'js/lista_de_farmacias.js' %}"></script>
-
-
 {% endblock %}
+
+
 

@@ -1,26 +1,26 @@
-{% extends "./base.html" %}
+{% extends "./index.html" %}
 
-{% block title %}Perfil de usuario{% endblock %}
-
-{% block body %}
+{% block title %}Mi Perfil{% endblock %}
 
 {% load crispy_forms_tags %}
 
 {% load static %}
+
+{% block content %}
 
 <form action="" method="POST">{% csrf_token %}
     <div class="card mx-auto" style="width: 30rem;">
         <div class="card-body">
             {% if user.username == form.instance.username %}
                 <fieldset class="form-group">
-                    <h3 class="border-bottom mb-4" style="text-align: center">Editar Mi Perfil</h3>
+                    <h3 class="border-bottom mb-4" style="text-align: center">Editar Perfil</h3>
                     {{ form.first_name|as_crispy_field }}
                     {{ form.last_name|as_crispy_field }}
                     {{ form.email|as_crispy_field }}
                     {{ form.description|as_crispy_field }}
                 </fieldset>
                 <div class="form-group"></div>
-                    <button class="btn btn-md btn-dark btn-block" type="submit" style="margin-left: 180px;">Aceptar</button>
+                    <button class="btn btn-md btn-dark btn-block" type="submit">Aceptar</button>
                 </div>
             {% endif %}
         </div>
@@ -33,3 +33,5 @@
 
 {% endblock %}
 
+
+{% block subtitle %}Perfil de usuario{% endblock %}
