@@ -16,6 +16,7 @@ from django.core.mail import EmailMessage
 from django.db.models.query_utils import Q
 from django.core.validators import RegexValidator
 from django.views.generic.edit import UpdateView
+from django.views.decorators.http import require_POST
 
 from .forms import CustomUserCreationForm, FarmaUserCreationForm, UserLoginForm, SetPasswordForm, PasswordResetForm, UserUpdateForm
 from .decorators import usuarios_permitidos, unauthenticated_user
@@ -281,10 +282,11 @@ def gestionarUsuarios(request):
 def listaDeUsuarios(request):
     users = CustomUser.objects.all()
     users_list = []
-    for user in users:
+    for index,user in enumerate(users):
         groups = user.groups.values_list('name', flat=True)  
         first_group = groups.first() if groups else None 
         user_data = {
+            'index': index + 1,
             'first_name': user.first_name,
             'last_name': user.last_name,
             'username': user.username,
@@ -292,9 +294,10 @@ def listaDeUsuarios(request):
             'first_group': first_group,
             'is_active': user.is_active,
             'is_superuser': user.is_superuser,
+            'id': user.pk,
         }
         users_list.append(user_data)
-    data = {'usuarios': users_list}
+    data = {'data': users_list}
     return JsonResponse(data, safe=False)
 
 
@@ -340,33 +343,25 @@ def activarUsuario(request, username):
     user.save()
     return JsonResponse({'status':'success'})
 
+def obtenerUserPorUsername(request, username):
+    user = CustomUser.objects.get(username = username)   
+    return JsonResponse({
+        'username': user.username,
+        'name': user.first_name,
+        'lastname': user.last_name
+        })
 
 @login_required(login_url='/aviso_login_requerido')
-class editarUsuario(UpdateView):
-    model = CustomUser
-    form_class = CustomUserCreationForm
-    template_name = 'editar_usuario.html'
-    
-    def post(self,request,*args,**kwargs):
-        if request.is_ajax():
-            form = self.form_class(request.POST, instance = self.get_object())
-            if form.is_valid():
-                form.save()
-                mensaje = f'{self.model.__name__} actualizado correctamente'
-                error = 'No hay error'
-                response = JsonResponse({'mensaje': mensaje, 'error': error})
-                response.status_code = 201
-                return response
-            else:
-                mensaje = f'{self.model.__name__} no se ha podido actualizar correctamente'
-                error = form.errors
-                response = JsonResponse({'mensaje': mensaje, 'error': error})
-                response.status_code = 400
-                return response
-        else:
-            return redirect('/')
+@require_POST
+def editarUsuario(request):
+    user = CustomUser.objects.get(username=request.POST.get('username'))
+    form = UserUpdateForm(request.POST, instance=user)
+    if form.is_valid():
+        form.save()
+        return JsonResponse({'success': True})
+    else:
+        return JsonResponse({'success': False, 'errors': form.errors})
         
-
 
 @login_required(login_url='/')
 @usuarios_permitidos(roles_permitidos=['admin'])
@@ -378,8 +373,9 @@ def gestionarFarmacias(request):
 def listaDeFarmacias(request):
     farmacias = Farmacia.objects.all()
     farmacias_list = []
-    for farma in farmacias:
+    for index,farma in enumerate(farmacias):
         farma_data = {
+            'index': index + 1,
             'id_farma': farma.id_farma,
             'nombre': farma.nombre,
             'id_prov': farma.id_munic.id_prov.nombre,
@@ -391,7 +387,7 @@ def listaDeFarmacias(request):
             'is_active': farma.is_active,
         }
         farmacias_list.append(farma_data)
-    data = {'farmacias': farmacias_list}
+    data = {'data': farmacias_list}
     return JsonResponse(data, safe=False)
 
 

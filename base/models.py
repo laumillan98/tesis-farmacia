@@ -79,7 +79,7 @@ class Farmacia(models.Model):
     id_turno = models.ForeignKey(TurnoFarmacia, on_delete=models.RESTRICT, null=True)
     id_tipo = models.ForeignKey(TipoFarmacia, on_delete=models.RESTRICT)
     id_munic = models.ForeignKey(Municipio, on_delete=models.RESTRICT)
-    is_active = is_active = models.BooleanField(
+    is_active = models.BooleanField(
         ("active"),
         default=True,
         help_text=(
