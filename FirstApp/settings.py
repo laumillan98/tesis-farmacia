@@ -155,12 +155,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 DEFAULT_CHARSET = 'utf-8'
 
+
 # Emailing settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_FROM = 'testtesisfarma@gmail.com'
 EMAIL_HOST_USER = 'testtesisfarma@gmail.com'
-EMAIL_HOST_PASSWORD = 'ubmdbcclxixbycrh'
+EMAIL_HOST_PASSWORD = 'uzgbxnwjcyielmxo'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+EMAIL_TIMEOUT = 30
 PASSWORD_RESET_TIMEOUT = 14400

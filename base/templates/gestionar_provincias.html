@@ -1,47 +1,79 @@
-{% extends "./base.html" %}
+{% extends "./index.html" %}
+
+{% load static %}
+
+{% block mycss %}{% endblock %}
 
 {% block title %}Gestionar Provincias{% endblock %}
 
-{% block body %}
-<head>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/data_tables.css' %}">
-</head>
+{% block content %}
 
-
-    <div class="row">
-        <div class="col-sm-12 col-md-8 col-lg-12 col-xl-12">
-            <div class="table-responsive">
-                <div>
-                    <a href="/registrar_provincia" class="btn btn-sm btn-secondary">Registrar Provincia</a>
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <a href="/registrar_provincia" class="btn btn-md btn-secondary">Registrar provincia</a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <br>
+                    <table id="miTabla" class="table table-bordered table-striped" data-url="{% url 'lista_de_provincias' %}">
+                        <thead>
+                            <tr>
+                                <th class="centered">#</th>
+                                <th class="centered">id</th>
+                                <th class="centered">Provincia</th>
+                                <th class="centered">Opciones</th>
+                            </tr>
+                        </thead>
+                    </table>
                 </div>
-                <br>
-                <table id="datatable-provincias" class="table">
-                    <caption>
-                        Gestionar Provincias 
-                    </caption>
-                    <thead>
-                        <tr>
-                            <th class="centered">#</th>
-                            <th class="centered">Nombre</th>
-                            <th class="centered">Apellidos</th>
-                            <th class="centered">Nombre de usuario</th>
-                            <th class="centered">Dirección de correo</th>
-                            <th class="centered">Roles</th>
-                            <th class="centered">Activo</th>
-                            <th class="centered">Opciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody_provincias"></tbody>
-                </table>
             </div>
         </div>
     </div>
+
+
+    <!-- /.modal -->
+    <div class="modal fade" id="modal-lg">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h4 class="modal-title">Editar</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <div class="modal-body">
+                    <form id="edicionProvinciaForm">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="name">Provincia</label>
+                                <input type="text" class="form-control" id="provincia" name="nombre" placeholder="Provincia">
+                                <input type="text" class="form-control" id="id" hidden name="id">
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Aceptar</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
     
 
-<!--Custom JS-->
+{% endblock %}   
+
+{% block subtitle %}Provincias{% endblock %}
+
+{% block custom_scripts %}
 <script src="{% static 'js/lista_de_provincias.js' %}"></script>
-
-
 {% endblock %}
 

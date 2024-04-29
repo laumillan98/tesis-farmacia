@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, SetPasswordForm, PasswordResetForm, UserChangeForm
-from .models import CustomUser, FarmaUser, Farmacia
+from .models import CustomUser, FarmaUser, Farmacia, Municipio, Provincia
 from django.contrib.auth import get_user_model
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
@@ -134,3 +134,21 @@ class UserUpdateForm(UserChangeForm):
     class Meta:
         model = CustomUser
         fields = ('first_name', 'last_name')
+
+
+class FarmaUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Farmacia
+        fields = ('nombre', 'direccion', 'telefono', 'id_turno', 'id_tipo', 'id_munic')
+
+
+class MunicUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Municipio
+        fields = ('nombre', 'id_prov')
+
+
+class ProvUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Provincia
+        fields = ('nombre',)

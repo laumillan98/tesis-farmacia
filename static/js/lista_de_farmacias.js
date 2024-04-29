@@ -6,12 +6,12 @@ $(document).ready(function() {
         "columns": [
             { "data": "index" },
             { "data": "nombre" },
-            { "data": "id_prov" },
-            { "data": "id_munic" },
+            { "data": "prov" },
+            { "data": "munic" },
             { "data": "direccion" },
             { "data": "telefono" },
-            { "data": "id_tipo" },
-            { "data": "id_turno" },
+            { "data": "tipo" },
+            { "data": "turno" },
             { "data": "is_active" },
             {
                 "data": null,
@@ -21,13 +21,13 @@ $(document).ready(function() {
                     // Verifica si estás en la columna de acciones
                     if (meta.col === 9) { 
                         let editButton = `
-                        <button id='editar' class='btn btn-sm btn-secondary' data-action='editar' data-id='${row.id_farma}'>
+                        <button id='editar' class='btn btn-sm btn-secondary' data-action='editar' data-id='${row.id}'>
                             <i class="fas fa-pencil-alt"></i>
                         </button>&nbsp`
-                        let deleteButton = `<button id='softdelete' class='btn btn-sm btn-danger' data-id='${row.id_farma}'>
+                        let deleteButton = `<button id='softdelete' class='btn btn-sm btn-danger' data-id='${row.id}'>
                         <i class="fa-solid fa-trash-can"></i>
                         </button>`
-                        let restoreButton = `<button id='activar' class='btn btn-sm btn-secondary' data-id='${row.id_farma}' data-action='activar'>
+                        let restoreButton = `<button id='activar' class='btn btn-sm btn-secondary' data-id='${row.id}' data-action='activar'>
                         <i class="fas fa-trash-restore-alt"></i>
                         </button>`
                         if(row.is_active) {
@@ -160,9 +160,13 @@ $(document).ready(function() {
             type: 'GET',
             data: {},
             success: function(response) {
-                $('#nombre').val(response.name);
-                $('#apellidos').val(response.lastname);
-                $('#username').val(response.username);
+                $('#nombre').val(response.nombre);
+                $('#direccion').val(response.direccion);
+                $('#telefono').val(response.telefono);
+                $('#turno').val(response.turno);
+                $('#tipo').val(response.tipo);
+                $('#municipio').val(response.munic);
+                $('#id').val(response.id);
             }
         });
     }
