@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect  
 
 
-def unauthenticated_user(function=None, redirect_url='/'):
+def unauthenticated_user(function=None, redirect_url='/acceder'):
     def decorator(view_func):
         def _wrapped_view(request, *args, **kwargs):
             if request.user.is_authenticated:

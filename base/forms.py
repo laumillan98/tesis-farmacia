@@ -108,7 +108,7 @@ class UserLoginForm(AuthenticationForm):
 
     username = forms.CharField(widget=forms.TextInput(
         attrs={'class': 'form-control'}),
-        label="Nombre de usuario")
+        label="Nombre de usuario o Correo")
 
     password = forms.CharField(widget=forms.PasswordInput(
         attrs={'class': 'form-control'}),

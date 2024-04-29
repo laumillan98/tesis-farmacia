@@ -21,7 +21,6 @@ from django.views.decorators.http import require_POST
 from .forms import CustomUserCreationForm, FarmaUserCreationForm, UserLoginForm, SetPasswordForm, PasswordResetForm, UserUpdateForm
 from .decorators import usuarios_permitidos, unauthenticated_user
 from .tokens import account_activation_token
-from .backend import EmailBackend
 
 # Create your views here.
 
@@ -334,7 +333,7 @@ def eliminarUsuario(request, username):
         farma_user = FarmaUser.objects.get(username = username)
         farma_user.farma = None
         farma_user.save()
-        
+
     return JsonResponse({'status':'success'})
 
 
