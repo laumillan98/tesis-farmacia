@@ -1,101 +1,60 @@
+$(document).ready(function() {
 
-  // editarrrrrrrrrrrrrrr
-
-  function abrir_modal_edicion(){
-    $('#edicion').load('gestionar_usuarios/editarUsuario/laumillan98/', function(){
-        $(this).modal('show');
-    })
-
-}
-
-function cerrar_modal_edicion() {
-    $('#edicion').modal('hide');
-}
-
-function activarBoton(){
-    if($('#boton_edicion').prop('disabled')){
-        $('#boton_edicion').prop('disabled', false);
-    }else{
-        $('#boton_edicion').prop('disabled', true);
-    }
-}
-
-
-let dataTable;
-let dataTableIsInitialized = false;
-
-
-const dataTableOptions = {
-    columnDefs:[
-        { className: 'centered', targets:[0, 1, 2, 3, 4, 5, 6, 7] },
-        { orderable: false, targets: [6, 7] },
-        { searchable: false, targets: [0, 6, 7] }
-    ],
-    paging: true,
-    pageLength: 7,
-    //destroy: true
-
-};
-
-
-const initDataTable = async () => {
-    if(dataTableIsInitialized){
-        dataTable.destroy();
-    }
-
-    await listaDeUsuarios();
-
-    dataTable = $("#datatable-usuarios").DataTable(dataTableOptions);
-
-    dataTableIsInitialized = true;
-};
-
-
-const listaDeUsuarios = async () => {
-    try{  
-        const response = await fetch('http://127.0.0.1:8000/lista_de_usuarios/');
-        const data = await response.json();
-
-        console.log(response)
-
-        let content = ``;
-        data.usuarios.forEach((usuario, index) => {
-
-            let buttonContent2 = usuario.is_active 
-            ? "<button id='editar' class='btn btn-sm btn-secondary' data-action='editar'><i class='fas fa-pencil-alt'></i></button>&nbsp<button id='softdelete' class='btn btn-sm btn-danger' data-id='"+ usuario.username +"'><i class='fa-solid fa-trash-can'></i></button>"
-            : "<button id='activar' class='btn btn-sm btn-secondary' data-id='"+ usuario.username +"' data-action='activar'><i class='fas fa-trash-restore-alt'></i></button>";
-
-            let buttonContent1 = usuario.is_superuser 
-            ? "<button id='editar' class='btn btn-sm btn-secondary' data-action='editar'><i class='fas fa-pencil-alt'></i></button>"
-            : ""+ buttonContent2 +"";
-
-            content += `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>${usuario.first_name}</td>
-                    <td>${usuario.last_name}</td>
-                    <td>${usuario.username}</td>
-                    <td>${usuario.email}</td>
-                    <td>${usuario.first_group}</td>
-                    <td>${usuario.is_active == true 
-                        ? "<i class='fa-solid fa-check' style='color: green'></i>" 
-                        : "<i class='fa-solid fa-xmark' style='color: red'></i>"}</td>
-                    <td>${buttonContent1}</td>      
-                </tr>
-            `;    
-        }); 
-        tableBody_usuarios.innerHTML = content;
-    } catch (ex) {
-        alert(ex);
-    }
-};
-
-window.addEventListener("load", async () => {
-    await initDataTable();
-
+    var ajaxUrl = $('#miTabla').data('url');
+    var table = $('#miTabla').DataTable({
+        "ajax": ajaxUrl,
+        "columns": [
+            { "data": "index" },
+            { "data": "first_name" },
+            { "data": "last_name" },
+            { "data": "username" },
+            { "data": "email" },
+            { "data": "first_group" },
+            { "data": "is_active" },
+            {
+                "data": null,
+                "orderable": false,
+                "searchable": false,
+                "render": function(data, type, row, meta) {
+                    // Verifica si estás en la columna de acciones
+                    if (meta.col === 7) { 
+                        let editButton = `
+                        <button id='editar' class='btn btn-sm btn-secondary' data-id='${row.username}' data-toggle='modal' data-target='#modal-lg'>
+                            <i class="fas fa-pencil-alt"></i>
+                        </button>&nbsp`
+                        let deleteButton = `<button id='softdelete' class='btn btn-sm btn-danger' data-id='${row.username}'>
+                        <i class="fa-solid fa-trash-can"></i>
+                        </button>`
+                        let restoreButton = `<button id='activar' class='btn btn-sm btn-secondary' data-id='${row.username}'>
+                        <i class="fas fa-trash-restore-alt"></i>
+                        </button>`
+                        if(row.is_superuser) {
+                            return editButton;
+                        } else if(row.is_active) {
+                            return editButton + deleteButton;
+                        } else {
+                            return restoreButton;
+                        }
+                    }
+                    // Puedes retornar diferentes contenidos dependiendo de la columna
+                    return data; // Retorna los datos originales para otras columnas
+                }
+            }
+        ],
+        "columnDefs": [
+            {
+                "targets": 6, // Columna de estado activo
+                "orderable": false,
+                "searchable": false,
+                "render": function(data, type, row) {
+                    return data ? '<i class="fas fa-check" style="color: green"></i>' : '<i class="fas fa-xmark" style="color: red"></i>';
+                }
+            },
+        ]
+    });
 
     // Evento de clic en el botón "Eliminar"
-    $('#datatable-usuarios').on('click', '#softdelete', function() {
+    $('#miTabla').on('click', '#softdelete', function() {
         var nombreUsuario = $(this).data('id'); 
         
         //Ejecuta el plugin (Sweet Alert) para confirmar la eliminación del usuario 
@@ -124,7 +83,7 @@ window.addEventListener("load", async () => {
             success: function(response) {
                 if (response.status == 'success') {
                     //Actualiza el estado del usuario eliminado
-                    listaDeUsuarios();
+                    table.ajax.reload(null, false);
                     Swal.fire({
                         title: id + " ha sido eliminado satisfactoriamente!",
                         icon: "success",
@@ -141,7 +100,7 @@ window.addEventListener("load", async () => {
 
 
     // Evento de clic en el botón "Activar"
-    $('#datatable-usuarios').on('click', '#activar', function() {
+    $('#miTabla').on('click', '#activar', function() {
         var nombreUsuario = $(this).data('id');
 
         //Ejecuta el plugin (Sweet Alert) para confirmar la activación del usuario 
@@ -167,6 +126,7 @@ window.addEventListener("load", async () => {
         
     });
 
+    
     // Función AJAX para "Activar un usuario"
     function activarUsuario(id, row) {
         $.ajax({
@@ -179,7 +139,7 @@ window.addEventListener("load", async () => {
             success: function(response) {
                 if (response.status == 'success') {
                     // Actualiza el estado del usuario activado
-                    listaDeUsuarios();
+                    table.ajax.reload(null, false);
                 } else {
                     // Maneja el error
                     alert('No se pudo activar el usuario.');
@@ -189,15 +149,48 @@ window.addEventListener("load", async () => {
     }
 
 
-    // Evento de clic en el botón "Editar"
-    $('#datatable-usuarios').on('click', '#editar', function() {
-        var nombreUsuario = $(this).data('id'); 
-        editarUsuario(nombreUsuario, $(this).closest('tr'));
-    });
+     // Evento de clic en el botón "Editar"
+     $('#miTabla').on('click', '#editar', function() {
+        let nombreUsuario = $(this).data('id');
+        cargarInformacionUsuario(nombreUsuario);
+     });
 
-
-    // Función AJAX para "Editar un usuario"
-    function editarUsuario(id, row) {
-        abrir_modal_edicion();
+     function cargarInformacionUsuario(id) {
+        $.ajax({
+            url: 'obtenerUsuario/' + id + '/',
+            type: 'GET',
+            data: {},
+            success: function(response) {
+                $('#nombre').val(response.name);
+                $('#apellidos').val(response.lastname);
+                $('#username').val(response.username);
+            }
+        });
     }
+
+    $('#edicionUsuarioForm').on('submit', function(e) {
+        alert('Usuario editado satisfactoriamente');
+        e.preventDefault();
+        var formData = $(this).serialize();
+      
+        // Enviar los datos al servidor usando AJAX
+        $.ajax({
+          url: 'editarUsuario/',
+          type: 'POST',
+          data: formData,
+          headers: {'X-CSRFToken': $('input[name=csrfmiddlewaretoken]').val()}, // Incluir el token CSRF
+          success: function(response) {
+            // Mostrar alerta de éxito
+            alert('Usuario editado satisfactoriamente');
+      
+            // Refrescar DataTables
+            $('#miTabla').DataTable().ajax.reload();
+          },
+          error: function(error) {
+            alert('Ocurrió un error al editar el usuario');
+          }
+        });
+      });
 });
+
+

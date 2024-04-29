@@ -40,6 +40,46 @@
         </div>
     </div>
 
+    <!-- /.modal -->
+    <div class="modal fade" id="modal-lg">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h4 class="modal-title">Editar</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <div class="modal-body">
+                    <form id="edicionFarmaciaForm">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="name">Nombre</label>
+                                <input type="text" class="form-control" id="nombre" name="first_name" placeholder="Nombre">
+                            </div>
+                            <div class="form-group">
+                                <label for="name">Apellidos</label>
+                                <input type="text" class="form-control" id="apellidos" name="last_name" placeholder="Apellidos">
+                                <input type="text" class="form-control" id="username" hidden name="username">
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+
 {% endblock %}      
 
 {% block subtitle %}Farmacias{% endblock %}

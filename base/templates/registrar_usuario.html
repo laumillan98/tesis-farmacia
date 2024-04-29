@@ -1,55 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+{% extends "./base.html" %}
 
-    {% load crispy_forms_tags %}
+{% block title %}Crear Cuenta{% endblock %}
 
-    <title>Registro de usuario</title>
+{% block body %}
 
-    <!-- CSS only -->
-    <!-- Boostrap 5  --> 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-    <!-- Custom CSS --> 
-    <link rel="stylesheet" href="https://unpkg.com/@trevoreyre/autocomplete-js/dist/style.css"/>
-</head>
+{% load crispy_forms_tags %}
 
-<body>
+<form action="" method="POST">{% csrf_token %}
+    <div class="card mx-auto" style="width: 30rem;">
+        <div class="card-body">
+           <h3 class="card-title">Crear Cuenta</h3>
+           {{ form | crispy }}   
+           <button type="submit" class="btn btn-dark btn-md btn-block" type="button" style="margin-left: 155px;">Registrar</button> 
+           <hr>
+           <a href="/" class="card-link">Inicio</a>
+           <a href="/acceder" class="card-link">Iniciar sesión</a>
+        </div> 
+    </div>
+</form>
 
-    <section class="vh-200 d-flex align-items-center justify-content-center" style="background-color: #d3e2e979;">
-        <div class="container">
-            <form action="" method="POST">{% csrf_token %}
-                <div class="card mx-auto" style="width: 30rem; border-radius: 1rem; box-shadow: 0 0 8px rgba(0, 0, 0, 0.122); margin-top: 30px; margin-bottom: 30px;">
-                    <div class="card-body">
-                       <h3 class="card-title" style="text-align: center;">Crea tu cuenta</h3>
-                       {{ form | crispy }}   
-                       <button type="submit" class="btn btn-dark btn-md btn-block" type="button" style="margin-left: 175px;">Registrar</button> 
-                       <hr>
-                       <a href="/" class="card-link">Inicio</a>
-                       <a href="/acceder" class="card-link">Iniciar sesión</a>
-                    </div> 
-                </div>
-            </form>
-        </div>
-    </section>
-    
-
-    <!-- Boostrap 5  --> 
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous">
-        </script>
-        
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
-        integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"
-        integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V"
-        crossorigin="anonymous"></script>
-</body>
-
-</html>
+{% endblock %} 

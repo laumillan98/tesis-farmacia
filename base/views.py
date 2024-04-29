@@ -126,7 +126,7 @@ def registrar(request):
         form = CustomUserCreationForm(data=request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.is_active = True
+            user.is_active = False
             user.save()
             group = Group.objects.get(name='clientes')
             user.groups.add(group)
@@ -344,12 +344,13 @@ def activarUsuario(request, username):
     return JsonResponse({'status':'success'})
 
 
-def obtenerUserPorUsername(request, username):
+# Funcion para obtener los datos del usuario que se va a editar
+def obtenerUsuario(request, username):
     user = CustomUser.objects.get(username = username)   
     return JsonResponse({
         'username': user.username,
         'name': user.first_name,
-        'lastname': user.last_name
+        'lastname': user.last_name,
         })
 
 
@@ -393,6 +394,7 @@ def listaDeFarmacias(request):
     return JsonResponse(data, safe=False)
 
 
+# no funciona
 @login_required(login_url='/acceder')
 @usuarios_permitidos(roles_permitidos=['admin'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -418,6 +420,7 @@ def registrarFarmacia(request):
         return redirect('/gestionar_farmacias/')
 
 
+# no funciona aun
 def eliminarFarmacia(request, uuid):
     farma = Farmacia.objects.get(id_farma = uuid)   
     farma.is_active = False
@@ -433,8 +436,31 @@ def activarFarmacia(request, uuid):
 
 
 # Completarrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
-def editarFarmacia(request, uuid):
-    return redirect('/')
+# Funcion para obtener los datos del usuario que se va a editar
+def obtenerFarmacia(request, uuid):
+    farma = Farmacia.objects.get(uuid = uuid)   
+    return JsonResponse({
+        'id_farma': farma.id_farma,
+        'nombre': farma.nombre,
+        'direccion': farma.direccion,
+        'telefono': farma.telefono,
+        'turno': farma.id_turno.nombre,
+        'tipo': farma.id_tipo.nombre,
+        'munic': farma.id_munic.nombre,
+        })
+
+
+# arreglarrrrrrrrrrrrrr
+@login_required(login_url='/acceder')
+@require_POST
+def editarFarmacia(request):
+    user = CustomUser.objects.get(username=request.POST.get('username'))
+    form = UserUpdateForm(request.POST, instance=user)
+    if form.is_valid():
+        form.save()
+        return JsonResponse({'success': True})
+    else:
+        return JsonResponse({'success': False, 'errors': form.errors})
 
 
 @login_required(login_url='/acceder')
@@ -463,20 +489,6 @@ def registrarMunicipio(request):
     return redirect('/')
 
 
-def eliminarMunicipio(request, uuid):
-    munic = Municipio.objects.get(id_munic = uuid)   
-    munic.is_active = False
-    munic.save()
-    return JsonResponse({'status':'success'})
-
-
-def activarMunicipio(request, uuid):
-    munic = Municipio.objects.get(id_munic = uuid)   
-    munic.is_active = True
-    munic.save()
-    return JsonResponse({'status':'success'})
-
-
 # Completarrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
 def editarMunicipio(request, uuid):
     return redirect('/')
@@ -496,13 +508,13 @@ def listaDeProvincias(request):
         prov_data = {
             'id_prov': prov.id_prov,
             'nombre': prov.nombre,
-            'is_active': prov.is_active,
         }
         provincias_list.append(prov_data)
     data = {'provincias': provincias_list}
     return JsonResponse(data, safe=False)
 
 
+# completarrrrrrrrrrrrrrr
 @usuarios_permitidos(roles_permitidos=['admin'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarProvincia(request):
@@ -525,20 +537,6 @@ def registrarProvincia(request):
         messages.success(request, 'Farmacia registrada :)')
 
         return redirect('/gestionar_farmacias/')
-
-
-def eliminarProvincia(request, uuid):
-    prov = Provincia.objects.get(id_prov = uuid)   
-    prov.is_active = False
-    prov.save()
-    return JsonResponse({'status':'success'})
-
-
-def activarProvincia(request, uuid):
-    prov = Provincia.objects.get(id_farma = uuid)   
-    prov.is_active = True
-    prov.save()
-    return JsonResponse({'status':'success'})
 
 
 # Completarrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
