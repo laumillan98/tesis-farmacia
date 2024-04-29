@@ -5,7 +5,6 @@ from . import views
 urlpatterns = [
      path('', views.inicio),
      path('administrator/', views.administrator, name = "index"),
-     path('aviso_login_requerido/', views.avisoLoginRequerido),
      path('salir/', views.salir),
      path('acceder/', views.autenticar, name='acceder'),
      path('activate/<uidb64>/<token>', views.activate, name='activate'),

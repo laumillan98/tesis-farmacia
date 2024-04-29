@@ -30,17 +30,10 @@ def inicio(request):
     return render(request, "Inicio.html")
 
 
-@login_required(login_url='/')
+@login_required(login_url='/acceder')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def administrator(request):
     return render(request, "index.html")
-
-
-@unauthenticated_user
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def avisoLoginRequerido(request):
-    return render(request, "aviso_login_requerido.html")
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -72,8 +65,7 @@ def autenticar(request):
                     return redirect('/')
                 else:
                     return redirect('/gestionar')  
-                
-              
+                     
        # else:
         #    for key, error in list(form.errors.items()):
         #        if key == 'captcha' and error[0] == 'This field is required.':
@@ -108,7 +100,7 @@ def activate(request, uidb64, token):
     else:
         messages.error(request, "Activación del link no válida!")
 
-    return redirect('/')
+    return redirect('/acceder')
 
 
 def activateEmail(request, user, to_email):
@@ -135,7 +127,7 @@ def registrar(request):
         form = CustomUserCreationForm(data=request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.is_active = False
+            user.is_active = True
             user.save()
             group = Group.objects.get(name='clientes')
             user.groups.add(group)
@@ -156,7 +148,7 @@ def registrar(request):
         )
 
 
-@login_required(login_url='/aviso_login_requerido')
+@login_required(login_url='/acceder')
 def cambiarPass(request):
     user = request.user
     if request.method == 'POST':
@@ -246,7 +238,8 @@ def confirmarRestablecerPass(request, uidb64, token):
     return redirect("/")
 
 
-@login_required(login_url='/')
+@login_required(login_url='/acceder')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def perfilUsuario(request, username):
     show_alert = False
     if request.method == "POST":
@@ -272,7 +265,7 @@ def perfilUsuario(request, username):
     return redirect('/')
 
 
-@login_required(login_url='/')
+@login_required(login_url='/acceder')
 @usuarios_permitidos(roles_permitidos=['admin'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def gestionarUsuarios(request):
@@ -301,6 +294,7 @@ def listaDeUsuarios(request):
     return JsonResponse(data, safe=False)
 
 
+@login_required(login_url='/acceder')
 @usuarios_permitidos(roles_permitidos=['admin'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarFarmaceutico(request):
@@ -332,8 +326,15 @@ def registrarFarmaceutico(request):
 
 def eliminarUsuario(request, username): 
     user = CustomUser.objects.get(username = username)   
+    grupo_farmaceutico = Group.objects.get(name='farmaceuticos')
     user.is_active = False
     user.save()
+
+    if grupo_farmaceutico in user.groups.all():
+        farma_user = FarmaUser.objects.get(username = username)
+        farma_user.farma = None
+        farma_user.save()
+        
     return JsonResponse({'status':'success'})
 
 
@@ -343,6 +344,7 @@ def activarUsuario(request, username):
     user.save()
     return JsonResponse({'status':'success'})
 
+
 def obtenerUserPorUsername(request, username):
     user = CustomUser.objects.get(username = username)   
     return JsonResponse({
@@ -351,7 +353,8 @@ def obtenerUserPorUsername(request, username):
         'lastname': user.last_name
         })
 
-@login_required(login_url='/aviso_login_requerido')
+
+@login_required(login_url='/acceder')
 @require_POST
 def editarUsuario(request):
     user = CustomUser.objects.get(username=request.POST.get('username'))
@@ -363,7 +366,7 @@ def editarUsuario(request):
         return JsonResponse({'success': False, 'errors': form.errors})
         
 
-@login_required(login_url='/')
+@login_required(login_url='/acceder')
 @usuarios_permitidos(roles_permitidos=['admin'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def gestionarFarmacias(request):
@@ -391,6 +394,7 @@ def listaDeFarmacias(request):
     return JsonResponse(data, safe=False)
 
 
+@login_required(login_url='/acceder')
 @usuarios_permitidos(roles_permitidos=['admin'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarFarmacia(request):
@@ -434,7 +438,7 @@ def editarFarmacia(request, uuid):
     return redirect('/')
 
 
-@login_required(login_url='/')
+@login_required(login_url='/acceder')
 @usuarios_permitidos(roles_permitidos=['admin'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def gestionarMunicipios(request):
@@ -479,7 +483,7 @@ def editarMunicipio(request, uuid):
     return redirect('/')
 
 
-@login_required(login_url='/')
+@login_required(login_url='/acceder')
 @usuarios_permitidos(roles_permitidos=['admin'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def gestionarProvincias(request):
@@ -543,7 +547,7 @@ def editarProvincia(request, uuid):
     return redirect('/')
 
 
-@login_required(login_url='/aviso_login_requerido')
+@login_required(login_url='/acceder')
 @usuarios_permitidos(roles_permitidos=['farmaceuticos'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def gestionarMedicamentos(request):
@@ -644,7 +648,7 @@ def actualizarCantidad(request):
     return redirect('/gestionar/')
 
 
-@login_required(login_url='/aviso_login_requerido')
+@login_required(login_url='/acceder')
 @usuarios_permitidos(roles_permitidos=['clientes'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def farmaciasTabla(request):
@@ -652,7 +656,7 @@ def farmaciasTabla(request):
     return render(request, "farmacias_tabla.html", {"farmacia": farmacia, })
 
 
-@login_required(login_url='/aviso_login_requerido')
+@login_required(login_url='/acceder')
 @usuarios_permitidos(roles_permitidos=['clientes'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def medicamentosTabla(request):
@@ -660,7 +664,7 @@ def medicamentosTabla(request):
     return render(request, "medicamentos_tabla.html", {"medic": medic})
 
 
-@login_required(login_url='/aviso_login_requerido')
+@login_required(login_url='/acceder')
 @usuarios_permitidos(roles_permitidos=['clientes'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def existenciasTabla(request):

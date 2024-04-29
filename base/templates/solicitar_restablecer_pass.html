@@ -23,12 +23,12 @@
                 <div class="col-md-5">
                     <div class="card" style="border-radius: 1rem; box-shadow: 0 0 8px rgba(0, 0, 0, 0.122);">
                         <div class="card-body">
-                            <h3 style="margin-left: 90px;">Restablecer Contraseña</h3><hr>
+                            <h3 style="text-align: center;">Restablecer Contraseña</h3><hr>
                             <p>¿Olvidó su contraseña? Introduzca su dirección de correo electrónico y le enviaremos instrucciones para obtener una nueva.</p>
                             <form method="POST">
                                 {% csrf_token %}
                                 {{ form|crispy }}
-                                <button class="btn btn-dark btn-md btn-block" type="submit" style="margin-left: 185px; margin-top: 10px;">Enviar correo</button>
+                                <button class="btn btn-dark btn-md btn-block" type="submit" style="margin-left: 182px; margin-top: 10px;">Enviar correo</button>
                             </form>
                         </div>
                     </div>

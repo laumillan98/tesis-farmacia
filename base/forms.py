@@ -32,7 +32,7 @@ class CustomUserCreationForm(UserCreationForm):
         if CustomUser.objects.filter(email=email).exists():
             raise forms.ValidationError("El correo introducido ya está en uso")
 
-        with open ("base/static/txt/disposable_email_providers.txt", 'r') as f:
+        with open ("static/txt/disposable_email_providers.txt", 'r') as f:
             blacklist = f.read().splitlines() 
 
         for disposable_email in blacklist:
