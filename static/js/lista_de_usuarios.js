@@ -169,7 +169,6 @@ $(document).ready(function() {
     }
 
     $('#edicionUsuarioForm').on('submit', function(e) {
-        alert('Usuario editado satisfactoriamente');
         e.preventDefault();
         var formData = $(this).serialize();
       

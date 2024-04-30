@@ -59,7 +59,7 @@ class FarmaUserCreationForm(UserCreationForm):
 
     class Meta:
         model = FarmaUser
-        fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2','farma_name']
+        fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2', 'farma_name']
 
     def save(self, commit=True):
         user = super(FarmaUserCreationForm, self).save(commit=False)
@@ -131,9 +131,44 @@ class PasswordResetForm(PasswordResetForm):
 
 
 class UserUpdateForm(UserChangeForm):
+    first_name = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
+    last_name = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Apellido no válido')], label="Apellidos", required=True)
+    
     class Meta:
         model = CustomUser
         fields = ('first_name', 'last_name')
+
+
+class FarmaUserUpdateForm(UserChangeForm):
+    email = forms.EmailField(help_text='Escriba una dirección de correo válida por favor', required=True)
+    first_name = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
+    last_name = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Apellido no válido')], label="Apellidos", required=True)
+    farma_name = forms.ModelChoiceField(queryset=Farmacia.objects.exclude(farmauser__isnull=False), label="Farmacia Asociada") 
+    
+    class Meta:
+        model = FarmaUser
+        fields = ('username', 'first_name', 'last_name', 'email', 'farma_name')
+
+    def clean_email(self):
+        print(type(self.cleaned_data))
+        email = self.cleaned_data.get('email')
+
+        if FarmaUser.objects.filter(email=email).exists():
+            raise forms.ValidationError("El correo introducido ya está en uso")
+
+        with open ("base/static/txt/disposable_email_providers.txt", 'r') as f:
+            blacklist = f.read().splitlines() 
+
+        for disposable_email in blacklist:
+            if disposable_email in email:
+                raise forms.ValidationError("Dirección de correo SPAM")
+        return email
+    
+    def clean_farma_name(self):
+        farma = self.cleaned_data.get('farma_name')
+        if farma:
+            self.instance.farma = farma
+        return farma
 
 
 class FarmaUpdateForm(forms.ModelForm):

@@ -18,7 +18,7 @@ from django.core.validators import RegexValidator
 from django.views.generic.edit import UpdateView
 from django.views.decorators.http import require_POST
 
-from .forms import CustomUserCreationForm, FarmaUserCreationForm, UserLoginForm, SetPasswordForm, PasswordResetForm, UserUpdateForm, FarmaUpdateForm, MunicUpdateForm, ProvUpdateForm
+from .forms import CustomUserCreationForm, FarmaUserCreationForm, UserLoginForm, SetPasswordForm, PasswordResetForm, UserUpdateForm, FarmaUserUpdateForm, FarmaUpdateForm, MunicUpdateForm, ProvUpdateForm
 from .decorators import usuarios_permitidos, unauthenticated_user
 from .tokens import account_activation_token
 
@@ -346,7 +346,7 @@ def activarUsuario(request, username):
 
 # Funcion para obtener los datos del usuario que se va a editar
 def obtenerUsuario(request, username):
-    user = CustomUser.objects.get(username = username)   
+    user = CustomUser.objects.get(username = username) 
     return JsonResponse({
         'username': user.username,
         'name': user.first_name,
