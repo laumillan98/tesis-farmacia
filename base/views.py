@@ -2,6 +2,9 @@ from os import name
 from typing import Protocol
 from django.http.response import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
+
+from FirstApp.tasks import add_and_print_numbers_with_delay, send_activation_email
+from base.tokens import AccountActivationTokenGenerator
 from .models import CustomUser, Medicamento, TipoMedicamento, Farmacia, FarmaUser, FarmaciaMedicamento, TipoFarmacia, TurnoFarmacia, Municipio, Provincia
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, get_user_model
@@ -104,20 +107,13 @@ def activate(request, uidb64, token):
 
 
 def activateEmail(request, user, to_email):
-    mail_subject = "Activar cuenta de usuario."
-    message = render_to_string("activar_cuenta.html", {
-        'user': user.username,
-        'domain': get_current_site(request).domain,
-        'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-        'token': account_activation_token.make_token(user),
-        "protocol": 'https' if request.is_secure() else 'http'
-    })
-    email = EmailMessage(mail_subject, message, to=[to_email])
-    if email.send():
-        messages.success(request, f'<b>{user}</b>, por favor diríjase a su correo <b>{to_email}</b> y haga click en \
-                el link de activación recibido para confirmar su registro. <b>Nota:</b> Chequee su carpeta Spam.')
-    else:
-        messages.error(request, f'Problema al enviar el correo a {to_email}, revise que este sea correcto.')    
+    send_activation_email.delay(
+        domain=get_current_site(request).domain,
+        username=user.username,
+        tok=account_activation_token.make_token(user=user),
+        email=to_email,
+        protocol='https' if request.is_secure() else 'http'
+    )
     
 
 @unauthenticated_user
@@ -131,7 +127,10 @@ def registrar(request):
             user.save()
             group = Group.objects.get(name='clientes')
             user.groups.add(group)
-            activateEmail(request, user, form.cleaned_data.get('email'))
+            to_email = form.cleaned_data.get('email')
+            activateEmail(request, user, to_email)
+            messages.success(request, f'<b>{user.first_name}</b>, por favor diríjase a su correo <b>{to_email}</b> y haga click en \
+        el link de activación recibido para confirmar su registro. <b>Nota:</b> Chequee su carpeta Spam.')
             return redirect('/')
 
         else:
@@ -765,3 +764,8 @@ def buscarDescripcionMedicamento(request):
         payload.append(DescripcionMedicamento(nombre=descripcion.nombre, description=descripcion.description).to_dict())
     print(payload)
     return JsonResponse(payload, safe=False)
+
+
+def testTask(request):
+    add_and_print_numbers_with_delay.delay(4,4)
+    return JsonResponse({ "success": True })

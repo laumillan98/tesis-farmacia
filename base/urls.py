@@ -52,4 +52,5 @@ urlpatterns = [
      path('buscarMunicipio/', views.buscarMunicipio),
      path('buscarDisponibilidadFarmacia/', views.buscarDisponibilidadFarmacia),
      path('buscarDescripcionMedicamento/', views.buscarDescripcionMedicamento),
+     path('test-task/', views.testTask),
 ]

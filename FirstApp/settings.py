@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 import os
 from pathlib import Path
+import socket
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,6 +29,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+CELERY_BROKER_URL = 'amqp://localhost'
+
 
 # Application definition
 
@@ -41,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'base.apps.BaseConfig',
-    'captcha',
+    'django_recaptcha',
     
 ]
 
@@ -97,9 +100,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'tesisfarma',
         'USER': 'postgres',
-        'PASSWORD': 'laura9891',
+        'PASSWORD': 'admin',
         'HOST': 'localhost',
-        'PORT': '5433',
+        'PORT': '5432',
     }
 }
 
@@ -156,8 +159,8 @@ DEFAULT_CHARSET = 'utf-8'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_FROM = 'testtesisfarma@gmail.com'
-EMAIL_HOST_USER = 'testtesisfarma@gmail.com'
-EMAIL_HOST_PASSWORD = 'jjyskuqljinloyvj'
+EMAIL_HOST_USER = 'cepero911001@gmail.com'
+EMAIL_HOST_PASSWORD = 'sxdo qslv uvid wpuk'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
