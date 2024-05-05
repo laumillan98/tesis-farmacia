@@ -123,7 +123,7 @@ def registrar(request):
         form = CustomUserCreationForm(data=request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.is_active = True
+            user.is_active = False
             user.save()
             group = Group.objects.get(name='clientes')
             user.groups.add(group)

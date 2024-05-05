@@ -1,11 +1,10 @@
 import time
 from celery import shared_task
 from django.core.mail import send_mail
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
-from base.tokens import account_activation_token
 
 @shared_task
 def send_email_task(subject, message, from_email, recipient_list):
@@ -25,7 +24,7 @@ def send_activation_email(domain, username, tok, email, protocol):
     message = render_to_string("activar_cuenta.html", {
         'user': username,
         'domain': domain,
-        'uid': urlsafe_base64_encode(force_bytes(username)),
+        'uid': urlsafe_base64_encode(force_bytes(username)), # Antes se le pasaba el pk, hay que mejorar la busqueda
         'token': tok,
         'protocol': protocol
     })
