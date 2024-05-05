@@ -21,7 +21,7 @@ $(document).ready(function() {
                     // Verifica si estás en la columna de acciones
                     if (meta.col === 9) { 
                         let editButton = `
-                        <button id='editar' class='btn btn-sm btn-secondary' data-action='editar' data-id='${row.id}'>
+                        <button id='editar' class='btn btn-sm btn-secondary' data-action='editar' data-id='${row.id}' data-toggle='modal' data-target='#modal-lg'>
                             <i class="fas fa-pencil-alt"></i>
                         </button>&nbsp`
                         let deleteButton = `<button id='softdelete' class='btn btn-sm btn-danger' data-id='${row.id}'>

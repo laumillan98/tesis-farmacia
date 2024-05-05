@@ -48,13 +48,14 @@
                         {% csrf_token %}
                         <div class="card-body">
                             <div class="form-group">
-                                <label for="name">Mnicipio</label>
+                                <label for="name">Municipio</label>
                                 <input type="text" class="form-control" id="municipio" name="nombre" placeholder="Municipio">
+                                <input type="text" class="form-control" id="id" hidden name="id">
                             </div>
                             <div class="form-group">
-                                <label for="name">Provincia</label>
-                                <input type="text" class="form-control" id="provincia" name="provincia" placeholder="Provincia">
-                                <input type="text" class="form-control" id="id" hidden name="id">
+                                <label>Provincia</label>
+                                <select class="form-control" id="provicia_selector" name="id_prov">
+                                </select>
                             </div>
                         </div>
                         <!-- /.card-body -->

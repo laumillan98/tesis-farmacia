@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'base.apps.BaseConfig',
-    'captcha',
+    'django_recaptcha',
     
 ]
 
@@ -95,13 +95,13 @@ WSGI_APPLICATION = 'FirstApp.wsgi.application'
 
 
 DATABASES = {
-    'default': {
+     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'tesisfarma',
         'USER': 'postgres',
-        'PASSWORD': 'laura9891',
+        'PASSWORD': 'admin',
         'HOST': 'localhost',
-        'PORT': '5433',
+        'PORT': '5432',
     }
 }
 

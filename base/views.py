@@ -467,18 +467,20 @@ def registrarMunicipio(request):
 
 
 def obtenerMunicipio(request, uuid):
+    prov = Provincia.objects.all()
     munic = Municipio.objects.get(id_munic = uuid)
     return JsonResponse({
         'id': munic.id_munic,
         'name': munic.nombre,
-        'prov_name': munic.id_prov.nombre,
+        'selected_prov_name': munic.id_prov.id_prov,
+        'provincias': [{'id_prov': obj.id_prov, 'nombre': obj.nombre} for obj in prov],
     })
 
 
 @login_required(login_url='/acceder')
 @require_POST
 def editarMunicipio(request):
-    munic = Municipio.objects.get(id_munic = request.POST.get('id_munic'))
+    munic = Municipio.objects.get(id_munic = request.POST.get('id'))
     form = MunicUpdateForm(request.POST, instance=munic)
     if form.is_valid():
         form.save()
