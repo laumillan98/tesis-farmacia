@@ -6,12 +6,12 @@ $(document).ready(function() {
         "columns": [
             { "data": "index" },
             { "data": "nombre" },
-            { "data": "id_prov" },
-            { "data": "id_munic" },
+            { "data": "prov" },
+            { "data": "munic" },
             { "data": "direccion" },
             { "data": "telefono" },
-            { "data": "id_tipo" },
-            { "data": "id_turno" },
+            { "data": "tipo" },
+            { "data": "turno" },
             { "data": "is_active" },
             {
                 "data": null,
@@ -21,13 +21,13 @@ $(document).ready(function() {
                     // Verifica si estás en la columna de acciones
                     if (meta.col === 9) { 
                         let editButton = `
-                        <button id='editar' class='btn btn-sm btn-secondary' data-action='editar' data-id='${row.nombre}'>
+                        <button id='editar' class='btn btn-sm btn-secondary' data-action='editar' data-id='${row.id}'>
                             <i class="fas fa-pencil-alt"></i>
                         </button>&nbsp`
-                        let deleteButton = `<button id='softdelete' class='btn btn-sm btn-danger' data-id='${row.nombre}'>
+                        let deleteButton = `<button id='softdelete' class='btn btn-sm btn-danger' data-id='${row.id}'>
                         <i class="fa-solid fa-trash-can"></i>
                         </button>`
-                        let restoreButton = `<button id='activar' class='btn btn-sm btn-secondary' data-id='${row.nombre}' data-action='activar'>
+                        let restoreButton = `<button id='activar' class='btn btn-sm btn-secondary' data-id='${row.id}' data-action='activar'>
                         <i class="fas fa-trash-restore-alt"></i>
                         </button>`
                         if(row.is_active) {
@@ -146,4 +146,51 @@ $(document).ready(function() {
             }
         });
     }
+
+
+    // Evento de clic en el botón "Editar"
+    $('#miTabla').on('click', '#editar', function() {
+        let nombreFarmacia = $(this).data('id');
+        cargarInformacionFarmacia(nombreFarmacia);
+     });
+
+     function cargarInformacionFarmacia(id) {
+        $.ajax({
+            url: 'obtenerFarmacia/' + id + '/',
+            type: 'GET',
+            data: {},
+            success: function(response) {
+                $('#nombre').val(response.nombre);
+                $('#direccion').val(response.direccion);
+                $('#telefono').val(response.telefono);
+                $('#turno').val(response.turno);
+                $('#tipo').val(response.tipo);
+                $('#municipio').val(response.munic);
+                $('#id').val(response.id);
+            }
+        });
+    }
+
+    $('#edicionFarmaciaForm').on('submit', function(e) {
+        e.preventDefault();
+        var formData = $(this).serialize();
+      
+        // Enviar los datos al servidor usando AJAX
+        $.ajax({
+          url: 'editarFarmacia/',
+          type: 'POST',
+          data: formData,
+          headers: {'X-CSRFToken': $('input[name=csrfmiddlewaretoken]').val()}, // Incluir el token CSRF
+          success: function(response) {
+            // Mostrar alerta de éxito
+            alert('Farmacia editada satisfactoriamente');
+      
+            // Refrescar DataTables
+            $('#miTabla').DataTable().ajax.reload();
+          },
+          error: function(error) {
+            alert('Ocurrió un error al editar la farmacia');
+          }
+        });
+      });
 });

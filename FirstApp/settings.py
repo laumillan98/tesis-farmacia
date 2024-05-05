@@ -144,6 +144,9 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
+# Para autenticarse con el Email
+AUTHENTICATION_BACKENDS = ['base.backend.EmailBackend']
+
 RECAPTCHA_PUBLIC_KEY = '6LctYx4mAAAAACutRGWR1n_aghykJPZsVGudVMqU'
 RECAPTCHA_PRIVATE_KEY = '6LctYx4mAAAAAGd_V2kKnlmezWGetZJqGchugiZO'
 SILENCED_SYSTEM_CHECKS = ['captcha.recaptcha_test_key_error']
@@ -155,13 +158,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 DEFAULT_CHARSET = 'utf-8'
 
+
 # Emailing settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_FROM = 'testtesisfarma@gmail.com'
-EMAIL_HOST_USER = 'cepero911001@gmail.com'
-EMAIL_HOST_PASSWORD = 'sxdo qslv uvid wpuk'
+EMAIL_HOST_USER = 'testtesisfarma@gmail.com'
+EMAIL_HOST_PASSWORD = 'pooa tvdz yaln xpmz'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-#PASSWORD_RESET_TIMEOUT = 14400
+

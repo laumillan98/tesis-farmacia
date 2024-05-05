@@ -15,16 +15,16 @@ from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.db.models.query_utils import Q
 from django.core.validators import RegexValidator
 from django.views.generic.edit import UpdateView
 from django.views.decorators.http import require_POST
 
-from .forms import CustomUserCreationForm, FarmaUserCreationForm, UserLoginForm, SetPasswordForm, PasswordResetForm, UserUpdateForm
+from .forms import CustomUserCreationForm, FarmaUserCreationForm, UserLoginForm, SetPasswordForm, PasswordResetForm, UserProfileForm, UserUpdateForm, FarmaUserUpdateForm, FarmaUpdateForm, MunicUpdateForm, ProvUpdateForm
 from .decorators import usuarios_permitidos, unauthenticated_user
 from .tokens import account_activation_token
-from .backend import EmailBackend
+from FirstApp.tasks import send_activation_email
 
 # Create your views here.
 
@@ -86,11 +86,11 @@ def autenticar(request):
         )
     
 
-def activate(request, uidb64, token):
+def activate(request, username, token):
     User = get_user_model()
     try:
-        uid = force_str(urlsafe_base64_decode(uidb64))
-        user = User.objects.get(pk=uid)
+        usernameDecode = force_str(urlsafe_base64_decode(username))
+        user = User.objects.get(username=usernameDecode)
     except:
         user = None
 
@@ -114,7 +114,7 @@ def activateEmail(request, user, to_email):
         email=to_email,
         protocol='https' if request.is_secure() else 'http'
     )
-    
+
 
 @unauthenticated_user
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -130,7 +130,7 @@ def registrar(request):
             to_email = form.cleaned_data.get('email')
             activateEmail(request, user, to_email)
             messages.success(request, f'<b>{user.first_name}</b>, por favor diríjase a su correo <b>{to_email}</b> y haga click en \
-        el link de activación recibido para confirmar su registro. <b>Nota:</b> Chequee su carpeta Spam.')
+                             el link de activación recibido para confirmar su registro. <b>Nota:</b> Chequee su carpeta Spam.')
             return redirect('/')
 
         else:
@@ -243,7 +243,7 @@ def perfilUsuario(request, username):
     show_alert = False
     if request.method == "POST":
         user = request.user
-        form = UserUpdateForm(request.POST, request.FILES, instance=user)
+        form = UserProfileForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
             user_form = form.save()
             show_alert = True
@@ -254,7 +254,7 @@ def perfilUsuario(request, username):
 
     user = get_user_model().objects.get(username=username)
     if user:
-        form = UserUpdateForm(instance=user)
+        form = UserProfileForm(instance=user)
         return render(
             request=request,
             template_name="perfil_de_usuario.html",
@@ -333,7 +333,7 @@ def eliminarUsuario(request, username):
         farma_user = FarmaUser.objects.get(username = username)
         farma_user.farma = None
         farma_user.save()
-        
+
     return JsonResponse({'status':'success'})
 
 
@@ -344,12 +344,13 @@ def activarUsuario(request, username):
     return JsonResponse({'status':'success'})
 
 
-def obtenerUserPorUsername(request, username):
-    user = CustomUser.objects.get(username = username)   
+# Funcion para obtener los datos del usuario que se va a editar
+def obtenerUsuario(request, username):
+    user = CustomUser.objects.get(username = username) 
     return JsonResponse({
         'username': user.username,
         'name': user.first_name,
-        'lastname': user.last_name
+        'lastname': user.last_name,
         })
 
 
@@ -378,14 +379,14 @@ def listaDeFarmacias(request):
     for index,farma in enumerate(farmacias):
         farma_data = {
             'index': index + 1,
-            'id_farma': farma.id_farma,
+            'id': farma.id_farma,
             'nombre': farma.nombre,
-            'id_prov': farma.id_munic.id_prov.nombre,
-            'id_munic': farma.id_munic.nombre,
+            'prov': farma.id_munic.id_prov.nombre,
+            'munic': farma.id_munic.nombre,
             'direccion': farma.direccion,
             'telefono': farma.telefono,
-            'id_tipo': farma.id_tipo.nombre,
-            'id_turno': farma.id_turno.nombre,
+            'tipo': farma.id_tipo.nombre,
+            'turno': farma.id_turno.nombre,
             'is_active': farma.is_active,
         }
         farmacias_list.append(farma_data)
@@ -398,26 +399,10 @@ def listaDeFarmacias(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarFarmacia(request):
     if request.method =='POST':
-        print(request.POST)
-        nombre = request.POST['txtNombre']
-        id_munic = request.POST['idMunicipio']
-        id_turno = request.POST['idTurno']
-        id_tipo = request.POST['idTipo']
-        direccion = request.POST['txtDireccion']
-        telefono = request.POST['txtTelefono']
-
-        municipio = Municipio.objects.get(pk=id_munic)
-        turno = TurnoFarmacia.objects.get(pk=id_turno)
-        tipo = TipoFarmacia.objects.get(pk=id_tipo)
-
-        farmacia = Farmacia.objects.create(nombre=nombre, id_munic=municipio, 
-                                        id_turno=turno, id_tipo=tipo, direccion=direccion, telefono=telefono)
-        
-        messages.success(request, 'Farmacia registrada :)')
-
-        return redirect('/gestionar_farmacias/')
+        return redirect('/')
 
 
+# no funciona aun
 def eliminarFarmacia(request, uuid):
     farma = Farmacia.objects.get(id_farma = uuid)   
     farma.is_active = False
@@ -432,9 +417,29 @@ def activarFarmacia(request, uuid):
     return JsonResponse({'status':'success'})
 
 
-# Completarrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
-def editarFarmacia(request, uuid):
-    return redirect('/')
+def obtenerFarmacia(request, uuid):
+    farma = Farmacia.objects.get(id_farma = uuid)   
+    return JsonResponse({
+        'id': farma.id_farma,
+        'nombre': farma.nombre,
+        'direccion': farma.direccion,
+        'telefono': farma.telefono,
+        'turno': farma.id_turno.nombre,
+        'tipo': farma.id_tipo.nombre,
+        'munic': farma.id_munic.nombre,
+        })
+
+
+@login_required(login_url='/acceder')
+@require_POST
+def editarFarmacia(request):
+    farma = Farmacia.objects.get(id_farma=request.POST.get('id_farma'))
+    form = FarmaUpdateForm(request.POST, instance=farma)
+    if form.is_valid():
+        form.save()
+        return JsonResponse({'success': True})
+    else:
+        return JsonResponse({'success': False, 'errors': form.errors})
 
 
 @login_required(login_url='/acceder')
@@ -445,16 +450,17 @@ def gestionarMunicipios(request):
 
 
 def listaDeMunicipios(request):
-    municipio = Municipio.objects.all()
-    municipio_list = []
-    for munic in municipio:
+    municipios = Municipio.objects.all()
+    municipios_list = []
+    for index,munic in enumerate(municipios):
         munic_data = {
-            'id_munic': munic.id_munic,
+            'index': index + 1,
+            'id': munic.id_munic,
             'nombre': munic.nombre,
-            'id_prov': munic.id_prov.nombre,
+            'provincia': munic.id_prov.nombre,
         }
-        municipio_list.append(munic_data)
-    data = {'municipios': municipio_list}
+        municipios_list.append(munic_data)
+    data = {'data': municipios_list}
     return JsonResponse(data, safe=False)
 
 
@@ -463,24 +469,26 @@ def registrarMunicipio(request):
     return redirect('/')
 
 
-def eliminarMunicipio(request, uuid):
-    munic = Municipio.objects.get(id_munic = uuid)   
-    munic.is_active = False
-    munic.save()
-    return JsonResponse({'status':'success'})
+def obtenerMunicipio(request, uuid):
+    munic = Municipio.objects.get(id_munic = uuid)
+    return JsonResponse({
+        'id': munic.id_munic,
+        'name': munic.nombre,
+        'prov_name': munic.id_prov.nombre,
+    })
 
 
-def activarMunicipio(request, uuid):
-    munic = Municipio.objects.get(id_munic = uuid)   
-    munic.is_active = True
-    munic.save()
-    return JsonResponse({'status':'success'})
-
-
-# Completarrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
-def editarMunicipio(request, uuid):
-    return redirect('/')
-
+@login_required(login_url='/acceder')
+@require_POST
+def editarMunicipio(request):
+    munic = Municipio.objects.get(id_munic = request.POST.get('id_munic'))
+    form = MunicUpdateForm(request.POST, instance=munic)
+    if form.is_valid():
+        form.save()
+        return JsonResponse({'success': True})
+    else:
+        return JsonResponse({'success': False, 'errors': form.errors})
+    
 
 @login_required(login_url='/acceder')
 @usuarios_permitidos(roles_permitidos=['admin'])
@@ -492,58 +500,43 @@ def gestionarProvincias(request):
 def listaDeProvincias(request):
     provincias = Provincia.objects.all()
     provincias_list = []
-    for prov in provincias:
+    for index,prov in enumerate(provincias):
         prov_data = {
-            'id_prov': prov.id_prov,
+            'index': index + 1,
+            'id': prov.id_prov,
             'nombre': prov.nombre,
-            'is_active': prov.is_active,
         }
         provincias_list.append(prov_data)
-    data = {'provincias': provincias_list}
+    data = {'data': provincias_list}
     return JsonResponse(data, safe=False)
 
 
+# completarrrrrrrrrrrrrrr
 @usuarios_permitidos(roles_permitidos=['admin'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarProvincia(request):
     if request.method =='POST':
-        print(request.POST)
-        nombre = request.POST['txtNombre']
-        id_munic = request.POST['idMunicipio']
-        id_turno = request.POST['idTurno']
-        id_tipo = request.POST['idTipo']
-        direccion = request.POST['txtDireccion']
-        telefono = request.POST['txtTelefono']
-
-        municipio = Municipio.objects.get(pk=id_munic)
-        turno = TurnoFarmacia.objects.get(pk=id_turno)
-        tipo = TipoFarmacia.objects.get(pk=id_tipo)
-
-        farmacia = Farmacia.objects.create(nombre=nombre, id_munic=municipio, 
-                                        id_turno=turno, id_tipo=tipo, direccion=direccion, telefono=telefono)
-        
-        messages.success(request, 'Farmacia registrada :)')
-
-        return redirect('/gestionar_farmacias/')
+        return redirect('/')
 
 
-def eliminarProvincia(request, uuid):
-    prov = Provincia.objects.get(id_prov = uuid)   
-    prov.is_active = False
-    prov.save()
-    return JsonResponse({'status':'success'})
+def obtenerProvincia(request, uuid):
+    prov = Provincia.objects.get(id_prov = uuid)
+    return JsonResponse({
+        'id': prov.id_prov,
+        'name': prov.nombre,
+    })
 
 
-def activarProvincia(request, uuid):
-    prov = Provincia.objects.get(id_farma = uuid)   
-    prov.is_active = True
-    prov.save()
-    return JsonResponse({'status':'success'})
-
-
-# Completarrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
-def editarProvincia(request, uuid):
-    return redirect('/')
+@login_required(login_url='/acceder')
+@require_POST
+def editarProvincia(request):
+    prov = Provincia.objects.get(id_prov = request.POST.get('id_prov'))
+    form = ProvUpdateForm(request.POST, instance=prov)
+    if form.is_valid():
+        form.save()
+        return JsonResponse({'success': True})
+    else:
+        return JsonResponse({'success': False, 'errors': form.errors})
 
 
 @login_required(login_url='/acceder')
@@ -766,6 +759,5 @@ def buscarDescripcionMedicamento(request):
     return JsonResponse(payload, safe=False)
 
 
-def testTask(request):
-    add_and_print_numbers_with_delay.delay(4,4)
-    return JsonResponse({ "success": True })
+
+
