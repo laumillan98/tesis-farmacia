@@ -49,7 +49,6 @@ $(document).ready(function() {
     }
 
     $('#edicionMunicipioForm').on('submit', function(e) {
-        alert('Municipio editado satisfactoriamente');
         e.preventDefault();
         var formData = $(this).serialize();
       
