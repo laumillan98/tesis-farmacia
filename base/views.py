@@ -415,22 +415,28 @@ def activarFarmacia(request, uuid):
 
 
 def obtenerFarmacia(request, uuid):
+    turno = TurnoFarmacia.objects.all()
+    tipo = TipoFarmacia.objects.all()
+    munic = Municipio.objects.all()
     farma = Farmacia.objects.get(id_farma = uuid)   
     return JsonResponse({
         'id': farma.id_farma,
         'nombre': farma.nombre,
         'direccion': farma.direccion,
         'telefono': farma.telefono,
-        'turno': farma.id_turno.nombre,
-        'tipo': farma.id_tipo.nombre,
-        'munic': farma.id_munic.nombre,
-        })
+        'selected_turno_name': farma.id_turno.id_turno_farmacia,
+        'selected_tipo_name': farma.id_tipo.id_tipo_farmacia,
+        'selected_munic_name': farma.id_munic.id_munic,
+        'turnos': [{'id_turno': obj.id_turno_farmacia, 'nombre': obj.nombre} for obj in turno],
+        'tipos': [{'id_tipo': obj.id_tipo_farmacia, 'nombre': obj.nombre} for obj in tipo],
+        'municipios': [{'id_munic': obj.id_munic, 'nombre': obj.nombre} for obj in munic],
+    })
 
 
 @login_required(login_url='/acceder')
 @require_POST
 def editarFarmacia(request):
-    farma = Farmacia.objects.get(id_farma=request.POST.get('id_farma'))
+    farma = Farmacia.objects.get(id_farma=request.POST.get('id'))
     form = FarmaUpdateForm(request.POST, instance=farma)
     if form.is_valid():
         form.save()
@@ -467,18 +473,20 @@ def registrarMunicipio(request):
 
 
 def obtenerMunicipio(request, uuid):
+    prov = Provincia.objects.all()
     munic = Municipio.objects.get(id_munic = uuid)
     return JsonResponse({
         'id': munic.id_munic,
         'name': munic.nombre,
-        'prov_name': munic.id_prov.nombre,
+        'selected_prov_name': munic.id_prov.id_prov,
+        'provincias': [{'id_prov': obj.id_prov, 'nombre': obj.nombre} for obj in prov],
     })
 
 
 @login_required(login_url='/acceder')
 @require_POST
 def editarMunicipio(request):
-    munic = Municipio.objects.get(id_munic = request.POST.get('id_munic'))
+    munic = Municipio.objects.get(id_munic = request.POST.get('id'))
     form = MunicUpdateForm(request.POST, instance=munic)
     if form.is_valid():
         form.save()
@@ -527,7 +535,7 @@ def obtenerProvincia(request, uuid):
 @login_required(login_url='/acceder')
 @require_POST
 def editarProvincia(request):
-    prov = Provincia.objects.get(id_prov = request.POST.get('id_prov'))
+    prov = Provincia.objects.get(id_prov = request.POST.get('id'))
     form = ProvUpdateForm(request.POST, instance=prov)
     if form.is_valid():
         form.save()

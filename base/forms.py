@@ -182,18 +182,25 @@ class FarmaUserUpdateForm(UserChangeForm):
 
 
 class FarmaUpdateForm(forms.ModelForm):
+    nombre = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
+    #telefono = forms.CharField(validators=[RegexValidator('{8,8}', message='Teléfono no válido')], label="Teléfono", required=True)
+    
     class Meta:
         model = Farmacia
         fields = ('nombre', 'direccion', 'telefono', 'id_turno', 'id_tipo', 'id_munic')
 
 
 class MunicUpdateForm(forms.ModelForm):
+    nombre = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
+  
     class Meta:
         model = Municipio
         fields = ('nombre', 'id_prov')
 
 
 class ProvUpdateForm(forms.ModelForm):
+    nombre = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
+
     class Meta:
         model = Provincia
         fields = ('nombre',)

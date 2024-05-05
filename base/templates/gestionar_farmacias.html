@@ -57,6 +57,7 @@
                             <div class="form-group">
                                 <label for="name">Nombre</label>
                                 <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre">
+                                <input type="text" class="form-control" id="id" hidden name="id">
                             </div>
                             <div class="form-group">
                                 <label for="name">Direccion</label>
@@ -67,17 +68,19 @@
                                 <input type="text" class="form-control" id="telefono" name="telefono" placeholder="Telefono">
                             </div>
                             <div class="form-group">
-                                <label for="name">Turno</label>
-                                <input type="text" class="form-control" id="turno" name="turno" placeholder="Turno">
+                                <label>Turno</label>
+                                <select class="form-control" id="turno_selector" name="id_turno">
+                                </select>
                             </div>
                             <div class="form-group">
-                                <label for="name">Tipo</label>
-                                <input type="text" class="form-control" id="tipo" name="tipo" placeholder="Tipo">
+                                <label>Tipo</label>
+                                <select class="form-control" id="tipo_selector" name="id_tipo">
+                                </select>
                             </div>
                             <div class="form-group">
-                                <label for="name">Municipio</label>
-                                <input type="text" class="form-control" id="municipio" name="munic" placeholder="Municipio">
-                                <input type="text" class="form-control" id="id" hidden name="id">
+                                <label>Municipio</label>
+                                <select class="form-control" id="municipio_selector" name="id_munic">
+                                </select>
                             </div>
                         </div>
                         <!-- /.card-body -->
@@ -85,9 +88,6 @@
                             <button type="submit" class="btn btn-primary">Aceptar</button>
                         </div>
                     </form>
-                </div>
-                <div class="modal-footer justify-content-between">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
             <!-- /.modal-content -->

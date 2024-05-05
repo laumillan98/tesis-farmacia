@@ -1,35 +1,34 @@
 $(document).ready(function() {
-
-    var ajaxUrl = $('#miTabla').data('url');
-    var table = $('#miTabla').DataTable({
+    let editionSuccessful = false
+    var ajaxUrl = $("#miTabla").data("url");
+    var table = $("#miTabla").DataTable({
         "ajax": ajaxUrl,
         "columns": [
-            { "data": "index" },
-            { "data": "nombre" },
-            { "data": "prov" },
-            { "data": "munic" },
-            { "data": "direccion" },
-            { "data": "telefono" },
-            { "data": "tipo" },
-            { "data": "turno" },
-            { "data": "is_active" },
+            { data: "index" },
+            { data: "nombre" },
+            { data: "prov" },
+            { data: "munic" },
+            { data: "direccion" },
+            { data: "telefono" },
+            { data: "tipo" },
+            { data: "turno" },
+            { data: "is_active" },
             {
-                "data": null,
-                "orderable": false,
-                "searchable": false,
-                "render": function(data, type, row, meta) {
+                data: null,
+                orderable: false,
+                searchable: false,
+                render: function (data, type, row, meta) {
                     // Verifica si estás en la columna de acciones
                     if (meta.col === 9) { 
-                        let editButton = `
-                        <button id='editar' class='btn btn-sm btn-secondary' data-action='editar' data-id='${row.id}'>
-                            <i class="fas fa-pencil-alt"></i>
-                        </button>&nbsp`
+                        let editButton = `<button id='editar' class='btn btn-sm btn-secondary' data-action='editar' data-id='${row.id}' data-toggle='modal' data-target='#modal-lg'>
+                                        <i class="fas fa-pencil-alt"></i>
+                                        </button>&nbsp`
                         let deleteButton = `<button id='softdelete' class='btn btn-sm btn-danger' data-id='${row.id}'>
-                        <i class="fa-solid fa-trash-can"></i>
-                        </button>`
+                                            <i class="fa-solid fa-trash-can"></i>
+                                            </button>`
                         let restoreButton = `<button id='activar' class='btn btn-sm btn-secondary' data-id='${row.id}' data-action='activar'>
-                        <i class="fas fa-trash-restore-alt"></i>
-                        </button>`
+                                            <i class="fas fa-trash-restore-alt"></i>
+                                            </button>`
                         if(row.is_active) {
                             return editButton + deleteButton;
                         } else {
@@ -150,8 +149,8 @@ $(document).ready(function() {
 
     // Evento de clic en el botón "Editar"
     $('#miTabla').on('click', '#editar', function() {
-        let nombreFarmacia = $(this).data('id');
-        cargarInformacionFarmacia(nombreFarmacia);
+        let idFarma = $(this).data('id');
+        cargarInformacionFarmacia(idFarma);
      });
 
      function cargarInformacionFarmacia(id) {
@@ -163,12 +162,42 @@ $(document).ready(function() {
                 $('#nombre').val(response.nombre);
                 $('#direccion').val(response.direccion);
                 $('#telefono').val(response.telefono);
-                $('#turno').val(response.turno);
-                $('#tipo').val(response.tipo);
-                $('#municipio').val(response.munic);
+                $('#turno').val(response.turno_name);
+                $('#tipo').val(response.tipo_name);
+                $('#municipio').val(response.munic_name);
                 $('#id').val(response.id);
-            }
-        });
+
+                var $selector = $("#turno_selector");
+                $selector.empty();
+                response.turnos.forEach(element => {
+                    $selector.append($('<option>', {
+                    value: element.id_turno,
+                    text: element.nombre,
+                    }))
+                });
+                $selector.val(response.selected_turno_name);    
+
+                var $selector = $("#tipo_selector");
+                $selector.empty();
+                response.tipos.forEach(element => {
+                    $selector.append($('<option>', {
+                    value: element.id_tipo,
+                    text: element.nombre,
+                    }))
+                });
+                $selector.val(response.selected_tipo_name); 
+
+                var $selector = $("#municipio_selector");
+                $selector.empty();
+                response.municipios.forEach(element => {
+                    $selector.append($('<option>', {
+                    value: element.id_munic,
+                    text: element.nombre,
+                    }))
+                });
+                $selector.val(response.selected_munic_name); 
+            },
+        })
     }
 
     $('#edicionFarmaciaForm').on('submit', function(e) {
@@ -177,20 +206,34 @@ $(document).ready(function() {
       
         // Enviar los datos al servidor usando AJAX
         $.ajax({
-          url: 'editarFarmacia/',
-          type: 'POST',
-          data: formData,
-          headers: {'X-CSRFToken': $('input[name=csrfmiddlewaretoken]').val()}, // Incluir el token CSRF
-          success: function(response) {
-            // Mostrar alerta de éxito
-            alert('Farmacia editada satisfactoriamente');
-      
-            // Refrescar DataTables
-            $('#miTabla').DataTable().ajax.reload();
-          },
-          error: function(error) {
-            alert('Ocurrió un error al editar la farmacia');
-          }
-        });
-      });
+            url: 'editarFarmacia/',
+            type: 'POST',
+            data: formData,
+            headers: {'X-CSRFToken': $('input[name=csrfmiddlewaretoken]').val()}, // Incluir el token CSRF
+            success: function (response) {
+                $("#modal-lg").modal("hide")
+
+                // Mostrar alerta de éxito
+                if (response.success === true) {
+                    editionSuccessful = true
+                    // Refrescar DataTables
+                    $("#miTabla").DataTable().ajax.reload()
+                }
+            },
+            error: function (error) {
+                alert("Ocurrió un error al editar la farmacia")
+            },
+        })
+      })
+
+      $("#modal-lg").on("hidden.bs.modal", function () {
+        if (editionSuccessful) {
+            Swal.fire({
+                title: 'Éxito',
+                text: 'La farmacia fue editada correctamente.',
+                icon: 'success'
+            });
+          editionSuccessful = false;
+        }
+      })
 });

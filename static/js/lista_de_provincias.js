@@ -30,8 +30,8 @@ $(document).ready(function() {
 
      // Evento de clic en el botón "Editar"
      $('#miTabla').on('click', '#editar', function() {
-        let nombreProv = $(this).data('id');
-        cargarInformacionProvincia(nombreProv);
+        let idProv = $(this).data('id');
+        cargarInformacionProvincia(idProv);
      });
 
      function cargarInformacionProvincia(id) {
@@ -47,26 +47,40 @@ $(document).ready(function() {
     }
 
     $('#edicionProvinciaForm').on('submit', function(e) {
-        alert('Provincia editada satisfactoriamente');
         e.preventDefault();
         var formData = $(this).serialize();
       
         // Enviar los datos al servidor usando AJAX
         $.ajax({
-          url: 'editarProvincia/',
-          type: 'POST',
-          data: formData,
-          headers: {'X-CSRFToken': $('input[name=csrfmiddlewaretoken]').val()}, // Incluir el token CSRF
-          success: function(response) {
+            url: 'editarProvincia/',
+            type: 'POST',
+            data: formData,
+            headers: {'X-CSRFToken': $('input[name=csrfmiddlewaretoken]').val()}, // Incluir el token CSRF
+            success: function (response) {
+            $("#modal-lg").modal("hide")
+
             // Mostrar alerta de éxito
-            alert('Provincia editada satisfactoriamente');
-      
-            // Refrescar DataTables
-            $('#miTabla').DataTable().ajax.reload();
-          },
-          error: function(error) {
-            alert('Ocurrió un error al editar la provincia');
-          }
-        });
-      });
+            if (response.success === true) {
+                editionSuccessful = true
+                // Refrescar DataTables
+                $("#miTabla").DataTable().ajax.reload()
+            }
+            },
+            error: function (error) {
+            alert("Ocurrió un error al editar la provincia")
+            },
+        })
+    })
+
+    $("#modal-lg").on("hidden.bs.modal", function () {
+        if (editionSuccessful) {
+            Swal.fire({
+                title: 'Éxito',
+                text: 'La provincia fue editada correctamente.',
+                icon: 'success'
+            });
+          editionSuccessful = false;
+        }
+    })
+
 });

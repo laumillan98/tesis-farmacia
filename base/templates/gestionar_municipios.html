@@ -1,3 +1,4 @@
+
 {% extends "./index.html" %}
 
 {% load static %}
@@ -50,11 +51,12 @@
                             <div class="form-group">
                                 <label for="name">Municipio</label>
                                 <input type="text" class="form-control" id="municipio" name="nombre" placeholder="Municipio">
+                                <input type="text" class="form-control" id="id" hidden name="id">
                             </div>
                             <div class="form-group">
-                                <label for="name">Provincia</label>
-                                <input type="text" class="form-control" id="provincia" name="provincia" placeholder="Provincia">
-                                <input type="text" class="form-control" id="id_munic" hidden name="id_munic">
+                                <label>Provincia</label>
+                                <select class="form-control" id="provicia_selector" name="id_prov">
+                                </select>
                             </div>
                         </div>
                         <!-- /.card-body -->
@@ -62,9 +64,6 @@
                             <button type="submit" class="btn btn-primary">Aceptar</button>
                         </div>
                     </form>
-                </div>
-                <div class="modal-footer justify-content-between">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
             <!-- /.modal-content -->
@@ -78,6 +77,8 @@
 {% block subtitle %}Municipios{% endblock %}
 
 {% block custom_scripts %}
+<script src="{% static 'plugins/jquery-validation/jquery-validate.min.js' %}"></script>
+<script src="{% static 'plugins/jquery-validation/additional-methods-min.js' %}"></script>
 <script src="{% static 'js/lista_de_municipios.js' %}"></script>
 {% endblock %}
 
