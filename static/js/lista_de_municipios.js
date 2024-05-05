@@ -43,24 +43,66 @@ $(document).ready(function () {
         $("#municipio").val(response.name)
         $("#provincia").val(response.prov_name)
         $("#id").val(response.id)
-        var $selector = $("#provicia_selector");
-        $selector.empty();
+        var $selector = $("#provicia_selector")
+        $selector.empty()
 
-        response.provincias.forEach(element => {
-          $selector.append($('<option>', {
-            value: element.id_prov,
-            text: element.nombre,
-          }))
-        });
+        response.provincias.forEach((element) => {
+          $selector.append(
+            $("<option>", {
+              value: element.id_prov,
+              text: element.nombre,
+            })
+          )
+        })
 
-        $selector.val(response.selected_prov_name);
+        $selector.val(response.selected_prov_name)
       },
     })
   }
 
-  $("#edicionMunicipioForm").on("submit", function (e) {
-    e.preventDefault()
-    var formData = $(this).serialize()
+  $("#modal-lg").on("hidden.bs.modal", function () {
+    if (editionSuccessful) {
+      Swal.fire({
+        title: "Éxito",
+        text: "El elemento fue editado correctamente.",
+        icon: "success",
+      })
+      editionSuccessful = false
+    }
+  })
+
+  $("#edicionMunicipioForm").validate({
+    rules: {
+      nombre: {
+        required: true,
+        minlength: 3
+      },
+    },
+    messages: {
+      nombre: {
+        required: "Este campo es obligatorio.",
+        minlength: "Por favor, introduce al menos 3 caracteres.",
+      },
+    },
+    errorElement: 'span',
+    errorPlacement: function (error, element) {
+      error.addClass('invalid-feedback');
+      element.closest('.form-group').append(error);
+    },
+    highlight: function (element, errorClass, validClass) {
+      $(element).addClass('is-invalid');
+    },
+    unhighlight: function (element, errorClass, validClass) {
+      $(element).removeClass('is-invalid');
+    },
+    submitHandler: function (form) {
+      editarMunicipio(form);
+      return false // Esto previene el envío tradicional del formulario
+    },
+  });
+
+  function editarMunicipio(form) {
+    var formData = $(form).serialize()
 
     // Enviar los datos al servidor usando AJAX
     $.ajax({
@@ -82,16 +124,5 @@ $(document).ready(function () {
         alert("Ocurrió un error al editar el municipio")
       },
     })
-  })
-
-  $("#modal-lg").on("hidden.bs.modal", function () {
-    if (editionSuccessful) {
-        Swal.fire({
-            title: 'Éxito',
-            text: 'El elemento fue editado correctamente.',
-            icon: 'success'
-        });
-      editionSuccessful = false;
-    }
-  })
+  }
 })
