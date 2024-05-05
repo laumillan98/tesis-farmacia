@@ -2,6 +2,9 @@ from os import name
 from typing import Protocol
 from django.http.response import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
+
+from FirstApp.tasks import add_and_print_numbers_with_delay, send_activation_email
+from base.tokens import AccountActivationTokenGenerator
 from .models import CustomUser, Medicamento, TipoMedicamento, Farmacia, FarmaUser, FarmaciaMedicamento, TipoFarmacia, TurnoFarmacia, Municipio, Provincia
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, get_user_model
