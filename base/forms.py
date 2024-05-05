@@ -130,6 +130,16 @@ class PasswordResetForm(PasswordResetForm):
     #captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox())
 
 
+class UserProfileForm(UserChangeForm):
+    #email = forms.EmailField(required=True)
+    first_name = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
+    last_name = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Apellido no válido')], label="Apellidos", required=True)
+
+    class Meta:
+        model = get_user_model()
+        fields = ['first_name', 'last_name', 'description']  
+    
+
 class UserUpdateForm(UserChangeForm):
     first_name = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
     last_name = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Apellido no válido')], label="Apellidos", required=True)

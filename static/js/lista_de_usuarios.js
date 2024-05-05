@@ -152,6 +152,7 @@ $(document).ready(function() {
      // Evento de clic en el botón "Editar"
      $('#miTabla').on('click', '#editar', function() {
         let nombreUsuario = $(this).data('id');
+        
         cargarInformacionUsuario(nombreUsuario);
      });
 
@@ -171,7 +172,6 @@ $(document).ready(function() {
     $('#edicionUsuarioForm').on('submit', function(e) {
         e.preventDefault();
         var formData = $(this).serialize();
-      
         // Enviar los datos al servidor usando AJAX
         $.ajax({
           url: 'editarUsuario/',

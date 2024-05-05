@@ -7,7 +7,7 @@ urlpatterns = [
      path('administrator/', views.administrator, name = "index"),
      path('salir/', views.salir),
      path('acceder/', views.autenticar, name='acceder'),
-     path('activate/<uidb64>/<token>', views.activate, name='activate'),
+     path('activate/<username>/<token>', views.activate, name='activate'),
      path('registrar/', views.registrar),
      path("cambiarPass", views.cambiarPass, name="cambiarPass"),
      path("solicitar_restablecer_pass", views.restablecerPass, name="solicitar_restablecer_pass"),
@@ -51,4 +51,5 @@ urlpatterns = [
      path('buscarMunicipio/', views.buscarMunicipio),
      path('buscarDisponibilidadFarmacia/', views.buscarDisponibilidadFarmacia),
      path('buscarDescripcionMedicamento/', views.buscarDescripcionMedicamento),
+
 ]

@@ -18,9 +18,10 @@ from django.core.validators import RegexValidator
 from django.views.generic.edit import UpdateView
 from django.views.decorators.http import require_POST
 
-from .forms import CustomUserCreationForm, FarmaUserCreationForm, UserLoginForm, SetPasswordForm, PasswordResetForm, UserUpdateForm, FarmaUserUpdateForm, FarmaUpdateForm, MunicUpdateForm, ProvUpdateForm
+from .forms import CustomUserCreationForm, FarmaUserCreationForm, UserLoginForm, SetPasswordForm, PasswordResetForm, UserProfileForm, UserUpdateForm, FarmaUserUpdateForm, FarmaUpdateForm, MunicUpdateForm, ProvUpdateForm
 from .decorators import usuarios_permitidos, unauthenticated_user
 from .tokens import account_activation_token
+from FirstApp.tasks import send_activation_email
 
 # Create your views here.
 
@@ -82,11 +83,11 @@ def autenticar(request):
         )
     
 
-def activate(request, uidb64, token):
+def activate(request, username, token):
     User = get_user_model()
     try:
-        uid = force_str(urlsafe_base64_decode(uidb64))
-        user = User.objects.get(pk=uid)
+        usernameDecode = force_str(urlsafe_base64_decode(username))
+        user = User.objects.get(username=usernameDecode)
     except:
         user = None
 
@@ -103,21 +104,14 @@ def activate(request, uidb64, token):
 
 
 def activateEmail(request, user, to_email):
-    subject = "Activar cuenta de usuario."
-    message = render_to_string("activar_cuenta.html", {
-        'user': user.username,
-        'domain': get_current_site(request).domain,
-        'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-        'token': account_activation_token.make_token(user),
-        "protocol": 'https' if request.is_secure() else 'http'
-    })
-    email = EmailMessage(subject, message, to=[to_email])
-    if email.send():
-        messages.success(request, f'<b>{user}</b>, por favor diríjase a su correo <b>{to_email}</b> y haga click en \
-                el link de activación recibido para confirmar su registro. <b>Nota:</b> Chequee su carpeta Spam.')
-    else:
-        messages.error(request, f'Problema al enviar el correo a {to_email}, revise que este sea correcto.')    
-    
+    send_activation_email.delay(
+        domain=get_current_site(request).domain,
+        username=user.username,
+        tok=account_activation_token.make_token(user=user),
+        email=to_email,
+        protocol='https' if request.is_secure() else 'http'
+    )
+
 
 @unauthenticated_user
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -130,7 +124,10 @@ def registrar(request):
             user.save()
             group = Group.objects.get(name='clientes')
             user.groups.add(group)
-            activateEmail(request, user, form.cleaned_data.get('email'))
+            to_email = form.cleaned_data.get('email')
+            activateEmail(request, user, to_email)
+            messages.success(request, f'<b>{user.first_name}</b>, por favor diríjase a su correo <b>{to_email}</b> y haga click en \
+                             el link de activación recibido para confirmar su registro. <b>Nota:</b> Chequee su carpeta Spam.')
             return redirect('/')
 
         else:
@@ -243,7 +240,7 @@ def perfilUsuario(request, username):
     show_alert = False
     if request.method == "POST":
         user = request.user
-        form = UserUpdateForm(request.POST, request.FILES, instance=user)
+        form = UserProfileForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
             user_form = form.save()
             show_alert = True
@@ -254,7 +251,7 @@ def perfilUsuario(request, username):
 
     user = get_user_model().objects.get(username=username)
     if user:
-        form = UserUpdateForm(instance=user)
+        form = UserProfileForm(instance=user)
         return render(
             request=request,
             template_name="perfil_de_usuario.html",
@@ -757,3 +754,7 @@ def buscarDescripcionMedicamento(request):
         payload.append(DescripcionMedicamento(nombre=descripcion.nombre, description=descripcion.description).to_dict())
     print(payload)
     return JsonResponse(payload, safe=False)
+
+
+
+

@@ -172,7 +172,6 @@ $(document).ready(function() {
     }
 
     $('#edicionFarmaciaForm').on('submit', function(e) {
-        alert('Farmacia editada satisfactoriamente');
         e.preventDefault();
         var formData = $(this).serialize();
       

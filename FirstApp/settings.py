@@ -28,6 +28,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+CELERY_BROKER_URL = 'amqp://localhost'
+
 
 # Application definition
 
@@ -161,8 +163,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_FROM = 'testtesisfarma@gmail.com'
 EMAIL_HOST_USER = 'testtesisfarma@gmail.com'
-EMAIL_HOST_PASSWORD = 'uzgbxnwjcyielmxo'
+EMAIL_HOST_PASSWORD = 'pooa tvdz yaln xpmz'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_TIMEOUT = 30
-PASSWORD_RESET_TIMEOUT = 14400
+
+
