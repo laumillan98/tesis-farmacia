@@ -200,40 +200,98 @@ $(document).ready(function() {
         })
     }
 
-    $('#edicionFarmaciaForm').on('submit', function(e) {
-        e.preventDefault();
-        var formData = $(this).serialize();
-      
+
+    function editarFarmacia(form) {
+        var formData = $(form).serialize()
+    
         // Enviar los datos al servidor usando AJAX
         $.ajax({
-            url: 'editarFarmacia/',
-            type: 'POST',
-            data: formData,
-            headers: {'X-CSRFToken': $('input[name=csrfmiddlewaretoken]').val()}, // Incluir el token CSRF
-            success: function (response) {
-                $("#modal-lg").modal("hide")
-
-                // Mostrar alerta de éxito
-                if (response.success === true) {
-                    editionSuccessful = true
-                    // Refrescar DataTables
-                    $("#miTabla").DataTable().ajax.reload()
-                }
-            },
-            error: function (error) {
-                alert("Ocurrió un error al editar la farmacia")
-            },
+          url: "editarFarmacia/",
+          type: "POST",
+          data: formData,
+          headers: { "X-CSRFToken": $("input[name=csrfmiddlewaretoken]").val() }, // Incluir el token CSRF
+          success: function (response) {
+            $("#modal-lg").modal("hide")
+    
+            // Mostrar alerta de éxito
+            if (response.success === true) {
+              editionSuccessful = true
+              // Refrescar DataTables
+              $("#miTabla").DataTable().ajax.reload()
+            }
+          },
+          error: function (error) {
+            alert("Ocurrió un error al editar la farmacia")
+          },
         })
-      })
+    }
 
-      $("#modal-lg").on("hidden.bs.modal", function () {
+
+    $("#edicionFarmaciaForm").validate({
+        rules: {
+          nombre: {
+            required: true,
+            minlength: 3,
+            pattern: /^[A-Za-z0-9\s]+(?:[A-Za-z][A-Za-z0-9\s]*)?$/
+          },
+          direccion: {
+            required: true,
+            minlength: 5,
+            pattern: /^[A-Za-z0-9\s]+(?:[A-Za-z][A-Za-z0-9\s]*)?$/
+          },
+          telefono: {
+            required: true,
+            minlength: 8,
+            maxlength: 8,
+            digits: true
+          },
+        },
+
+        messages: {
+          nombre: {
+            required: "Este campo es obligatorio.",
+            minlength: "Por favor, introduce al menos 3 caracteres.",
+            pattern: "Por favor introduce al menos una letra, puede contener números."
+          },
+          direccion: {
+            required: "Este campo es obligatorio.",
+            minlength: "Por favor, introduce al menos 5 caracteres.",
+            pattern: "Por favor introduce al menos una letra, puede contener números."
+          },
+          telefono: {
+            required: "Este campo es obligatorio.",
+            minlength: "Solo puede contener 8 dígitos.",
+            maxlength: "Solo puede contener 8 dígitos.",
+            digits: "No puede contener letras ni símbolos."
+          }, 
+        },
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.form-group').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        },
+        submitHandler: function (form) {
+            editarFarmacia(form);
+            return false // Esto previene el envío tradicional del formulario
+        },
+    });
+
+
+    $("#modal-lg").on("hidden.bs.modal", function () {
         if (editionSuccessful) {
             Swal.fire({
                 title: 'Éxito',
                 text: 'La farmacia fue editada correctamente.',
                 icon: 'success'
             });
-          editionSuccessful = false;
+            editionSuccessful = false;
         }
-      })
+    })
+
 });

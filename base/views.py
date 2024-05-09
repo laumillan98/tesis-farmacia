@@ -1,23 +1,27 @@
 from os import name
 from typing import Protocol
+from io import StringIO
+import subprocess
+import json
+from datetime import datetime
+from django.db.models.query_utils import Q
 from django.http.response import JsonResponse
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import CustomUser, Medicamento, TipoMedicamento, Farmacia, FarmaUser, FarmaciaMedicamento, TipoFarmacia, TurnoFarmacia, Municipio, Provincia
+from django.shortcuts import render, redirect
+from django.template.loader import render_to_string
+from django.core.mail import EmailMessage
+from django.core.management import call_command
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, get_user_model
+from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.cache import cache_control
-from django.contrib.auth.models import Group, User
-from django.template.loader import render_to_string
+from django.contrib.admin.models import LogEntry
 from django.contrib.sites.shortcuts import get_current_site
+from django.views.decorators.http import require_POST
+from django.views.decorators.cache import cache_control
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
-from django.core.mail import EmailMessage, EmailMultiAlternatives
-from django.db.models.query_utils import Q
-from django.core.validators import RegexValidator
-from django.views.generic.edit import UpdateView
-from django.views.decorators.http import require_POST
 
+from .models import CustomUser, Medicamento, TipoMedicamento, Farmacia, FarmaUser, FarmaciaMedicamento, TipoFarmacia, TurnoFarmacia, Municipio, Provincia
 from .forms import CustomUserCreationForm, FarmaUserCreationForm, UserLoginForm, SetPasswordForm, PasswordResetForm, UserProfileForm, UserUpdateForm, FarmaUserUpdateForm, FarmaUpdateForm, MunicUpdateForm, ProvUpdateForm
 from .decorators import usuarios_permitidos, unauthenticated_user
 from .tokens import account_activation_token
@@ -34,6 +38,32 @@ def inicio(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def administrator(request):
     return render(request, "index.html")
+
+
+def backup_database(request):
+    try:
+        now = datetime.now()
+        date_time = now.strftime("%Y-%m-%d %H:%M:%S")  #Formatear la fecha y hora
+        call_command('dbbackup')
+        with open('backup_log.txt', 'a') as f:
+            f.write(f"Backup realizado el {date_time}\n")
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})
+
+
+def restore_database(request):
+    try:
+        now = datetime.now()
+        date_time = now.strftime("%Y-%m-%d %H:%M:%S")  #Formatear la fecha y hora
+        input_stream = StringIO('yes/n')
+        process = subprocess.Popen(['python', 'manage.py', 'dbrestore'], stdin=subprocess.PIPE)
+        process.communicate(input=input_stream.getvalue().encode())
+        with open('restore_log.txt', 'a') as f:
+            f.write(f"Restauración realizada el {date_time}\n")
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -344,10 +374,24 @@ def activarUsuario(request, username):
 # Funcion para obtener los datos del usuario que se va a editar
 def obtenerUsuario(request, username):
     user = CustomUser.objects.get(username = username) 
-    return JsonResponse({
-        'username': user.username,
-        'name': user.first_name,
-        'lastname': user.last_name,
+    grupo_farmaceuticos = Group.objects.get(name='farmaceuticos')
+    if grupo_farmaceuticos in user.groups.all():
+        farma = Farmacia.objects.all()
+        farmaUser = FarmaUser.objects.get(username = username) 
+        print(farmaUser.username)
+        return JsonResponse({
+            'username': farmaUser.username,
+            'name': farmaUser.first_name,
+            'lastname': farmaUser.last_name,
+            'selected_farma_name': farmaUser.farma.id_farma,
+            'farmacias': [{'farma': obj.id_farma, 'nombre': obj.nombre} for obj in farma],
+        })
+    else:
+        print(user.username)
+        return JsonResponse({
+            'username': user.username,
+            'name': user.first_name,
+            'lastname': user.last_name,
         })
 
 
@@ -355,12 +399,22 @@ def obtenerUsuario(request, username):
 @require_POST
 def editarUsuario(request):
     user = CustomUser.objects.get(username=request.POST.get('username'))
-    form = UserUpdateForm(request.POST, instance=user)
-    if form.is_valid():
-        form.save()
-        return JsonResponse({'success': True})
+    grupo_farmaceuticos = Group.objects.get(name='farmaceuticos')
+    if grupo_farmaceuticos in user.groups.all():
+        farmaUser = FarmaUser.objects.get(username=request.POST.get('username'))
+        formFarma = FarmaUserUpdateForm(request.POST, instance=farmaUser)
+        if formFarma.is_valid():
+            formFarma.save()
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({'success': False, 'errors': formFarma.errors})   
     else:
-        return JsonResponse({'success': False, 'errors': form.errors})
+        form = UserUpdateForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({'success': False, 'errors': form.errors})
         
 
 @login_required(login_url='/acceder')
@@ -766,3 +820,25 @@ def buscarDescripcionMedicamento(request):
 
 
 
+#####################################################################################################################
+################    TRAZAS    #################
+
+def logEntries(request):
+    # Obtener todas las trazas de LogEntry (acciones registradas por Django)
+    trazas = LogEntry.objects.all()
+    # Preparar los datos en formato JSON para DataTables
+    data = {
+        'data': [
+            {
+                'id': traza.id,
+                'action_time': traza.action_time.strftime('%Y-%m-%d %H:%M:%S'),
+                'user': traza.user.username if traza.user else 'System',
+                'content_type': str(traza.content_type),
+                'object_repr': traza.object_repr,
+                'action_flag': traza.get_action_flag_display(),
+                'change_message': json.loads(traza.change_message)[0] if traza.change_message else {}
+            }
+            for traza in trazas
+        ]
+    }
+    return JsonResponse(data)

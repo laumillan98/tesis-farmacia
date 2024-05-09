@@ -1,123 +1,44 @@
-{% extends "./base.html" %}
+{% extends "./index.html" %}
 
 {% load static %}
 
+{% block mycss %}{% endblock %}
+
+{% block title %}Trazas{% endblock %}
+
 {% block content %}
-<div class="page-wrapper" style="display:block;">
-<div class="page-breadcrumb">
-    <div class="row">
-        <div class="col-7 align-self-center">
-            <h4 class="page-title text-truncate text-dark font-weight-medium mb-1">Historial</h4>
-            <div class="d-flex align-items-center">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb m-0 p-0">
-                    <li class="breadcrumb-item"><a href="{% url 'index' %}" class="text-muted">Incio</a></li>
-                    <li class="breadcrumb-item text-muted active" aria-current="page">Seguridad</li>
-                    <li class="breadcrumb-item text-muted active" aria-current="page"><a href="{% url 'history_list' %}">Historial</a></li>
 
-                </ol>
-            </nav>
+<div class="col-12">
+    <div class="card">
+        <div class="card-header">
+            <a href="/registrar_municipioo" class="btn btn-md btn-secondary">Registrar municipio</a>
         </div>
-    </div>
-   
-</div>
-</div>
-{% if messages %}
-{% for message in messages %}
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        {{ message }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-{% endfor %}
-{% endif %}
-<div class="container-fluid">
-    <!-- ============================================================== -->
-    <!-- Start Page Content -->
-    <!-- ============================================================== -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    {% comment %} <a href="{% url 'crear_usuario' %}" class="btn btn-outline-primary fa-pull-right" title="Nuevo usuario">
-                        <span>  </span>
-                    </a>
-                    <a id="showInactiveButton" href="#" class="btn btn-outline-primary fa-pull-right"title="Usuarios Inactivos">
-                        <span> Mostrar Inactivo </span>
-                    </a> {% endcomment %}
-                <div class="table-responsive">
-                    <table id="example1" class="table table-bordered table-hover ">
-                        <thead>
-                            <tr>
-                                <th>
-                                    No.
-                                </th>
-                                <th>
-                                    Usuario
-                                </th>
-                                <th>
-                                    Descripción
-                                </th>
-                                <th>
-                                    Fecha
-                                </th>
-                              
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for h in history %}
-                                <tr>
-                                    <td>
-                                        {{ forloop.counter }}
-                                    </td>
-                                    <td>
-                                        {{ h.user }}
-                                    </td>
-                                    <td>
-                                        {% if h.action_flag == 0 %}
-                                            Accedió al listado de {{ h.content_type }}
-                                        {% elif h.action_flag == 1 %}
-                                            Agregó un/a {{ h.content_type }}
-                                        {% elif h.action_flag == 2 %}
-                                            Modificó un/a {{ h.content_type }}
-                                        {% elif h.action_flag == 3 %}
-                                            Elimino un/a {{ h.content_type }}
-                                        {% elif h.action_flag == 4 %}
-                                            Inició sesión
-                                        {% elif h.action_flag == 5 %}
-                                            Cerró la sesión
-                                        {% elif h.action_flag == 6 %}
-                                            Activó el usuario {{ h.object_repr }}
-                                        {% elif h.action_flag == 7 %}
-                                            Desactivar el usuario {{ h.object_repr }}
-                                        {% elif h.action_flag == 8 %}
-                                            Reactivar el usuario {{ h.object_repr }}
-                                        {% elif h.action_flag == 11 %}
-                                             {{ h.object_repr }}
-                                        {% elif h.action_flag == 9 %}
-                                           ERROR de login(4 intentos)! <strong>{{ h.object_repr }}</strong>
-                                        
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {{ h.action_time }}
-                                    </td>
-                                  
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-
-                    </table>
-                </div>
-                <!-- /.card-body -->
+        <div class="card-body">
+            <div class="table-responsive">
+                <br>
+                <table id="miTabla" class="table table-bordered table-striped" data-url="{% url 'trazas' %}">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Fecha y Hora</th>
+                            <th>Usuario</th>
+                            <th>Tipo de Objeto</th>
+                            <th>Objeto</th>
+                            <th>Acción</th>
+                            <th>Mensaje de Cambio</th>
+                        </tr>
+                    </thead>
+                </table>
             </div>
-       
         </div>
-       
-
-
     </div>
 </div>
 
+
+{% endblock %}   
+
+{% block subtitle %}Trazas{% endblock %}
+
+{% block custom_scripts %}
+<script src="{% static 'js/trazas.js' %}"></script>
 {% endblock %}

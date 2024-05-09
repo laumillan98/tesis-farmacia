@@ -5,6 +5,8 @@ from . import views
 urlpatterns = [
      path('', views.inicio),
      path('administrator/', views.administrator, name = "index"),
+     path('backup_database/', views.backup_database, name='backup_database'),
+     path('restore_database/', views.restore_database, name='restore_database'),
      path('salir/', views.salir),
      path('acceder/', views.autenticar, name='acceder'),
      path('activate/<username>/<token>', views.activate, name='activate'),
@@ -51,5 +53,6 @@ urlpatterns = [
      path('buscarMunicipio/', views.buscarMunicipio),
      path('buscarDisponibilidadFarmacia/', views.buscarDisponibilidadFarmacia),
      path('buscarDescripcionMedicamento/', views.buscarDescripcionMedicamento),
+     path('trazas/', views.logEntries, name='log_entries'),
 
 ]

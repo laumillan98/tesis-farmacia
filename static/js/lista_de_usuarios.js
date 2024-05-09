@@ -165,31 +165,100 @@ $(document).ready(function() {
                 $('#nombre').val(response.name);
                 $('#apellidos').val(response.lastname);
                 $('#username').val(response.username);
-            }
-        });
+                var $selector = $("#farmacia_selector");
+                $selector.empty();
+        
+                response.farmacias.forEach(element => {
+                    $selector.append($('<option>', {
+                    value: element.id_farma,
+                    text: element.nombre,
+                    }))
+                });
+        
+                $selector.val(response.selected_farma_name);
+            },
+        })
     }
 
-    $('#edicionUsuarioForm').on('submit', function(e) {
-        e.preventDefault();
-        var formData = $(this).serialize();
+
+    function editarUsuario(form) {
+        var formData = $(form).serialize()
+    
         // Enviar los datos al servidor usando AJAX
         $.ajax({
-          url: 'editarUsuario/',
-          type: 'POST',
+          url: "editarUsuario/",
+          type: "POST",
           data: formData,
-          headers: {'X-CSRFToken': $('input[name=csrfmiddlewaretoken]').val()}, // Incluir el token CSRF
-          success: function(response) {
+          headers: { "X-CSRFToken": $("input[name=csrfmiddlewaretoken]").val() }, // Incluir el token CSRF
+          success: function (response) {
+            $("#modal-lg").modal("hide")
+    
             // Mostrar alerta de éxito
-            alert('Usuario editado satisfactoriamente');
-      
-            // Refrescar DataTables
-            $('#miTabla').DataTable().ajax.reload();
+            if (response.success === true) {
+              editionSuccessful = true
+              // Refrescar DataTables
+              $("#miTabla").DataTable().ajax.reload()
+            }
           },
-          error: function(error) {
-            alert('Ocurrió un error al editar el usuario');
-          }
-        });
-      });
+          error: function (error) {
+            alert("Ocurrió un error al editar el usuario")
+          },
+        })
+    }
+
+
+    $("#edicionUsuarioForm").validate({
+        rules: {
+          nombre: {
+            required: true,
+            minlength: 3,
+            pattern: /^[A-Za-z\s]+$/
+          },
+          apellidos: {
+            required: true,
+            minlength: 3,
+            pattern: /^[A-Za-z\s]+$/
+          },
+        },
+        messages: {
+          nombre: {
+            required: "Este campo es obligatorio.",
+            minlength: "Por favor, introduce al menos 3 caracteres.",
+            pattern: "No puede contener números ni símbolos."
+          },
+          apellidos: {
+            required: "Este campo es obligatorio.",
+            minlength: "Por favor, introduce al menos 3 caracteres.",
+            pattern: "No puede contener números ni símbolos."
+          },
+        },
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+          error.addClass('invalid-feedback');
+          element.closest('.form-group').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+          $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+          $(element).removeClass('is-invalid');
+        },
+        submitHandler: function (form) {
+          editarUsuario(form);
+          return false // Esto previene el envío tradicional del formulario
+        },
+    });
+
+    $("#modal-lg").on("hidden.bs.modal", function () {
+        if (editionSuccessful) {
+            Swal.fire({
+                title: 'Éxito',
+                text: 'El usuario fue editado correctamente.',
+                icon: 'success'
+            });
+          editionSuccessful = false;
+        }
+    })
 });
 
 

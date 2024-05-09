@@ -117,8 +117,8 @@
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="index3.html" class="brand-link">
-      <img src="{% static 'dist/img/AdminLTELogo.png' %}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+    <a href="https://salud.msp.gob.cu/tag/infomed/" class="brand-link">
+      <img src="{% static 'dist/img/InfomedLogo.png' %}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
       <span class="brand-text font-weight-light">Admin</span>
     </a>
 
@@ -130,7 +130,7 @@
           <img src="{% static 'dist/img/user2-160x160.jpg' %}" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
-          <a href="#" class="d-block">{{user.first_name}}</a>
+          <a href="{%url 'perfil_de_usuario' user.username %}" class="d-block">{{user.first_name}}</a>
         </div>
       </div>
 
@@ -152,7 +152,7 @@
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
           <li class="nav-item menu-open">
-            <a href="#" class="nav-link active">
+            <a href="#" class="nav-link">
               <i class="nav-icon fa-solid fa-pen-to-square"></i>
               <p>
                 Gestionar
@@ -184,6 +184,12 @@
                   <p>Provincias</p>
                 </a>
               </li>
+              <li class="nav-item">
+                <a href="/trazas" class="nav-link {% if request.path == '/trazas/' %}active{% endif %}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Trazas</p>
+                </a>
+              </li>
             </ul>
           </li>
           <li class="nav-item">
@@ -193,6 +199,29 @@
                 Reportes
               </p>
             </a>
+          </li>
+          <li class="nav-item menu-close">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fa-solid fa-database"></i>
+              <p>
+                Base de Datos
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a id="backup-link" href="#" data-url="{% url 'backup_database' %}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Salva BD</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a id="restore-link" href="#" data-url="{% url 'restore_database' %}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Restaura BD</p>
+                </a>
+              </li>
+            </ul>
           </li>
         </ul>
       </nav>
@@ -233,7 +262,7 @@
   </div>
   <!-- /.content-wrapper -->
   <footer class="main-footer">
-    <strong>Copyright &copy; 2023-2024 <a href="https://infomed.sld.cu">Infomed.</a></strong>
+    <strong>Copyright &copy; 2023-2024 <a href="https://salud.msp.gob.cu/tag/infomed/">Infomed.</a></strong>
     Todos los derechos reservados.
     <div class="float-right d-none d-sm-inline-block">
       <b>Version</b> 1.0
@@ -299,6 +328,9 @@
 
 
 <!--MIOSSSSSSSSSSSSSSSSSSSSSSSSS-->
+<!-- Backup Base de Datos Alerta --> 
+<script src="{% static 'js/backup_bd.js' %}"></script>
+<script src="{% static 'js/restore_bd.js' %}"></script>
 <!-- Sweet Alert  --> 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- DataTables.js  
@@ -307,3 +339,5 @@
 {% block custom_scripts %}{% endblock %}
 </body>
 </html>
+
+

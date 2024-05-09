@@ -28,12 +28,14 @@ $(document).ready(function () {
       ],
     })
   
+
     // Evento de clic en el botón "Editar"
     $("#miTabla").on("click", "#editar", function () {
       let idMunic = $(this).data("id")
       cargarInformacionMunicipio(idMunic)
     })
   
+    
     function cargarInformacionMunicipio(id) {
       $.ajax({
         url: "obtenerMunicipio/" + id + "/",
@@ -58,6 +60,7 @@ $(document).ready(function () {
       })
     }
   
+
     function editarMunicipio(form) {
         var formData = $(form).serialize()
     
@@ -88,13 +91,15 @@ $(document).ready(function () {
         rules: {
           nombre: {
             required: true,
-            minlength: 3
+            minlength: 3,
+            pattern: /^[A-Za-z0-9\s]+(?:[A-Za-z][A-Za-z0-9\s]*)?$/
           },
         },
         messages: {
           nombre: {
             required: "Este campo es obligatorio.",
             minlength: "Por favor, introduce al menos 3 caracteres.",
+            pattern: "Por favor introduce al menos una letra, puede contener números."
           },
         },
         errorElement: 'span',

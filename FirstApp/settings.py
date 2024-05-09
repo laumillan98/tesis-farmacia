@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'base.apps.BaseConfig',
     'captcha',
-    
+    'dbbackup',
 ]
 
 AUTH_USER_MODEL = 'base.CustomUser'
@@ -167,4 +167,6 @@ EMAIL_HOST_PASSWORD = 'pooa tvdz yaln xpmz'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-
+# Backup de la bd 
+DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DBBACKUP_STORAGE_OPTIONS = {'location': 'C:/Users/laumi/Downloads/example/FirstApp/backup_bd'}
