@@ -365,7 +365,7 @@ def eliminarUsuario(request, username):
 
     if grupo_farmaceutico in user.groups.all():
         farma_user = FarmaUser.objects.get(username = username)
-        farma_user.farma = None
+        farma_user.id_farma = None
         farma_user.save()
 
     return JsonResponse({'status':'success'})
@@ -378,20 +378,25 @@ def activarUsuario(request, username):
     return JsonResponse({'status':'success'})
 
 
-# Funcion para obtener los datos del usuario que se va a editar
 def obtenerUsuario(request, username):
     user = CustomUser.objects.get(username = username) 
     grupo_farmaceuticos = Group.objects.get(name='farmaceuticos')
     if grupo_farmaceuticos in user.groups.all():
         farma = Farmacia.objects.all()
         farmaUser = FarmaUser.objects.get(username = username) 
-        return JsonResponse({
+        response_data = {
+            'isFarmaUser': True,
             'username': farmaUser.username,
             'name': farmaUser.first_name,
             'lastname': farmaUser.last_name,
-            'selected_farma_name': farmaUser.farma.id_farma,
-            'farmacias': [{'farma': obj.id_farma, 'nombre': obj.nombre} for obj in farma],
-        })
+            'farmacias': [{'id_farma': obj.id_farma, 'nombre': obj.nombre} for obj in farma],
+        }
+
+        if farmaUser.id_farma and farmaUser.id_farma.id_farma:
+            response_data['selected_farma_name'] = farmaUser.id_farma.id_farma
+
+        return JsonResponse(response_data)
+    
     else:
         return JsonResponse({
             'username': user.username,

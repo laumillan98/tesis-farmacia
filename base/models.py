@@ -72,7 +72,7 @@ class Medicamento(models.Model):
 
 
 class Farmacia(models.Model):
-    id_farma = models.UUIDField(unique=True, default=uuid.uuid4, editable=False)
+    id_farma = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     nombre = models.CharField(max_length=100)
     direccion = models.CharField(max_length=200)
     telefono = models.IntegerField(null=True, blank=True) 
@@ -93,8 +93,8 @@ class Farmacia(models.Model):
     
 
 class FarmaUser(CustomUser):
-    farma = models.ForeignKey(Farmacia, on_delete=models.RESTRICT, null=True)
-    
+    id_farma = models.ForeignKey(Farmacia, on_delete=models.RESTRICT, null=True, blank=True, to_field='id_farma')
+
     def __str__(self):
         return self.username 
 

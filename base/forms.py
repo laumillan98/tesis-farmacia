@@ -155,7 +155,7 @@ class FarmaUserUpdateForm(UserChangeForm):
     
     class Meta:
         model = FarmaUser
-        fields = ('first_name', 'last_name', 'farma')
+        fields = ('first_name', 'last_name', 'id_farma')
 
 
 class FarmaUpdateForm(forms.ModelForm):

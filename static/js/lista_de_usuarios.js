@@ -158,15 +158,17 @@ $(document).ready(function() {
         cargarInformacionUsuario(nombreUsuario);
      });
 
-     function cargarInformacionUsuario(id) {
-        $.ajax({
-            url: 'obtenerUsuario/' + id + '/',
-            type: 'GET',
-            data: {},
-            success: function(response) {
-                $('#nombre').val(response.name);
-                $('#apellidos').val(response.lastname);
-                $('#username').val(response.username);
+    function cargarInformacionUsuario(id) {
+      $.ajax({
+          url: 'obtenerUsuario/' + id + '/',
+          type: 'GET',
+          data: {},
+          success: function(response) {
+              $('#nombre').val(response.name);
+              $('#apellidos').val(response.lastname);
+              $('#username').val(response.username);
+              if(response.hasOwnProperty("isFarmaUser")) {
+                $("#form-selector-farmacias").prop('hidden', false);
                 var $selector = $("#farmacia_selector");
                 $selector.empty();
         
@@ -178,8 +180,11 @@ $(document).ready(function() {
                 });
         
                 $selector.val(response.selected_farma_name);
-            },
-        })
+              } else {
+                $("#form-selector-farmacias").prop('hidden', true);
+              }
+          },
+      })
     }
 
 
