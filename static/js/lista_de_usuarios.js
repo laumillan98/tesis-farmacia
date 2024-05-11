@@ -1,23 +1,25 @@
 $(document).ready(function() {
-
-    var ajaxUrl = $('#miTabla').data('url');
-    var table = $('#miTabla').DataTable({
-        "ajax": ajaxUrl,
-        "columns": [
-            { "data": "index" },
-            { "data": "first_name" },
-            { "data": "last_name" },
-            { "data": "username" },
-            { "data": "email" },
-            { "data": "first_group" },
-            { "data": "is_active" },
+    let editionSuccessful = false
+    var ajaxUrl = $("#miTabla").data("url");
+    var table = $("#miTabla").DataTable({
+        ajax: ajaxUrl,
+        columns: [
+            { data: "index" },
+            { data: "first_name" },
+            { data: "last_name" },
+            { data: "username" },
+            { data: "email" },
+            { data: "first_group" },
+            { data: "date_joined"},
+            { data: "last_login"},
+            { data: "is_active" },
             {
-                "data": null,
-                "orderable": false,
-                "searchable": false,
-                "render": function(data, type, row, meta) {
+                data: null,
+                orderable: false,
+                searchable: false,
+                render: function(data, type, row, meta) {
                     // Verifica si estás en la columna de acciones
-                    if (meta.col === 7) { 
+                    if (meta.col === 9) { 
                         let editButton = `
                         <button id='editar' class='btn btn-sm btn-secondary' data-id='${row.username}' data-toggle='modal' data-target='#modal-lg'>
                             <i class="fas fa-pencil-alt"></i>
@@ -41,12 +43,12 @@ $(document).ready(function() {
                 }
             }
         ],
-        "columnDefs": [
+        columnDefs: [
             {
-                "targets": 6, // Columna de estado activo
-                "orderable": false,
-                "searchable": false,
-                "render": function(data, type, row) {
+                targets: 8, // Columna de estado activo
+                orderable: false,
+                searchable: false,
+                render: function(data, type, row) {
                     return data ? '<i class="fas fa-check" style="color: green"></i>' : '<i class="fas fa-xmark" style="color: red"></i>';
                 }
             },

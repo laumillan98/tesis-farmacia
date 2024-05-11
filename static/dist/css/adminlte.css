@@ -11778,7 +11778,7 @@ body.sidebar-collapse:not(.sidebar-mini-xs):not(.sidebar-mini-md):not(.sidebar-m
 }
 
 .sidebar-collapse .main-sidebar .nav-sidebar.nav-child-indent .nav-treeview {
-  padding: 0;
+  padding: 0px;
 }
 
 @media (max-width: 767.98px) {

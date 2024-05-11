@@ -152,16 +152,16 @@ class UserUpdateForm(UserChangeForm):
 class FarmaUserUpdateForm(UserChangeForm):
     first_name = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
     last_name = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Apellido no válido')], label="Apellidos", required=True)
-    #farma = forms.ModelChoiceField(queryset=Farmacia.objects.exclude(farmauser__isnull=False), label="Farmacia Asociada") 
     
     class Meta:
         model = FarmaUser
         fields = ('first_name', 'last_name', 'farma')
 
 
-
 class FarmaUpdateForm(forms.ModelForm):
     nombre = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
+    direccion = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Dirección no válida')], label="Dirección", required=True)
+    telefono = forms.CharField(label="Teléfono", required=True)
     
     class Meta:
         model = Farmacia

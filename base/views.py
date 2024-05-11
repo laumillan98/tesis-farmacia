@@ -3,7 +3,7 @@ from typing import Protocol
 from io import StringIO
 import subprocess
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.db.models.query_utils import Q
 from django.http.response import JsonResponse
 from django.shortcuts import render, redirect
@@ -301,21 +301,28 @@ def gestionarUsuarios(request):
 def listaDeUsuarios(request):
     users = CustomUser.objects.all()
     users_list = []
+    total_connected_time = timedelta()  # Inicializar el tiempo total conectado como cero
     for index,user in enumerate(users):
         groups = user.groups.values_list('name', flat=True)  
         first_group = groups.first() if groups else None 
+        user_date_joined = user.date_joined.strftime('%Y-%m-%d %H:%M:%S') if user.date_joined else None
+        user_last_login = user.last_login.strftime('%Y-%m-%d %H:%M:%S') if user.last_login else None
+
         user_data = {
             'index': index + 1,
             'first_name': user.first_name,
             'last_name': user.last_name,
             'username': user.username,
             'email': user.email,
+            'date_joined': user_date_joined,
+            'last_login': user_last_login,
             'first_group': first_group,
             'is_active': user.is_active,
             'is_superuser': user.is_superuser,
             'id': user.pk,
         }
         users_list.append(user_data)
+
     data = {'data': users_list}
     return JsonResponse(data, safe=False)
 
@@ -450,7 +457,25 @@ def listaDeFarmacias(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarFarmacia(request):
     if request.method =='POST':
-        return redirect('/')
+        form = FarmaUpdateForm(data=request.POST)
+        if form.is_valid():
+            farma = form.save(commit=False)
+            farma.id_turno = form.cleaned_data['id_turno']
+            farma.id_tipo = form.cleaned_data['id_tipo']
+            farma.id_munic = form.cleaned_data['id_munic']
+            farma.save()
+            return redirect('/gestionar_farmacias')
+        else:
+            for error in list(form.errors.values()):
+                messages.error(request, error)
+    else:
+        form = FarmaUpdateForm()
+    
+    return render(
+        request=request,
+        template_name="registrar_farmacia.html",
+        context={"form": form}
+    )
 
 
 # no funciona aun
@@ -461,6 +486,7 @@ def eliminarFarmacia(request, uuid):
     return JsonResponse({'status':'success'})
 
 
+# no funciona aun
 def activarFarmacia(request, uuid):
     farma = Farmacia.objects.get(id_farma = uuid)   
     farma.is_active = True
@@ -523,7 +549,24 @@ def listaDeMunicipios(request):
 
 # Completarrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
 def registrarMunicipio(request):
-    return redirect('/')
+    if request.method =='POST':
+        form = MunicUpdateForm(data=request.POST)
+        if form.is_valid():
+            munic = form.save(commit=False)
+            munic.id_prov = form.cleaned_data['id_prov']
+            munic.save()
+            return redirect('/gestionar_municipios')
+        else:
+            for error in list(form.errors.values()):
+                messages.error(request, error)
+    else:
+        form = MunicUpdateForm()
+    
+    return render(
+        request=request,
+        template_name="registrar_municipio.html",
+        context={"form": form}
+    )
 
 
 def obtenerMunicipio(request, uuid):
@@ -575,7 +618,22 @@ def listaDeProvincias(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarProvincia(request):
     if request.method =='POST':
-        return redirect('/')
+        form = ProvUpdateForm(data=request.POST)
+        if form.is_valid():
+            prov = form.save(commit=False)
+            prov.save()
+            return redirect('/gestionar_provincias')
+        else:
+            for error in list(form.errors.values()):
+                messages.error(request, error)
+    else:
+        form = ProvUpdateForm()
+    
+    return render(
+        request=request,
+        template_name="registrar_provincia.html",
+        context={"form": form}
+    )
 
 
 def obtenerProvincia(request, uuid):
