@@ -53,6 +53,7 @@ urlpatterns = [
      path('buscarMunicipio/', views.buscarMunicipio),
      path('buscarDisponibilidadFarmacia/', views.buscarDisponibilidadFarmacia),
      path('buscarDescripcionMedicamento/', views.buscarDescripcionMedicamento),
-     path('trazas/', views.logEntries, name='log_entries'),
+     path('visualizar_trazas/', views.visualizarTrazas),
+     path('lista_de_trazas/', views.listaDeTrazas, name='lista_de_trazas'),
 
 ]

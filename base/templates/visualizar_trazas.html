@@ -1,0 +1,41 @@
+{% extends "./index.html" %}
+
+{% load static %}
+
+{% block mycss %}{% endblock %}
+
+{% block title %}Trazas{% endblock %}
+
+{% block content %}
+
+<div class="col-12">
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <br>
+                <table id="miTabla" class="table table-bordered table-striped" data-url="{% url 'lista_de_trazas' %}">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Id</th>
+                            <th>Fecha y Hora</th>
+                            <th>Usuario</th>
+                            <th>Tipo de Objeto</th>
+                            <th>Objeto</th>
+                            <th>Acción</th>
+                            <th>Detalles</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}   
+
+{% block subtitle %}Trazas{% endblock %}
+
+{% block custom_scripts %}
+<script src="{% static 'js/lista_de_trazas.js' %}"></script>
+{% endblock %}

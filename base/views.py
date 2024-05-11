@@ -823,22 +823,32 @@ def buscarDescripcionMedicamento(request):
 #####################################################################################################################
 ################    TRAZAS    #################
 
-def logEntries(request):
-    # Obtener todas las trazas de LogEntry (acciones registradas por Django)
-    trazas = LogEntry.objects.all()
-    # Preparar los datos en formato JSON para DataTables
-    data = {
-        'data': [
-            {
-                'id': traza.id,
-                'action_time': traza.action_time.strftime('%Y-%m-%d %H:%M:%S'),
-                'user': traza.user.username if traza.user else 'System',
-                'content_type': str(traza.content_type),
-                'object_repr': traza.object_repr,
-                'action_flag': traza.get_action_flag_display(),
-                'change_message': json.loads(traza.change_message)[0] if traza.change_message else {}
-            }
-            for traza in trazas
-        ]
-    }
-    return JsonResponse(data)
+
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['admin'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def visualizarTrazas(request):
+    return render(request, "visualizar_trazas.html")
+
+
+def listaDeTrazas(request):
+    trazas = LogEntry.objects.all()  # Obtener todas las trazas de LogEntry (acciones registradas por Django)
+    trazas_list = []
+    for index, traza in enumerate(trazas):
+        traza_data = {
+            'index': index + 1,
+            'id': traza.id,
+            'action_time': traza.action_time.strftime('%Y-%m-%d %H:%M:%S'),
+            'user': traza.user.username if traza.user else 'System',
+            'content_type': str(traza.content_type),
+            'object_repr': traza.object_repr,
+            'action_flag': traza.get_action_flag_display(),
+            'change_message': json.loads(traza.change_message)[0] if traza.change_message else {}
+        }
+        trazas_list.append(traza_data)
+    data = {'data': trazas_list}
+    return JsonResponse(data, safe=False)
+    
+
+
+
