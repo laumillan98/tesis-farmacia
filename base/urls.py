@@ -25,8 +25,6 @@ urlpatterns = [
      path('gestionar_farmacias/', views.gestionarFarmacias),
      path('lista_de_farmacias/', views.listaDeFarmacias, name='lista_de_farmacias'),
      path('registrar_farmacia/', views.registrarFarmacia),
-     path('gestionar_farmacias/eliminarFarmacia/<uuid>/', views.eliminarFarmacia, name='eliminar_farmacia'),
-     path('gestionar_farmacias/activarFarmacia/<uuid>/', views.activarFarmacia, name ='activar_farmacia'),
      path('gestionar_farmacias/obtenerFarmacia/<uuid>/', views.obtenerFarmacia, name ='obtener_farmacia'),
      path('gestionar_farmacias/editarFarmacia/', views.editarFarmacia, name ='editar_farmacia'),
      path('gestionar_tipos_de_farmacias/', views.gestionarTiposFarmacias),

@@ -385,7 +385,6 @@ def obtenerUsuario(request, username):
     if grupo_farmaceuticos in user.groups.all():
         farma = Farmacia.objects.all()
         farmaUser = FarmaUser.objects.get(username = username) 
-        print(farmaUser.username)
         return JsonResponse({
             'username': farmaUser.username,
             'name': farmaUser.first_name,
@@ -394,7 +393,6 @@ def obtenerUsuario(request, username):
             'farmacias': [{'farma': obj.id_farma, 'nombre': obj.nombre} for obj in farma],
         })
     else:
-        print(user.username)
         return JsonResponse({
             'username': user.username,
             'name': user.first_name,
@@ -445,7 +443,6 @@ def listaDeFarmacias(request):
             'telefono': farma.telefono,
             'tipo': farma.id_tipo.nombre,
             'turno': farma.id_turno.nombre,
-            'is_active': farma.is_active,
         }
         farmacias_list.append(farma_data)
     data = {'data': farmacias_list}
@@ -476,22 +473,6 @@ def registrarFarmacia(request):
         template_name="registrar_farmacia.html",
         context={"form": form}
     )
-
-
-# no funciona aun
-def eliminarFarmacia(request, uuid):
-    farma = Farmacia.objects.get(id_farma = uuid)   
-    farma.is_active = False
-    farma.save()
-    return JsonResponse({'status':'success'})
-
-
-# no funciona aun
-def activarFarmacia(request, uuid):
-    farma = Farmacia.objects.get(id_farma = uuid)   
-    farma.is_active = True
-    farma.save()
-    return JsonResponse({'status':'success'})
 
 
 def obtenerFarmacia(request, uuid):
