@@ -1,5 +1,6 @@
 $(document).ready(function() {
 
+    let editionSuccessful = false
     var ajaxUrl = $('#miTabla').data('url');
     var table = $('#miTabla').DataTable({
         "ajax": ajaxUrl,
@@ -165,17 +166,22 @@ $(document).ready(function() {
                 $('#nombre').val(response.name);
                 $('#apellidos').val(response.lastname);
                 $('#username').val(response.username);
-                var $selector = $("#farmacia_selector");
-                $selector.empty();
-        
-                response.farmacias.forEach(element => {
-                    $selector.append($('<option>', {
-                    value: element.id_farma,
-                    text: element.nombre,
-                    }))
-                });
-        
-                $selector.val(response.selected_farma_name);
+                if(response.hasOwnProperty("isFarmaUser")) {
+                  $("#form-selector-farmacias").prop('hidden', false);
+                  var $selector = $("#farmacia_selector");
+                  $selector.empty();
+          
+                  response.farmacias.forEach(element => {
+                      $selector.append($('<option>', {
+                      value: element.id_farma,
+                      text: element.nombre,
+                      }))
+                  });
+          
+                  $selector.val(response.selected_farma_name);
+                } else {
+                  $("#form-selector-farmacias").prop('hidden', true);
+                }
             },
         })
     }

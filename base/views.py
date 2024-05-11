@@ -378,14 +378,18 @@ def obtenerUsuario(request, username):
     if grupo_farmaceuticos in user.groups.all():
         farma = Farmacia.objects.all()
         farmaUser = FarmaUser.objects.get(username = username) 
-        print(farmaUser.username)
-        return JsonResponse({
+        response_data = {
+            'isFarmaUser': True,
             'username': farmaUser.username,
             'name': farmaUser.first_name,
             'lastname': farmaUser.last_name,
-            'selected_farma_name': farmaUser.farma.id_farma,
-            'farmacias': [{'farma': obj.id_farma, 'nombre': obj.nombre} for obj in farma],
-        })
+            'farmacias': [{'id_farma': obj.id_farma, 'nombre': obj.nombre} for obj in farma],
+        }
+        # Check if farmaUser.id_farma.id_farma is not empty or None
+        if farmaUser.id_farma and farmaUser.id_farma.id_farma:
+            response_data['selected_farma_name'] = farmaUser.id_farma.id_farma
+
+        return JsonResponse(response_data)
     else:
         print(user.username)
         return JsonResponse({
@@ -398,6 +402,7 @@ def obtenerUsuario(request, username):
 @login_required(login_url='/acceder')
 @require_POST
 def editarUsuario(request):
+    print(request.POST.get('farma'))
     user = CustomUser.objects.get(username=request.POST.get('username'))
     grupo_farmaceuticos = Group.objects.get(name='farmaceuticos')
     if grupo_farmaceuticos in user.groups.all():
@@ -407,6 +412,7 @@ def editarUsuario(request):
             formFarma.save()
             return JsonResponse({'success': True})
         else:
+            print(formFarma.errors)
             return JsonResponse({'success': False, 'errors': formFarma.errors})   
     else:
         form = UserUpdateForm(request.POST, instance=user)
