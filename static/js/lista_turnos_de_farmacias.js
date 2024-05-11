@@ -2,8 +2,8 @@ $(document).ready(function() {
     let editionSuccessful = false
     var ajaxUrl = $('#miTabla').data('url');
     var table = $('#miTabla').DataTable({
-        "ajax": ajaxUrl,
-        "columns": [
+        ajax: ajaxUrl,
+        columns: [
             { data: "index" },
             { data: "id" },
             { data: "nombre" },
@@ -31,28 +31,28 @@ $(document).ready(function() {
      // Evento de clic en el botón "Editar"
      $('#miTabla').on('click', '#editar', function() {
         let idProv = $(this).data('id');
-        cargarInformacionProvincia(idProv);
+        cargarInformacionTurnoFarmacia(idProv);
      });
 
-     function cargarInformacionProvincia(id) {
+     function cargarInformacionTurnoFarmacia(id) {
         $.ajax({
-            url: 'obtenerProvincia/' + id + '/',
+            url: 'obtenerTurnoFarmacia/' + id + '/',
             type: 'GET',
             data: {},
             success: function(response) {
-                $('#provincia').val(response.name);
+                $('#turno').val(response.name);
                 $('#id').val(response.id);
             }
         });
     }
 
 
-    function editarProvincia(form) {
+    function editarTurnoFarmacia(form) {
         var formData = $(form).serialize()
     
         // Enviar los datos al servidor usando AJAX
         $.ajax({
-          url: "editarProvincia/",
+          url: "editarTurnoFarmacia/",
           type: "POST",
           data: formData,
           headers: { "X-CSRFToken": $("input[name=csrfmiddlewaretoken]").val() }, // Incluir el token CSRF
@@ -67,13 +67,13 @@ $(document).ready(function() {
             }
           },
           error: function (error) {
-            alert("Ocurrió un error al editar la provincia")
+            alert("Ocurrió un error al editar el turno de la farmacia")
           },
         })
     }
 
 
-    $("#edicionProvinciaForm").validate({
+    $("#edicionTurnoFarmaciaForm").validate({
         rules: {
           nombre: {
             required: true,
@@ -100,7 +100,7 @@ $(document).ready(function() {
             $(element).removeClass('is-invalid');
         },
         submitHandler: function (form) {
-            editarProvincia(form);
+            editarTurnoFarmacia(form);
             return false // Esto previene el envío tradicional del formulario
         },
     });
@@ -110,7 +110,7 @@ $(document).ready(function() {
         if (editionSuccessful) {
             Swal.fire({
                 title: 'Éxito',
-                text: 'La provincia fue editada correctamente.',
+                text: 'El turno de la farmacia fue editado correctamente.',
                 icon: 'success'
             });
           editionSuccessful = false;

@@ -22,7 +22,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 
 from .models import CustomUser, Medicamento, TipoMedicamento, Farmacia, FarmaUser, FarmaciaMedicamento, TipoFarmacia, TurnoFarmacia, Municipio, Provincia
-from .forms import CustomUserCreationForm, FarmaUserCreationForm, UserLoginForm, SetPasswordForm, PasswordResetForm, UserProfileForm, UserUpdateForm, FarmaUserUpdateForm, FarmaUpdateForm, MunicUpdateForm, ProvUpdateForm
+from .forms import CustomUserCreationForm, FarmaUserCreationForm, UserLoginForm, SetPasswordForm, PasswordResetForm, UserProfileForm, UserUpdateForm, FarmaUserUpdateForm, FarmaUpdateForm, TipoFarmaciaUpdateForm, TurnoFarmaciaUpdateForm, MunicUpdateForm, ProvUpdateForm
 from .decorators import usuarios_permitidos, unauthenticated_user
 from .tokens import account_activation_token
 from FirstApp.tasks import send_activation_email
@@ -523,6 +523,132 @@ def editarFarmacia(request):
         return JsonResponse({'success': True})
     else:
         return JsonResponse({'success': False, 'errors': form.errors})
+    
+
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['admin'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def gestionarTiposFarmacias(request):
+    return render(request, "gestionar_tipos_de_farmacias.html")
+
+
+def listaDeTiposDeFarmacias(request):
+    tipos = TipoFarmacia.objects.all()
+    tipos_list = []
+    for index,tipo in enumerate(tipos):
+        tipo_data = {
+            'index': index + 1,
+            'id': tipo.id_tipo_farmacia,
+            'nombre': tipo.nombre,
+        }
+        tipos_list.append(tipo_data)
+    data = {'data': tipos_list}
+    return JsonResponse(data, safe=False)
+
+
+@usuarios_permitidos(roles_permitidos=['admin'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def registrarTipoFarmacia(request):
+    if request.method =='POST':
+        form = TipoFarmaciaUpdateForm(data=request.POST)
+        if form.is_valid():
+            tipo = form.save(commit=False)
+            tipo.save()
+            return redirect('/gestionar_tipos_de_farmacias')
+        else:
+            for error in list(form.errors.values()):
+                messages.error(request, error)
+    else:
+        form = TipoFarmaciaUpdateForm()
+    
+    return render(
+        request=request,
+        template_name="registrar_tipo_de_farmacia.html",
+        context={"form": form}
+    )
+
+
+def obtenerTipoFarmacia(request, uuid):
+    tipo = TipoFarmacia.objects.get(id_tipo_farmacia = uuid)
+    return JsonResponse({
+        'id': tipo.id_tipo_farmacia,
+        'name': tipo.nombre,
+    })
+
+
+@login_required(login_url='/acceder')
+@require_POST
+def editarTipoFarmacia(request):
+    tipo = TipoFarmacia.objects.get(id_tipo_farmacia = request.POST.get('id'))
+    form = TipoFarmaciaUpdateForm(request.POST, instance=tipo)
+    if form.is_valid():
+        form.save()
+        return JsonResponse({'success': True})
+    else:
+        return JsonResponse({'success': False, 'errors': form.errors})
+
+
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['admin'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def gestionarTurnosFarmacias(request):
+    return render(request, "gestionar_turnos_de_farmacias.html")
+
+
+def listaDeTurnosDeFarmacias(request):
+    turnos = TurnoFarmacia.objects.all()
+    turnos_list = []
+    for index,tipo in enumerate(turnos):
+        turno_data = {
+            'index': index + 1,
+            'id': tipo.id_turno_farmacia,
+            'nombre': tipo.nombre,
+        }
+        turnos_list.append(turno_data)
+    data = {'data': turnos_list}
+    return JsonResponse(data, safe=False)
+
+
+@usuarios_permitidos(roles_permitidos=['admin'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def registrarTurnoFarmacia(request):
+    if request.method =='POST':
+        form = TurnoFarmaciaUpdateForm(data=request.POST)
+        if form.is_valid():
+            turno = form.save(commit=False)
+            turno.save()
+            return redirect('/gestionar_turnos_de_farmacias')
+        else:
+            for error in list(form.errors.values()):
+                messages.error(request, error)
+    else:
+        form = TurnoFarmaciaUpdateForm()
+    
+    return render(
+        request=request,
+        template_name="registrar_turno_de_farmacia.html",
+        context={"form": form}
+    )
+
+
+def obtenerTurnoFarmacia(request, uuid):
+    turno = TurnoFarmacia.objects.get(id_turno_farmacia = uuid)
+    return JsonResponse({
+        'id': turno.id_turno_farmacia,
+        'name': turno.nombre,
+    })
+
+
+@login_required(login_url='/acceder')
+@require_POST
+def editarTurnoFarmacia(request):
+    turno = TurnoFarmacia.objects.get(id_turno_farmacia = request.POST.get('id'))
+    form = TurnoFarmaciaUpdateForm(request.POST, instance=turno)
+    if form.is_valid():
+        form.save()
+        return JsonResponse({'success': True})
+    else:
+        return JsonResponse({'success': False, 'errors': form.errors})
 
 
 @login_required(login_url='/acceder')
@@ -547,7 +673,6 @@ def listaDeMunicipios(request):
     return JsonResponse(data, safe=False)
 
 
-# Completarrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
 def registrarMunicipio(request):
     if request.method =='POST':
         form = MunicUpdateForm(data=request.POST)
@@ -613,7 +738,6 @@ def listaDeProvincias(request):
     return JsonResponse(data, safe=False)
 
 
-# completarrrrrrrrrrrrrrr
 @usuarios_permitidos(roles_permitidos=['admin'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarProvincia(request):

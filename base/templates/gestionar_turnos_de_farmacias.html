@@ -1,0 +1,78 @@
+{% extends "./index.html" %}
+
+{% load static %}
+
+{% block mycss %}{% endblock %}
+
+{% block title %}Gestionar Turnos de Farmacias{% endblock %}
+
+{% block content %}
+
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <a href="/registrar_turno_de_farmacia" class="btn btn-md btn-secondary">Registrar Turno de Farmacia</a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <br>
+                    <table id="miTabla" class="table table-bordered table-striped" data-url="{% url 'lista_turnos_de_farmacias' %}">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>id</th>
+                                <th>Turnos de farmacias</th>
+                                <th>Opciones</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- /.modal -->
+    <div class="modal fade" id="modal-lg">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h4 class="modal-title">Editar</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <div class="modal-body">
+                    <form id="edicionTurnoFarmaciaForm">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="name">Turno de Farmacia</label>
+                                <input type="text" class="form-control" id="turno" name="nombre" placeholder="Turno">
+                                <input type="text" class="form-control" id="id" hidden name="id">
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Aceptar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+    
+
+{% endblock %}   
+
+{% block subtitle %}Turnos{% endblock %}
+
+{% block custom_scripts %}
+<script src="{% static 'plugins/jquery-validation/jquery.validate.min.js' %}"></script>
+<script src="{% static 'plugins/jquery-validation/additional-methods.min.js' %}"></script>
+<script src="{% static 'js/lista_turnos_de_farmacias.js' %}"></script>
+{% endblock %}
+

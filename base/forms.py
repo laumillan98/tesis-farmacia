@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, SetPasswordForm, PasswordResetForm, UserChangeForm
-from .models import CustomUser, FarmaUser, Farmacia, Municipio, Provincia
+from .models import CustomUser, FarmaUser, Farmacia, Municipio, Provincia, TipoFarmacia, TurnoFarmacia
 from django.contrib.auth import get_user_model
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
@@ -166,6 +166,22 @@ class FarmaUpdateForm(forms.ModelForm):
     class Meta:
         model = Farmacia
         fields = ('nombre', 'direccion', 'telefono', 'id_turno', 'id_tipo', 'id_munic')
+
+
+class TipoFarmaciaUpdateForm(forms.ModelForm):
+    nombre = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
+
+    class Meta:
+        model = TipoFarmacia
+        fields = ('nombre',)
+
+
+class TurnoFarmaciaUpdateForm(forms.ModelForm):
+    nombre = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
+
+    class Meta:
+        model = TurnoFarmacia
+        fields = ('nombre',)
 
 
 class MunicUpdateForm(forms.ModelForm):

@@ -166,11 +166,34 @@
                   <p>Usuarios</p>
                 </a>
               </li>
-              <li class="nav-item">
-                <a href="/gestionar_farmacias" class="nav-link {% if request.path == '/gestionar_farmacias/' %}active{% endif %}">
+              <li class="nav-item menu-open">
+                <a href="#" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Farmacias</p>
+                  <p>
+                    Farmacias
+                    <i class="right fas fa-angle-left"></i>
+                  </p>
                 </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="/gestionar_farmacias" class="nav-link {% if request.path == '/gestionar_farmacias/' %}active{% endif %}">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Lista</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="/gestionar_tipos_de_farmacias" class="nav-link {% if request.path == '/gestionar_tipos_de_farmacias/' %}active{% endif %}">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Tipos</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="/gestionar_turnos_de_farmacias" class="nav-link {% if request.path == '/gestionar_turnos_de_farmacias/' %}active{% endif %}">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Turnos</p>
+                    </a>
+                  </li>
+                </ul>
               </li>
               <li class="nav-item">
                 <a href="/gestionar_municipios" class="nav-link {% if request.path == '/gestionar_municipios/' %}active{% endif %}">
