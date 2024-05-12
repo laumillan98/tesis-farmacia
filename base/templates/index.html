@@ -127,7 +127,7 @@
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-          <img src="{% static 'dist/img/user2-160x160.jpg' %}" class="img-circle elevation-2" alt="User Image">
+          <img src="{% static 'dist/img/avatar2.png' %}" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
           <a href="{%url 'perfil_de_usuario' user.username %}" class="d-block">{{user.first_name}}</a>
@@ -166,45 +166,10 @@
                   <p>Usuarios</p>
                 </a>
               </li>
-              <li class="nav-item menu-open">
-                <a href="#" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>
-                    Farmacias
-                    <i class="right fas fa-angle-left"></i>
-                  </p>
-                </a>
-                <ul class="nav nav-treeview">
-                  <li class="nav-item">
-                    <a href="/gestionar_farmacias" class="nav-link {% if request.path == '/gestionar_farmacias/' %}active{% endif %}">
-                      <i class="far fa-circle nav-icon"></i>
-                      <p>Lista</p>
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="/gestionar_tipos_de_farmacias" class="nav-link {% if request.path == '/gestionar_tipos_de_farmacias/' %}active{% endif %}">
-                      <i class="far fa-circle nav-icon"></i>
-                      <p>Tipos</p>
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="/gestionar_turnos_de_farmacias" class="nav-link {% if request.path == '/gestionar_turnos_de_farmacias/' %}active{% endif %}">
-                      <i class="far fa-circle nav-icon"></i>
-                      <p>Turnos</p>
-                    </a>
-                  </li>
-                </ul>
-              </li>
               <li class="nav-item">
-                <a href="/gestionar_municipios" class="nav-link {% if request.path == '/gestionar_municipios/' %}active{% endif %}">
+                <a href="/gestionar_farmacias" class="nav-link {% if request.path == '/gestionar_farmacias/' %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Municipios</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="/gestionar_provincias" class="nav-link {% if request.path == '/gestionar_provincias/' %}active{% endif %}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Provincias</p>
+                  <p>Farmacias</p>
                 </a>
               </li>
               <li class="nav-item">
@@ -212,6 +177,41 @@
                   <i class="far fa-circle nav-icon"></i>
                   <p>Trazas</p>
                 </a>
+              </li>
+              <li class="nav-item menu-open">
+                <a href="#" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>
+                    Nomencladores
+                    <i class="right fas fa-angle-left"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="/gestionar_municipios" class="nav-link {% if request.path == '/gestionar_municipios/' %}active{% endif %}">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Municipios</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="/gestionar_provincias" class="nav-link {% if request.path == '/gestionar_provincias/' %}active{% endif %}">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Provincias</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="/gestionar_tipos_de_farmacias" class="nav-link {% if request.path == '/gestionar_tipos_de_farmacias/' %}active{% endif %}">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Tipos de Farmacia</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="/gestionar_turnos_de_farmacias" class="nav-link {% if request.path == '/gestionar_turnos_de_farmacias/' %}active{% endif %}">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Turnos de Farmacia</p>
+                    </a>
+                  </li>
+                </ul>
               </li>
             </ul>
           </li>
