@@ -9,6 +9,7 @@ from django.http.response import JsonResponse
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
+from django.core.paginator import Paginator, EmptyPage
 from django.core.management import call_command
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, get_user_model
@@ -301,7 +302,6 @@ def gestionarUsuarios(request):
 def listaDeUsuarios(request):
     users = CustomUser.objects.all()
     users_list = []
-    total_connected_time = timedelta()  # Inicializar el tiempo total conectado como cero
     for index,user in enumerate(users):
         groups = user.groups.values_list('name', flat=True)  
         first_group = groups.first() if groups else None 
@@ -436,8 +436,25 @@ def gestionarFarmacias(request):
 
 def listaDeFarmacias(request):
     farmacias = Farmacia.objects.all()
+
+    # Configurar la paginación
+    paginator = Paginator(farmacias, 10)  # Mostrar 10 elementos por página (ajusta según sea necesario)
+
+    # Obtener el número de página actual del parámetro de solicitud (si no está presente, por defecto a la página 1)
+    page_number = request.GET.get('page', 1)
+
+    try:
+        page = paginator.page(page_number)
+    except EmptyPage:
+        page = paginator.page(1)  # Si el número de página está fuera de rango, devolver la primera página
+
     farmacias_list = []
-    for index,farma in enumerate(farmacias):
+    for index,farma in enumerate(page.object_list):
+        usuario_asignado = FarmaUser.objects.filter(id_farma=farma.id_farma).first()
+        if usuario_asignado:
+            nombre_usuario_asignado = usuario_asignado.username
+        else:
+            nombre_usuario_asignado = "Ninguno"
         farma_data = {
             'index': index + 1,
             'id': farma.id_farma,
@@ -448,9 +465,14 @@ def listaDeFarmacias(request):
             'telefono': farma.telefono,
             'tipo': farma.id_tipo.nombre,
             'turno': farma.id_turno.nombre,
+            'usuario_asignado': nombre_usuario_asignado
         }
         farmacias_list.append(farma_data)
-    data = {'data': farmacias_list}
+    data = {
+        'recordsTotal': paginator.count,
+        'recordsFiltered': paginator.count,
+        'data': farmacias_list
+    }
     return JsonResponse(data, safe=False)
 
 
@@ -1003,6 +1025,19 @@ def listaDeTrazas(request):
     trazas = LogEntry.objects.all()  # Obtener todas las trazas de LogEntry (acciones registradas por Django)
     trazas_list = []
     for index, traza in enumerate(trazas):
+        # Verificar si change_message es una lista no vacía antes de intentar acceder al primer elemento
+        if traza.change_message:
+            try:
+                change_message_data = json.loads(traza.change_message)
+                if isinstance(change_message_data, list) and len(change_message_data) > 0:
+                    change_message = change_message_data[0]
+                else:
+                    change_message = {}
+            except json.JSONDecodeError:
+                change_message = {}  # Manejo seguro en caso de que no se pueda decodificar como JSON
+        else:
+            change_message = {}  # Manejo seguro en caso de que change_message sea None o vacío
+
         traza_data = {
             'index': index + 1,
             'id': traza.id,
@@ -1011,9 +1046,10 @@ def listaDeTrazas(request):
             'content_type': str(traza.content_type),
             'object_repr': traza.object_repr,
             'action_flag': traza.get_action_flag_display(),
-            'change_message': json.loads(traza.change_message)[0] if traza.change_message else {}
+            'change_message': change_message
         }
         trazas_list.append(traza_data)
+
     data = {'data': trazas_list}
     return JsonResponse(data, safe=False)
     

@@ -2,6 +2,8 @@ $(document).ready(function() {
     let editionSuccessful = false
     var ajaxUrl = $("#miTabla").data("url");
     var table = $("#miTabla").DataTable({
+        processing: true,
+        serverSide: true,
         ajax: ajaxUrl,
         columns: [
             { data: "index" },
@@ -12,13 +14,14 @@ $(document).ready(function() {
             { data: "telefono" },
             { data: "tipo" },
             { data: "turno" },
+            { data: "usuario_asignado"},
             {
                 data: null,
                 orderable: false,
                 searchable: false,
                 render: function (data, type, row, meta) {
                     // Verifica si estás en la columna de acciones
-                    if (meta.col === 8) { 
+                    if (meta.col === 9) { 
                         let editButton = `
                             <button id='editar' class='btn btn-sm btn-secondary' data-action='editar' data-id='${row.id}' data-toggle='modal' data-target='#modal-lg'>
                                 <i class="fas fa-pencil-alt"></i>

@@ -2,7 +2,7 @@ $(document).ready(function () {
     var ajaxUrl = $("#miTabla").data("url")
     var table = $("#miTabla").DataTable({
         processing: true,
-        serverSide: false,  // Cambiar a true si prefieres cargar los datos de forma server-side
+        serverSide: true,  // Cambiar a true si prefieres cargar los datos de forma server-side
         ajax:  ajaxUrl,
         columns: [
             { data: "index" },
