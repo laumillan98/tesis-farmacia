@@ -31,28 +31,28 @@ $(document).ready(function() {
      // Evento de clic en el botón "Editar"
      $('#miTabla').on('click', '#editar', function() {
         let idProv = $(this).data('id');
-        cargarInformacionTurnoFarmacia(idProv);
+        cargarInformacionRestriccionMedicamento(idProv);
      });
 
-     function cargarInformacionTurnoFarmacia(id) {
+     function cargarInformacionRestriccionMedicamento(id) {
         $.ajax({
-            url: 'obtenerTurnoFarmacia/' + id + '/',
+            url: 'obtenerRestriccionMedicamento/' + id + '/',
             type: 'GET',
             data: {},
             success: function(response) {
-                $('#turno').val(response.name);
+                $('#restriccion').val(response.name);
                 $('#id').val(response.id);
             }
         });
     }
 
 
-    function editarTurnoFarmacia(form) {
+    function editarRestriccionMedicamento(form) {
         var formData = $(form).serialize()
     
         // Enviar los datos al servidor usando AJAX
         $.ajax({
-          url: "editarTurnoFarmacia/",
+          url: "editarRestriccionMedicamento/",
           type: "POST",
           data: formData,
           headers: { "X-CSRFToken": $("input[name=csrfmiddlewaretoken]").val() }, // Incluir el token CSRF
@@ -67,13 +67,13 @@ $(document).ready(function() {
             }
           },
           error: function (error) {
-            alert("Ocurrió un error al editar el turno de la farmacia")
+            alert("Ocurrió un error al editar la restricción del medicamento")
           },
         })
     }
 
 
-    $("#edicionTurnoFarmaciaForm").validate({
+    $("#edicionRestriccionMedicamentoForm").validate({
         rules: {
           nombre: {
             required: true,
@@ -100,7 +100,7 @@ $(document).ready(function() {
             $(element).removeClass('is-invalid');
         },
         submitHandler: function (form) {
-            editarTurnoFarmacia(form);
+            editarRestriccionMedicamento(form);
             return false // Esto previene el envío tradicional del formulario
         },
     });
@@ -110,7 +110,7 @@ $(document).ready(function() {
         if (editionSuccessful) {
             Swal.fire({
                 title: 'Éxito',
-                text: 'El turno de la farmacia fue editado correctamente.',
+                text: 'La restricción del medicamento fue editada correctamente.',
                 icon: 'success'
             });
           editionSuccessful = false;

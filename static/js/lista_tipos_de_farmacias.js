@@ -78,7 +78,7 @@ $(document).ready(function() {
           nombre: {
             required: true,
             minlength: 3,
-            pattern: /^[A-Za-z\s]+$/
+            pattern: /^[A-Za-záéíóúÁÉÍÓÚüÜ\s]+$/
           },
         },
         messages: {

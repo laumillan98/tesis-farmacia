@@ -3,7 +3,13 @@ $(document).ready(function () {
     var table = $("#miTabla").DataTable({
         processing: true,
         serverSide: true,  // Cambiar a true si prefieres cargar los datos de forma server-side
-        ajax:  ajaxUrl,
+        ajax: {
+            'url': ajaxUrl,
+            'type': "GET",
+            "data": function(d) {
+              d.page = (d.start / d.length) + 1;  // Agregar el número de página al request
+            }
+        },
         columns: [
             { data: "index" },
             { data: "id" },

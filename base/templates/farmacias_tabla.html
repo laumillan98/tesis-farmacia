@@ -23,7 +23,7 @@
                         <th>Dirección</th>
                         <th>Teléfono</th>
                         <th>Turno</th>
-                        <th>Tipo de farmacia</th>
+                        <th>Tipo</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -66,15 +66,15 @@
             success: function (response) {
                 $("tbody").empty();
                 $.each(response, function (key, value) {
-                    var count = key;
+                    var count = key + 1;
                     var nombre = value.nombre;
                     var direccion = value.direccion
                     var telefono = value.telefono;
-                    var turno_corrido = value.turno_corrido;
+                    var id_turno = value.id_turno;
                     var id_tipo = value.id_tipo;
                     $("tbody").append(
                         "<tr><td>" + count + "</td><td>" + nombre + "</td><td>" +
-                        direccion + "</td><td>" + telefono + "</td><td>" + turno_corrido + "</td><td>" + id_tipo + "</td></tr>"
+                        direccion + "</td><td>" + telefono + "</td><td>" + id_turno + "</td><td>" + id_tipo + "</td></tr>"
                     )
                 })
             }

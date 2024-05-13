@@ -103,9 +103,9 @@ class FarmaUser(CustomUser):
 
 
 class FarmaciaMedicamento(models.Model):
-    id_medic = models.ForeignKey(Medicamento, on_delete=models.CASCADE)
-    id_farmacia = models.ForeignKey(Farmacia, on_delete=models.RESTRICT)
+    id_medic = models.ForeignKey(Medicamento, on_delete=models.RESTRICT, null=True, blank=True, to_field='id_medic')
+    id_farma = models.ForeignKey(Farmacia, on_delete=models.RESTRICT, null=True, blank=True, to_field='id_farma')
     existencia = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.id_medic.nombre + ' ' + self.id_farmacia.nombre + str(self.existencia)
+        return self.id_medic.nombre + ' ' + self.id_farma.nombre + str(self.existencia)

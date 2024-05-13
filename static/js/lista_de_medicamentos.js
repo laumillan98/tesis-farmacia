@@ -1,6 +1,6 @@
-$(document).ready(function() {
+$(document).ready(function () {
     let editionSuccessful = false
-    var ajaxUrl = $("#miTabla").data("url");
+    var ajaxUrl = $("#miTabla").data("url")
     var table = $("#miTabla").DataTable({
         processing: true,
         serverSide: true,
@@ -14,95 +14,72 @@ $(document).ready(function() {
         columns: [
             { data: "index" },
             { data: "nombre" },
-            { data: "prov" },
-            { data: "munic" },
-            { data: "direccion" },
-            { data: "telefono" },
-            { data: "tipo" },
-            { data: "turno" },
-            { data: "usuario_asignado"},
+            { data: "descripcion" },
+            { data: "cant_max" },
+            { data: "precio" },
+            { data: "origen" },
+            { data: "restriccion" },
             {
                 data: null,
                 orderable: false,
                 searchable: false,
-                render: function (data, type, row, meta) {
+                render: function (data, type, row, meta) {  
                     // Verifica si estás en la columna de acciones
-                    if (meta.col === 9) { 
+                    if (meta.col === 7) {
                         let editButton = `
-                            <button id='editar' class='btn btn-sm btn-secondary' data-action='editar' data-id='${row.id}' data-toggle='modal' data-target='#modal-lg'>
+                            <button id='editar' class='btn btn-sm btn-secondary' data-id='${row.id}' data-toggle='modal' data-target='#modal-lg'>
                                 <i class="fas fa-pencil-alt"></i>
                             </button>&nbsp`
-                        return editButton 
+                        return editButton
                     }
                     // Puedes retornar diferentes contenidos dependiendo de la columna
-                    return data; // Retorna los datos originales para otras columnas
+                    return data // Retorna los datos originales para otras columnas
                 },
             },
         ],
     })
 
-    
 
     // Evento de clic en el botón "Editar"
     $('#miTabla').on('click', '#editar', function() {
-        let idFarma = $(this).data('id');
-        cargarInformacionFarmacia(idFarma);
+        let idMedic = $(this).data('id');
+        cargarInformacionMedicamento(idMedic);
      });
 
-     function cargarInformacionFarmacia(id) {
+     function cargarInformacionMedicamento(id) {
         $.ajax({
-            url: 'obtenerFarmacia/' + id + '/',
+            url: 'obtenerMedicamento/' + id + '/',
             type: 'GET',
             data: {},
             success: function(response) {
                 $('#nombre').val(response.nombre);
-                $('#direccion').val(response.direccion);
-                $('#telefono').val(response.telefono);
-                $('#turno').val(response.turno_name);
-                $('#tipo').val(response.tipo_name);
-                $('#municipio').val(response.munic_name);
+                $('#descripcion').val(response.descripcion);
+                $('#cant_max').val(response.cant_max);
+                $('#precio').val(response.precio);
+                $('#origen').val(response.origen);
+                $('#restriccion').val(response.restriccion_name);
                 $('#id').val(response.id);
 
-                var $selector = $("#turno_selector");
+                var $selector = $("#restriccion_selector");
                 $selector.empty();
-                response.turnos.forEach(element => {
+                response.restricciones.forEach(element => {
                     $selector.append($('<option>', {
-                    value: element.id_turno,
+                    value: element.id_restriccion,
                     text: element.nombre,
                     }))
                 });
-                $selector.val(response.selected_turno_name);    
-
-                var $selector = $("#tipo_selector");
-                $selector.empty();
-                response.tipos.forEach(element => {
-                    $selector.append($('<option>', {
-                    value: element.id_tipo,
-                    text: element.nombre,
-                    }))
-                });
-                $selector.val(response.selected_tipo_name); 
-
-                var $selector = $("#municipio_selector");
-                $selector.empty();
-                response.municipios.forEach(element => {
-                    $selector.append($('<option>', {
-                    value: element.id_munic,
-                    text: element.nombre,
-                    }))
-                });
-                $selector.val(response.selected_munic_name); 
+                $selector.val(response.selected_restriccion_name);    
             },
         })
     }
 
 
-    function editarFarmacia(form) {
+    function editarMedicamento(form) {
         var formData = $(form).serialize()
     
         // Enviar los datos al servidor usando AJAX
         $.ajax({
-          url: "editarFarmacia/",
+          url: "editarMedicamento/",
           type: "POST",
           data: formData,
           headers: { "X-CSRFToken": $("input[name=csrfmiddlewaretoken]").val() }, // Incluir el token CSRF
@@ -117,28 +94,34 @@ $(document).ready(function() {
             }
           },
           error: function (error) {
-            alert("Ocurrió un error al editar la farmacia")
+            alert("Ocurrió un error al editar el medicamento")
           },
         })
     }
 
 
-    $("#edicionFarmaciaForm").validate({
+    $("#edicionMedicamentoForm").validate({
         rules: {
           nombre: {
             required: true,
             minlength: 3,
             pattern: /^[A-Za-z0-9\s]+(?:[A-Za-z][A-Za-z0-9\s]*)?$/
           },
-          direccion: {
+          descripcion: {
             required: true,
             minlength: 5,
             pattern: /^[A-Za-z0-9\s]+(?:[A-Za-z][A-Za-z0-9\s]*)?$/
           },
-          telefono: {
+          cant_max: {
             required: true,
-            minlength: 8,
-            maxlength: 8,
+            minlength: 1,
+            maxlength: 3,
+            digits: true
+          },
+          precio: {
+            required: true,
+            minlength: 1,
+            maxlength: 5,
             digits: true
           },
         },
@@ -149,17 +132,23 @@ $(document).ready(function() {
             minlength: "Por favor, introduce al menos 3 caracteres.",
             pattern: "Por favor introduce al menos una letra, puede contener números."
           },
-          direccion: {
+          descripcion: {
             required: "Este campo es obligatorio.",
             minlength: "Por favor, introduce al menos 5 caracteres.",
             pattern: "Por favor introduce al menos una letra, puede contener números."
           },
-          telefono: {
+          cant_max: {
             required: "Este campo es obligatorio.",
-            minlength: "Solo puede contener 8 dígitos.",
-            maxlength: "Solo puede contener 8 dígitos.",
+            minlength: "Solo puede contener de 1 a 3 dígitos.",
+            maxlength: "Solo puede contener de 1 a 3 dígitos.",
             digits: "No puede contener letras ni símbolos."
           }, 
+          precio: {
+            required: "Este campo es obligatorio.",
+            minlength: "Solo puede contener de 1 a 5 dígitos.",
+            maxlength: "Solo puede contener de 1 a 5 dígitos.",
+            digits: "No puede contener letras ni símbolos."
+          },
         },
         errorElement: 'span',
         errorPlacement: function (error, element) {
@@ -173,7 +162,7 @@ $(document).ready(function() {
             $(element).removeClass('is-invalid');
         },
         submitHandler: function (form) {
-            editarFarmacia(form);
+            editarMedicamento(form);
             return false // Esto previene el envío tradicional del formulario
         },
     });
@@ -183,7 +172,7 @@ $(document).ready(function() {
         if (editionSuccessful) {
             Swal.fire({
                 title: 'Éxito',
-                text: 'La farmacia fue editada correctamente.',
+                text: 'El medicamento fue editado correctamente.',
                 icon: 'success'
             });
             editionSuccessful = false;
@@ -191,3 +180,4 @@ $(document).ready(function() {
     })
 
 });
+  

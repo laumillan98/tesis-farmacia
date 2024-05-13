@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, SetPasswordForm, PasswordResetForm, UserChangeForm
-from .models import CustomUser, FarmaUser, Farmacia, Municipio, Provincia, TipoFarmacia, TurnoFarmacia
+from .models import CustomUser, FarmaUser, Farmacia, Municipio, Provincia, TipoFarmacia, TurnoFarmacia, Medicamento, TipoMedicamento
 from django.contrib.auth import get_user_model
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
@@ -197,4 +197,20 @@ class ProvUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Provincia
+        fields = ('nombre',)
+
+
+class MedicUpdateForm(forms.ModelForm):
+    nombre = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
+    
+    class Meta:
+        model = Medicamento
+        fields = ('nombre', 'description', 'cant_max', 'precio_unidad', 'origen_natural', 'id_restriccion')
+
+
+class RestriccionMedicamentoUpdateForm(forms.ModelForm):
+    nombre = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
+    
+    class Meta:
+        model = TipoMedicamento
         fields = ('nombre',)
