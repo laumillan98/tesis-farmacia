@@ -1,6 +1,7 @@
 $(document).ready(function () {
     let editionSuccessful = false
     var ajaxUrl = $("#miTabla").data("url")
+    var farmaciaNombre = data.nombre_farmacia;
     var table = $("#miTabla").DataTable({
         ajax: ajaxUrl,
         columns: [

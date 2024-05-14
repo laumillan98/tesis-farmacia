@@ -163,7 +163,13 @@
               <li class="nav-item">
                 <a href="/gestionar_medicfarma" class="nav-link {% if request.path == '/gestionar_medicfarma/' %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Medic Farma</p>
+                  <p>Mi Farmacia</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/gestionar_medicamentos" class="nav-link {% if request.path == '/gestionar_medicamentos/' %}active{% endif %}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Medicamentos</p>
                 </a>
               </li>
               <li class="nav-item menu-open">
@@ -176,15 +182,15 @@
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="/gestionar_medicamentos" class="nav-link {% if request.path == '/gestionar_medicamentos/' %}active{% endif %}">
+                    <a href="/gestionar_restricciones_de_medicamentos" class="nav-link {% if request.path == '/gestionar_restricciones_de_medicamentos/' %}active{% endif %}">
                       <i class="far fa-circle nav-icon"></i>
-                      <p>Medicamentos</p>
+                      <p>Restricciones</p>
                     </a>
                   </li>
                   <li class="nav-item">
                     <a href="/gestionar_restricciones_de_medicamentos" class="nav-link {% if request.path == '/gestionar_restricciones_de_medicamentos/' %}active{% endif %}">
                       <i class="far fa-circle nav-icon"></i>
-                      <p>Restricción</p>
+                      <p>Clasificaciones</p>
                     </a>
                   </li>
                 </ul>
