@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'base.apps.BaseConfig',
     'captcha',
     'dbbackup',
+    'django.contrib.gis',
+    'leaflet',
 ]
 
 AUTH_USER_MODEL = 'base.CustomUser'
@@ -83,20 +85,9 @@ TEMPLATES = [
 WSGI_APPLICATION = 'FirstApp.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
-#DATABASES = {
- #   'default': {
-  #      'ENGINE': 'django.db.backends.sqlite3',
-   #     'NAME': BASE_DIR / 'db.sqlite3',
-    #}
-#}
-
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'tesisfarma',
         'USER': 'postgres',
         'PASSWORD': 'laura9891',
@@ -167,6 +158,19 @@ EMAIL_HOST_PASSWORD = 'pooa tvdz yaln xpmz'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
+
 # Backup de la bd 
 DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
-DBBACKUP_STORAGE_OPTIONS = {'location': 'C:/Users/laumi/Downloads/example/FirstApp/backup_bd'}
+DBBACKUP_STORAGE_OPTIONS = {'location': 'C:/Users/laumi/Downloads/example/FirstApp/backup_bd'}      
+
+
+# Para el MAPA
+GDAL_LIBRARY_PATH = r'C:\OSGeo4W\bin\gdal308'
+GEOS_LIBRARY_PATH = r'C:\OSGeo4W\bin\geos_c'
+
+LEAFLET_CONFIG = {
+    'DEFAULT_CENTER': (23.113592, -82.366596),  # Coordenadas de La Habana-Cuba
+    'DEFAULT_ZOOM': 12,
+    'MIN_ZOOM': 3,
+    'MAX_ZOOM': 18,
+}

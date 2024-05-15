@@ -43,17 +43,15 @@ urlpatterns = [
      path('registrar_municipio/', views.registrarMunicipio),
      path('gestionar_municipios/obtenerMunicipio/<uuid>/', views.obtenerMunicipio, name ='obtener_municipio'),
      path('gestionar_municipios/editarMunicipio/', views.editarMunicipio, name ='editar_municipio'),
-     
      path('gestionar_provincias/', views.gestionarProvincias),
      path('lista_de_provincias/', views.listaDeProvincias, name='lista_de_provincias'),
      path('registrar_provincia/', views.registrarProvincia),
      path('gestionar_provincias/obtenerProvincia/<uuid>/', views.obtenerProvincia, name ='obtener_provincia'),
      path('gestionar_provincias/editarProvincia/', views.editarProvincia, name ='editar_provincia'),
-
      path('gestionar_medicfarma/', views.gestionarMedicFarma),
      path('lista_de_medicfarma/', views.listaDeMedicFarma, name='lista_de_medicfarma'),
-     #path('agregar_medicfarma/', views.agregarMedicFarma),
-
+     path('lista_de_medic/', views.listaDeMedic, name='lista_de_medic'),
+     path('agregar_medicfarma/', views.agregarMedicFarma, name='agregar_medicfarma'),
      path('gestionar_medicamentos/', views.gestionarMedicamentos),
      path('lista_de_medicamentos/', views.listaDeMedicamentos, name='lista_de_medicamentos'),
      path('registrar_medicamento/', views.registrarMedicamento),
@@ -62,9 +60,14 @@ urlpatterns = [
      path('gestionar_restricciones_de_medicamentos/', views.gestionarRestriccionesMedicamentos),
      path('lista_restricciones_de_medicamentos/', views.listaDeRestriccionesDeMedicamentos, name='lista_restricciones_de_medicamentos'),
      path('registrar_restriccion_de_medicamento/', views.registrarRestriccionMedicamento),
-     path('gestionar_restricciones_de_medicamentos/obtenerRestriccionMedicamento/<uuid>/', views.obtenerRestriccionMedicamento, name ='obtener_turno_de_farmacia'),
+     path('gestionar_restricciones_de_medicamentos/obtenerRestriccionMedicamento/<uuid>/', views.obtenerRestriccionMedicamento, name ='obtener_restriccion_de_medicamento'),
      path('gestionar_restricciones_de_medicamentos/editarRestriccionMedicamento/', views.editarRestriccionMedicamento, name ='editar_restriccion_de_medicamento'),
-
+     path('gestionar_clasificaciones_de_medicamentos/', views.gestionarClasificacionesMedicamentos),
+     path('lista_clasificaciones_de_medicamentos/', views.listaDeClasificacionesDeMedicamentos, name='lista_clasificaciones_de_medicamentos'),
+     path('registrar_clasificacion_de_medicamento/', views.registrarClasificacionMedicamento),
+     path('gestionar_clasificaciones_de_medicamentos/obtenerClasificacionMedicamento/<uuid>/', views.obtenerClasificacionMedicamento, name ='obtener_clasificacion_de_medicamento'),
+     path('gestionar_clasificaciones_de_medicamentos/editarClasificacionMedicamento/', views.editarClasificacionMedicamento, name ='editar_clasificacion_de_medicamento'),
+    
      #path('gestionar/editarMedicamento/<uuid>', views.editarMedicamento),
      #path('edicionMedicamento/', views.edicionMedicamento),
      #path('gestionar/eliminarMedicamento/<uuid>', views.eliminarMedicamento),

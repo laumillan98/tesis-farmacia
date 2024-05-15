@@ -28,6 +28,7 @@
                                 <th>Precio</th>
                                 <th>Origen</th>
                                 <th>Restricción</th>
+                                <th>Clasificación</th>
                                 <th>Opciones</th>
                             </tr>
                         </thead>
@@ -65,8 +66,24 @@
                                 <input type="text" class="form-control" id="cant_max" name="cant_max" placeholder="Cant_max">
                             </div>
                             <div class="form-group">
+                                <label for="precio">Precio</label>
+                                <input type="text" class="form-control" id="precio" name="precio" placeholder="Precio">
+                            </div>
+                            <div class="form-group">
+                                <label for="origen">Origen</label>
+                                <select class="form-control" id="origen" name="origen">
+                                    <option value="1">Natural</option>
+                                    <option value="0">Fármaco</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
                                 <label>Restricción</label>
                                 <select class="form-control" id="restriccion_selector" name="id_restriccion">
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Clasificación</label>
+                                <select class="form-control" id="clasificacion_selector" name="id_clasificacion">
                                 </select>
                             </div>
                         </div>

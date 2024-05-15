@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, SetPasswordForm, PasswordResetForm, UserChangeForm
-from .models import CustomUser, FarmaUser, Farmacia, Municipio, Provincia, TipoFarmacia, TurnoFarmacia, Medicamento, TipoMedicamento
+from .models import CustomUser, FarmaUser, Farmacia, Municipio, Provincia, TipoFarmacia, TurnoFarmacia, Medicamento, RestriccionMedicamento, ClasificacionMedicamento
 from django.contrib.auth import get_user_model
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
@@ -205,12 +205,37 @@ class MedicUpdateForm(forms.ModelForm):
     
     class Meta:
         model = Medicamento
-        fields = ('nombre', 'description', 'cant_max', 'precio_unidad', 'origen_natural', 'id_restriccion')
+        fields = ('nombre', 'description', 'cant_max', 'precio_unidad', 'origen_natural', 'id_restriccion', 'id_clasificacion')
 
 
 class RestriccionMedicamentoUpdateForm(forms.ModelForm):
     nombre = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
     
     class Meta:
-        model = TipoMedicamento
+        model = RestriccionMedicamento
         fields = ('nombre',)
+
+
+class ClasificacionMedicamentoUpdateForm(forms.ModelForm):
+    nombre = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
+    
+    class Meta:
+        model = ClasificacionMedicamento
+        fields = ('nombre',)
+
+
+
+
+class FarmaciaAdminForm(forms.ModelForm):
+    latitud = forms.FloatField(required=False)
+    longitud = forms.FloatField(required=False)
+
+    class Meta:
+        model = Farmacia
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super(FarmaciaAdminForm, self).__init__(*args, **kwargs)
+        if self.instance and self.instance.ubicacion:
+            self.fields['latitud'].initial = self.instance.ubicacion.y
+            self.fields['longitud'].initial = self.instance.ubicacion.x

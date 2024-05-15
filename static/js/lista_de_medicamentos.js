@@ -19,13 +19,14 @@ $(document).ready(function () {
             { data: "precio" },
             { data: "origen" },
             { data: "restriccion" },
+            { data: "clasificacion" },
             {
                 data: null,
                 orderable: false,
                 searchable: false,
                 render: function (data, type, row, meta) {  
                     // Verifica si estás en la columna de acciones
-                    if (meta.col === 7) {
+                    if (meta.col === 8) {
                         let editButton = `
                             <button id='editar' class='btn btn-sm btn-secondary' data-id='${row.id}' data-toggle='modal' data-target='#modal-lg'>
                                 <i class="fas fa-pencil-alt"></i>
@@ -56,8 +57,9 @@ $(document).ready(function () {
                 $('#descripcion').val(response.descripcion);
                 $('#cant_max').val(response.cant_max);
                 $('#precio').val(response.precio);
-                $('#origen').val(response.origen);
+                $('#origen').val(response.origen ? '1' : '0');
                 $('#restriccion').val(response.restriccion_name);
+                $('#clasificacion').val(response.clasificacion_name);
                 $('#id').val(response.id);
 
                 var $selector = $("#restriccion_selector");
@@ -69,6 +71,16 @@ $(document).ready(function () {
                     }))
                 });
                 $selector.val(response.selected_restriccion_name);    
+
+                var $selector = $("#clasificacion_selector");
+                $selector.empty();
+                response.clasificaciones.forEach(element => {
+                    $selector.append($('<option>', {
+                    value: element.id_clasificacion,
+                    text: element.nombre,
+                    }))
+                });
+                $selector.val(response.selected_clasificacion_name);   
             },
         })
     }
@@ -100,6 +112,10 @@ $(document).ready(function () {
     }
 
 
+    $.validator.addMethod("notZero", function(value, element) {
+      return parseFloat(value) !== 0; // Verificar que el valor del precio no sea igual a 0
+    }, "El valor no puede ser cero");
+
     $("#edicionMedicamentoForm").validate({
         rules: {
           nombre: {
@@ -122,7 +138,8 @@ $(document).ready(function () {
             required: true,
             minlength: 1,
             maxlength: 5,
-            digits: true
+            digits: true,
+            notZero: true
           },
         },
 
@@ -147,7 +164,8 @@ $(document).ready(function () {
             required: "Este campo es obligatorio.",
             minlength: "Solo puede contener de 1 a 5 dígitos.",
             maxlength: "Solo puede contener de 1 a 5 dígitos.",
-            digits: "No puede contener letras ni símbolos."
+            digits: "No puede contener letras ni símbolos.",
+            notZero: "El valor no puede ser cero."
           },
         },
         errorElement: 'span',

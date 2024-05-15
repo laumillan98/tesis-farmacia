@@ -23,8 +23,8 @@ from django.views.decorators.cache import cache_control
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 
-from .models import CustomUser, Medicamento, TipoMedicamento, Farmacia, FarmaUser, FarmaciaMedicamento, TipoFarmacia, TurnoFarmacia, Municipio, Provincia
-from .forms import CustomUserCreationForm, FarmaUserCreationForm, UserLoginForm, SetPasswordForm, PasswordResetForm, UserProfileForm, UserUpdateForm, FarmaUserUpdateForm, FarmaUpdateForm, TipoFarmaciaUpdateForm, TurnoFarmaciaUpdateForm, MunicUpdateForm, ProvUpdateForm, MedicUpdateForm, RestriccionMedicamentoUpdateForm
+from .models import CustomUser, Medicamento, Farmacia, FarmaUser, FarmaciaMedicamento, TipoFarmacia, TurnoFarmacia, Municipio, Provincia, RestriccionMedicamento, ClasificacionMedicamento
+from .forms import CustomUserCreationForm, FarmaUserCreationForm, UserLoginForm, SetPasswordForm, PasswordResetForm, UserProfileForm, UserUpdateForm, FarmaUserUpdateForm, FarmaUpdateForm, TipoFarmaciaUpdateForm, TurnoFarmaciaUpdateForm, MunicUpdateForm, ProvUpdateForm, MedicUpdateForm, RestriccionMedicamentoUpdateForm, ClasificacionMedicamentoUpdateForm
 from .decorators import usuarios_permitidos, unauthenticated_user
 from .tokens import account_activation_token
 from FirstApp.tasks import send_activation_email
@@ -816,7 +816,7 @@ def gestionarMedicFarma(request):
     return render(request, "gestionar_medicfarma.html")
 
 
-def listaDeMedicFarma(request):   # ver si le cambio el nombre a listaDeMedicFarma
+def listaDeMedicFarma(request): 
     if request.user.is_authenticated:
         try:
             farmaceutico = FarmaUser.objects.get(username=request.user.username)
@@ -842,6 +842,7 @@ def listaDeMedicFarma(request):   # ver si le cambio el nombre a listaDeMedicFar
                     'precio': f'{medic.precio_unidad} CUP/u',
                     'origen': origen_texto,
                     'restriccion': medic.id_restriccion.nombre if medic.id_restriccion else None,
+                    'clasificacion': medic.id_clasificacion.nombre if medic.id_clasificacion else None,
                     'existencia': farmaMedic.existencia,
                 }
                 medicamentos_list.append(medic_data)
@@ -853,6 +854,75 @@ def listaDeMedicFarma(request):   # ver si le cambio el nombre a listaDeMedicFar
     
     return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
 
+
+def listaDeMedic(request):
+    if request.user.is_authenticated:
+        try:
+            farmaceutico = FarmaUser.objects.get(username=request.user.username)
+            farmacia_del_farmaceutico = farmaceutico.id_farma
+            farmacia_medicamento = FarmaciaMedicamento.objects.filter(id_farma=farmacia_del_farmaceutico)
+            medicamentos_list = []
+
+            for index, farmaMedic in enumerate(farmacia_medicamento):
+                medic = farmaMedic.id_medic
+
+                if medic.cant_max == 1:
+                    cant_max_texto = f'{medic.cant_max} unidad'
+                else:
+                    cant_max_texto = f'{medic.cant_max} unidades'
+
+                origen_texto = "Natural" if medic.origen_natural else "Fármaco"
+                medic_data = {
+                    'index': index + 1,
+                    'id': str(medic.id_medic),
+                    'farma': farmaMedic.id_farma.nombre,
+                    'nombre': medic.nombre,
+                    'descripcion': medic.description,
+                    'cant_max': cant_max_texto,
+                    'precio': f'{medic.precio_unidad} CUP/u',
+                    'origen': origen_texto,
+                    'restriccion': medic.id_restriccion.nombre if medic.id_restriccion else None,
+                    'clasificacion': medic.id_clasificacion.nombre if medic.id_clasificacion else None,
+                    'existencia': farmaMedic.existencia,
+                }
+                medicamentos_list.append(medic_data)
+
+            # Crear el contexto con los datos de los medicamentos
+            context = {
+                'medicamentos_list': medicamentos_list  # Pasar la lista de medicamentos al contexto
+            }
+
+            # Renderizar la plantilla con el contexto
+            return render(request, 'gestionar_medicfarma.html', context)
+        
+        except FarmaUser.DoesNotExist:
+            return JsonResponse({'error': 'Usuario farmacéutico no encontrado'}, status=404)
+    
+    return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
+
+
+def agregarMedicFarma(request):
+    if request.method == 'POST':
+        medicamentos_seleccionados = request.POST.getlist('medicamentos[]')
+
+        try:
+            farmaceutico = FarmaUser.objects.get(username=request.user.username)
+            farmacia_del_farmaceutico = farmaceutico.id_farma
+
+            for medicamento_id in medicamentos_seleccionados:
+                # Crear y guardar FarmaciaMedicamento para cada medicamento seleccionado
+                farmacia_medicamento = FarmaciaMedicamento(
+                    id_medic_id=medicamento_id,
+                    id_farma=farmacia_del_farmaceutico,
+                    existencia=0  
+                )
+                farmacia_medicamento.save()
+
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 
 @login_required(login_url='/acceder')
@@ -887,6 +957,7 @@ def listaDeMedicamentos(request):
             'precio': f'{medic.precio_unidad} CUP/u',
             'origen': origen_texto,
             'restriccion': medic.id_restriccion.nombre if medic.id_restriccion else None,
+            'clasificacion': medic.id_clasificacion.nombre if medic.id_clasificacion else None,
         }
         medicamentos_list.append(medic_data)
     data = {
@@ -922,7 +993,8 @@ def registrarMedicamento(request):
 
 
 def obtenerMedicamento(request, uuid):
-    restriccion = TipoMedicamento.objects.all()
+    restriccion = RestriccionMedicamento.objects.all()
+    clasificacion = ClasificacionMedicamento.objects.all()
     medic = Medicamento.objects.get(id_medic = uuid)   
     return JsonResponse({
         'id': medic.id_medic,
@@ -931,17 +1003,21 @@ def obtenerMedicamento(request, uuid):
         'cant_max': medic.cant_max,
         'precio': medic.precio_unidad,
         'origen': medic.origen_natural,
-        'selected_restriccion_name': medic.id_restriccion.id_tipo_medicamento,
-        'restricciones': [{'id_restriccion': obj.id_tipo_medicamento, 'nombre': obj.nombre} for obj in restriccion],
+        'selected_restriccion_name': medic.id_restriccion.id_restriccion,
+        'restricciones': [{'id_restriccion': obj.id_restriccion, 'nombre': obj.nombre} for obj in restriccion],
+        'selected_clasificacion_name': medic.id_clasificacion.id_clasificacion,
+        'clasificaciones': [{'id_clasificacion': obj.id_clasificacion, 'nombre': obj.nombre} for obj in clasificacion],
     })
 
 
 @login_required(login_url='/acceder')
 @require_POST
 def editarMedicamento(request):
+    print('entro aquiiiii 1')
     medic = Medicamento.objects.get(id_medic=request.POST.get('id'))
     form = MedicUpdateForm(request.POST, instance=medic)
     if form.is_valid():
+        print('entro aquiiiii 2')
         form.save()
         return JsonResponse({'success': True})
     else:
@@ -956,12 +1032,12 @@ def gestionarRestriccionesMedicamentos(request):
 
 
 def listaDeRestriccionesDeMedicamentos(request):
-    restricciones = TipoMedicamento.objects.all()
+    restricciones = RestriccionMedicamento.objects.all()
     restricciones_list = []
     for index,restric in enumerate(restricciones):
         restric_data = {
             'index': index + 1,
-            'id': restric.id_tipo_medicamento,
+            'id': restric.id_restriccion,
             'nombre': restric.nombre,
         }
         restricciones_list.append(restric_data)
@@ -992,9 +1068,9 @@ def registrarRestriccionMedicamento(request):
 
 
 def obtenerRestriccionMedicamento(request, uuid):
-    restriccion = TipoMedicamento.objects.get(id_tipo_medicamento = uuid)
+    restriccion = RestriccionMedicamento.objects.get(id_restriccion = uuid)
     return JsonResponse({
-        'id': restriccion.id_tipo_medicamento,
+        'id': restriccion.id_restriccion,
         'name': restriccion.nombre,
     })
 
@@ -1002,8 +1078,71 @@ def obtenerRestriccionMedicamento(request, uuid):
 @login_required(login_url='/acceder')
 @require_POST
 def editarRestriccionMedicamento(request):
-    restriccion = TipoMedicamento.objects.get(id_tipo_medicamento = request.POST.get('id'))
+    restriccion = RestriccionMedicamento.objects.get(id_restriccion = request.POST.get('id'))
     form = RestriccionMedicamentoUpdateForm(request.POST, instance=restriccion)
+    if form.is_valid():
+        form.save()
+        return JsonResponse({'success': True})
+    else:
+        return JsonResponse({'success': False, 'errors': form.errors})
+
+
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['farmaceuticos'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def gestionarClasificacionesMedicamentos(request):
+    return render(request, "gestionar_clasificaciones_de_medicamentos.html")
+
+
+def listaDeClasificacionesDeMedicamentos(request):
+    clasificaciones = ClasificacionMedicamento.objects.all()
+    clasificaciones_list = []
+    for index,clasific in enumerate(clasificaciones):
+        restric_data = {
+            'index': index + 1,
+            'id': clasific.id_clasificacion,
+            'nombre': clasific.nombre,
+        }
+        clasificaciones_list.append(restric_data)
+    data = {'data': clasificaciones_list}
+    return JsonResponse(data, safe=False)
+
+
+@usuarios_permitidos(roles_permitidos=['farmaceuticos'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def registrarClasificacionMedicamento(request):
+    if request.method =='POST':
+        form = ClasificacionMedicamentoUpdateForm(data=request.POST)
+        if form.is_valid():
+            clasificacion = form.save(commit=False)
+            clasificacion.save()
+            return redirect('/gestionar_clasificaciones_de_medicamentos')
+        else:
+            for error in list(form.errors.values()):
+                messages.error(request, error)
+    else:
+        form = ClasificacionMedicamentoUpdateForm()
+    
+    return render(
+        request=request,
+        template_name="registrar_clasificacion_de_medicamento.html",
+        context={"form": form}
+    )
+
+
+def obtenerClasificacionMedicamento(request, uuid):
+    clasificacion = ClasificacionMedicamento.objects.get(id_clasificacion = uuid)
+    return JsonResponse({
+        'id': clasificacion.id_clasificacion,
+        'name': clasificacion.nombre,
+    })
+
+
+@login_required(login_url='/acceder')
+@require_POST
+def editarClasificacionMedicamento(request):
+    clasificacion = ClasificacionMedicamento.objects.get(id_clasificacion = request.POST.get('id'))
+    form = ClasificacionMedicamentoUpdateForm(request.POST, instance=clasificacion)
     if form.is_valid():
         form.save()
         return JsonResponse({'success': True})

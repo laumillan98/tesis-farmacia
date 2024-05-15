@@ -1,7 +1,6 @@
 $(document).ready(function () {
     let editionSuccessful = false
     var ajaxUrl = $("#miTabla").data("url")
-    var farmaciaNombre = data.nombre_farmacia;
     var table = $("#miTabla").DataTable({
         ajax: ajaxUrl,
         columns: [
@@ -12,6 +11,7 @@ $(document).ready(function () {
             { data: "precio" },
             { data: "origen" },
             { data: "restriccion" },
+            { data: "clasificacion" },
             { data: "existencia" },
             {
             data: null,
@@ -19,7 +19,7 @@ $(document).ready(function () {
             searchable: false,
             render: function (data, type, row, meta) {  ////////////cambiar boton editar por boton de EXISTENCIASSSSS
                 // Verifica si estás en la columna de acciones
-                if (meta.col === 8) {
+                if (meta.col === 9) {
                     let editButton = `
                         <button id='editar' class='btn btn-sm btn-secondary' data-id='${row.id}' data-toggle='modal' data-target='#modal-lg'>
                             <i class="fas fa-pencil-alt"></i>
@@ -32,5 +32,34 @@ $(document).ready(function () {
             },
         ],
     })
+
+
+    $(document).ready(function() {
+        $('#agregarMedicamentosBtn').on('click', function() {
+            var selectedMedicamentos = [];
+            $('input[name="medicamentos_seleccionados"]:checked').each(function() {
+                selectedMedicamentos.push($(this).val());
+            });
+    
+            $.ajax({
+                url: '/agregar_medicfarma/',
+                type: 'POST',
+                headers: {
+                    'X-CSRFToken': $('input[name=csrfmiddlewaretoken]').val()
+                },
+                data: {
+                    'medicamentos': selectedMedicamentos,
+                    'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val()
+                },
+                success: function(response) {
+                    // Manejar la respuesta del servidor si es necesario
+                    console.log('Medicamentos agregados exitosamente');
+                },
+                error: function(error) {
+                    console.log('Error al agregar medicamentos');
+                }
+            });
+        });
+    });
 })
   

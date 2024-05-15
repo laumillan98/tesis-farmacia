@@ -28,6 +28,7 @@
                                 <th>Precio</th>
                                 <th>Origen</th>
                                 <th>Restricción</th>
+                                <th>Clasificación</th>
                                 <th>Existencia</th>
                                 <th>Opciones</th>
                             </tr>
@@ -37,6 +38,19 @@
             </div>
         </div>
     </div>
+
+   
+    <!-- Aquí mostrar la lista de medicamentos con checkboxes para selección -->
+    <form id="agregarMedicamentosForm">{% csrf_token %}
+        {% for medicamento in medicamentos_list %}
+            <div>
+                <input type="checkbox" name="medicamentos_seleccionados" value="{{ medicamento.id }}">
+                {{ medicamento.nombre }}
+            </div>
+        {% endfor %}
+        <button type="button" id="agregarMedicamentosBtn">Agregar Medicamentos</button>
+    </form>
+
 
 {% endblock %}   
 

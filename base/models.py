@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.contrib.gis.db import models as gis_models
 import uuid
 # Create your models here.
 
@@ -28,8 +29,17 @@ class TurnoFarmacia(models.Model):
         return self.nombre
 
 
-class TipoMedicamento(models.Model):
-    id_tipo_medicamento = models.UUIDField(
+class RestriccionMedicamento(models.Model):
+    id_restriccion = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False)
+    nombre = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.nombre 
+
+
+class ClasificacionMedicamento(models.Model):
+    id_clasificacion = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False)
     nombre = models.CharField(max_length=20)
 
@@ -64,7 +74,8 @@ class Medicamento(models.Model):
     cant_max = models.IntegerField(default=0)
     precio_unidad = models.FloatField(default=0)
     origen_natural = models.BooleanField(default=False)
-    id_restriccion = models.ForeignKey(TipoMedicamento, on_delete=models.RESTRICT)
+    id_restriccion = models.ForeignKey(RestriccionMedicamento, on_delete=models.RESTRICT, null=True, blank=True, to_field='id_restriccion')
+    id_clasificacion = models.ForeignKey(ClasificacionMedicamento, on_delete=models.RESTRICT, null=True, blank=True, to_field='id_clasificacion')
    
     
     def __str__(self):
@@ -79,14 +90,7 @@ class Farmacia(models.Model):
     id_turno = models.ForeignKey(TurnoFarmacia, on_delete=models.RESTRICT, null=True)
     id_tipo = models.ForeignKey(TipoFarmacia, on_delete=models.RESTRICT)
     id_munic = models.ForeignKey(Municipio, on_delete=models.RESTRICT)
-    is_active = models.BooleanField(
-        ("active"),
-        default=True,
-        help_text=(
-            "Designates whether this farma should be treated as active. "
-            "Unselect this instead of deleting farmas."
-        ),
-    )
+    ubicacion = gis_models.PointField(geography=True, blank=True, null=True)
 
     def __str__(self):
         return self.nombre
