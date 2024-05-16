@@ -1,6 +1,6 @@
 $(document).ready(function () {
-    let editionSuccessful = false
-    var ajaxUrl = $("#miTabla").data("url")
+    let editionSuccessful = false;
+    var ajaxUrl = $("#miTabla").data("url");
     var table = $("#miTabla").DataTable({
         processing: true,
         serverSide: true,
@@ -14,31 +14,57 @@ $(document).ready(function () {
         columns: [
             { data: "index" },
             { data: "nombre" },
-            { data: "descripcion" },
             { data: "cant_max" },
-            { data: "precio" },
+            { data: "precio_unidad" },
             { data: "origen" },
             { data: "restriccion" },
             { data: "clasificacion" },
             {
-                data: null,
-                orderable: false,
-                searchable: false,
-                render: function (data, type, row, meta) {  
-                    // Verifica si estás en la columna de acciones
-                    if (meta.col === 8) {
-                        let editButton = `
-                            <button id='editar' class='btn btn-sm btn-secondary' data-id='${row.id}' data-toggle='modal' data-target='#modal-lg'>
-                                <i class="fas fa-pencil-alt"></i>
-                            </button>&nbsp`
-                        return editButton
-                    }
-                    // Puedes retornar diferentes contenidos dependiendo de la columna
-                    return data // Retorna los datos originales para otras columnas
-                },
+              data: null,
+              orderable: false,
+              searchable: false,
+              render: function (data, type, row, meta) {
+                  let mostrarButton = `
+                  <button id='mostrar' class='btn btn-sm btn-secondary' data-id='${row.id}' data-toggle='modal' data-target='#modaldesc-lg'>
+                      <i class="fa-solid fa-eye"></i>
+                  </button>`;
+                  return mostrarButton;
+              }
+            },
+            {
+              data: null,
+              orderable: false,
+              searchable: false,
+              render: function (data, type, row, meta) {
+                  let editButton = `
+                  <button id='editar' class='btn btn-sm btn-secondary' data-id='${row.id}' data-toggle='modal' data-target='#modal-lg'>
+                      <i class="fas fa-pencil-alt"></i>
+                  </button>`;
+                  return editButton;
+              }
             },
         ],
-    })
+    });
+
+
+    // Evento de clic en el botón "Mostrar"
+    $('#miTabla').on('click', '#mostrar', function() {
+      let idMedic = $(this).data('id');
+      cargarDescripcionMedicamento(idMedic);
+    });
+
+    function cargarDescripcionMedicamento(id) {
+      $.ajax({
+          url: 'obtenerDescripcion/' + id + '/',
+          type: 'GET',
+          data: {},
+          success: function(response) {
+              $('#descripcionMostrar').text(response.description);
+              $('#id').val(response.id);
+              $('#modaldesc-lg').modal('show'); 
+          },
+      })
+    }
 
 
     // Evento de clic en el botón "Editar"
@@ -46,18 +72,26 @@ $(document).ready(function () {
         let idMedic = $(this).data('id');
         cargarInformacionMedicamento(idMedic);
      });
-
-     function cargarInformacionMedicamento(id) {
+     
+    function cargarInformacionMedicamento(id) {
         $.ajax({
             url: 'obtenerMedicamento/' + id + '/',
             type: 'GET',
             data: {},
             success: function(response) {
+                //console.log('Respuesta del servidor:', response);
                 $('#nombre').val(response.nombre);
-                $('#descripcion').val(response.descripcion);
+                $('#modal-lg').modal('show');
+                $('#descriptionEdit').val(response.description);
                 $('#cant_max').val(response.cant_max);
-                $('#precio').val(response.precio);
-                $('#origen').val(response.origen ? '1' : '0');
+                $('#precio_unidad').val(response.precio_unidad);
+
+                if (response.origen) {
+                  $('#origen').prop('checked', true);
+                } else {
+                  $('#origen').prop('checked', false);
+                }
+
                 $('#restriccion').val(response.restriccion_name);
                 $('#clasificacion').val(response.clasificacion_name);
                 $('#id').val(response.id);
@@ -85,7 +119,6 @@ $(document).ready(function () {
         })
     }
 
-
     function editarMedicamento(form) {
         var formData = $(form).serialize()
     
@@ -111,7 +144,6 @@ $(document).ready(function () {
         })
     }
 
-
     $.validator.addMethod("notZero", function(value, element) {
       return parseFloat(value) !== 0; // Verificar que el valor del precio no sea igual a 0
     }, "El valor no puede ser cero");
@@ -121,12 +153,12 @@ $(document).ready(function () {
           nombre: {
             required: true,
             minlength: 3,
-            pattern: /^[A-Za-z0-9\s]+(?:[A-Za-z][A-Za-z0-9\s]*)?$/
+            pattern: /^[A-Za-zÁáÉéÍíÓóÚúÜüÑñ\s]+$/
           },
-          descripcion: {
+          description: {
             required: true,
             minlength: 5,
-            pattern: /^[A-Za-z0-9\s]+(?:[A-Za-z][A-Za-z0-9\s]*)?$/
+            pattern: /^[A-Za-z0-9\s.,;:"'ÁáÉéÍíÓóÚúÜüÑñ()]+$/u
           },
           cant_max: {
             required: true,
@@ -134,7 +166,7 @@ $(document).ready(function () {
             maxlength: 3,
             digits: true
           },
-          precio: {
+          precio_unidad: {
             required: true,
             minlength: 1,
             maxlength: 5,
@@ -149,7 +181,7 @@ $(document).ready(function () {
             minlength: "Por favor, introduce al menos 3 caracteres.",
             pattern: "Por favor introduce al menos una letra, puede contener números."
           },
-          descripcion: {
+          description: {
             required: "Este campo es obligatorio.",
             minlength: "Por favor, introduce al menos 5 caracteres.",
             pattern: "Por favor introduce al menos una letra, puede contener números."
@@ -160,7 +192,7 @@ $(document).ready(function () {
             maxlength: "Solo puede contener de 1 a 3 dígitos.",
             digits: "No puede contener letras ni símbolos."
           }, 
-          precio: {
+          precio_unidad: {
             required: "Este campo es obligatorio.",
             minlength: "Solo puede contener de 1 a 5 dígitos.",
             maxlength: "Solo puede contener de 1 a 5 dígitos.",
@@ -185,7 +217,6 @@ $(document).ready(function () {
         },
     });
 
-
     $("#modal-lg").on("hidden.bs.modal", function () {
         if (editionSuccessful) {
             Swal.fire({
@@ -195,7 +226,8 @@ $(document).ready(function () {
             });
             editionSuccessful = false;
         }
-    })
+    });
+
 
 });
   

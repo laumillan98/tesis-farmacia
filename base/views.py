@@ -893,7 +893,11 @@ def listaDeMedic(request):
             }
 
             # Renderizar la plantilla con el contexto
-            return render(request, 'gestionar_medicfarma.html', context)
+            return render(
+                request=request,
+                template_name="gestionar_medicfarma.html", 
+                context={"farmacia_del_farmaceutico": farmacia_del_farmaceutico}
+                )
         
         except FarmaUser.DoesNotExist:
             return JsonResponse({'error': 'Usuario farmacéutico no encontrado'}, status=404)
@@ -903,26 +907,49 @@ def listaDeMedic(request):
 
 def agregarMedicFarma(request):
     if request.method == 'POST':
-        medicamentos_seleccionados = request.POST.getlist('medicamentos[]')
-
         try:
             farmaceutico = FarmaUser.objects.get(username=request.user.username)
-            farmacia_del_farmaceutico = farmaceutico.id_farma
+            idfarma_del_farmaceutico = farmaceutico.id_farma.id_farma
+        except FarmaUser.DoesNotExist:
+            return redirect('/')
 
-            for medicamento_id in medicamentos_seleccionados:
-                # Crear y guardar FarmaciaMedicamento para cada medicamento seleccionado
-                farmacia_medicamento = FarmaciaMedicamento(
-                    id_medic_id=medicamento_id,
-                    id_farma=farmacia_del_farmaceutico,
-                    existencia=0  
+        # Obtener lista de IDs de medicamentos seleccionados del formulario
+        selected_medicamento_ids = request.POST.getlist('medicamentos')
+    
+        for id_medic in selected_medicamento_ids:
+            try:
+                # Obtener el objeto del medicamento y la farmacia
+                medicamento = Medicamento.objects.get(id_medic=id_medic)
+                farmacia = Farmacia.objects.get(id_farma=idfarma_del_farmaceutico)
+                # Verificar si ya existe la relación para este medicamento y farmacia
+                farmacia_medicamento, created = FarmaciaMedicamento.objects.get_or_create(
+                    id_medic=medicamento,
+                    id_farma=farmacia,
+                    defaults={'existencia': 0} 
                 )
-                farmacia_medicamento.save()
+                # Guardar la relación en la base de datos
+                #farmacia_medicamento.save()
+            except Medicamento.DoesNotExist:
+                pass
 
-            return JsonResponse({'success': True})
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
+        return redirect('/gestionar_medicfarma')
 
-    return JsonResponse({'error': 'Método no permitido'}, status=405)
+    try:
+        farmaceutico = FarmaUser.objects.get(username=request.user.username)
+        id_farma = farmaceutico.id_farma.id_farma
+
+        medicamentos_disponibles = Medicamento.objects.exclude(
+            farmaciamedicamento__id_farma=id_farma
+        )
+
+    except FarmaUser.DoesNotExist:
+        medicamentos_disponibles = Medicamento.objects.none()  # Devolver queryset vacío
+
+    return render(
+        request=request,
+        template_name="agregar_medicfarma.html",
+        context={"medicamentos": medicamentos_disponibles}
+    )
 
 
 @login_required(login_url='/acceder')
@@ -952,9 +979,9 @@ def listaDeMedicamentos(request):
             'index': index + 1,
             'id': medic.id_medic,
             'nombre': medic.nombre,
-            'descripcion': medic.description,
+            'description': medic.description,
             'cant_max': cant_max_texto,
-            'precio': f'{medic.precio_unidad} CUP/u',
+            'precio_unidad': f'{medic.precio_unidad} CUP/u',
             'origen': origen_texto,
             'restriccion': medic.id_restriccion.nombre if medic.id_restriccion else None,
             'clasificacion': medic.id_clasificacion.nombre if medic.id_clasificacion else None,
@@ -977,6 +1004,7 @@ def registrarMedicamento(request):
         if form.is_valid():
             medic = form.save(commit=False)
             medic.id_restriccion = form.cleaned_data['id_restriccion']
+            medic.id_clasificacion = form.cleaned_data['id_clasificacion']
             medic.save()
             return redirect('/gestionar_medicamentos')
         else:
@@ -992,6 +1020,14 @@ def registrarMedicamento(request):
     )
 
 
+def obtenerDescripcion(request, uuid):
+    medic = Medicamento.objects.get(id_medic = uuid)   
+    return JsonResponse({
+        'id': medic.id_medic,
+        'description': medic.description,
+    })
+
+
 def obtenerMedicamento(request, uuid):
     restriccion = RestriccionMedicamento.objects.all()
     clasificacion = ClasificacionMedicamento.objects.all()
@@ -999,9 +1035,9 @@ def obtenerMedicamento(request, uuid):
     return JsonResponse({
         'id': medic.id_medic,
         'nombre': medic.nombre,
-        'descripcion': medic.description,
+        'description': medic.description,
         'cant_max': medic.cant_max,
-        'precio': medic.precio_unidad,
+        'precio_unidad': medic.precio_unidad,
         'origen': medic.origen_natural,
         'selected_restriccion_name': medic.id_restriccion.id_restriccion,
         'restricciones': [{'id_restriccion': obj.id_restriccion, 'nombre': obj.nombre} for obj in restriccion],
@@ -1018,9 +1054,12 @@ def editarMedicamento(request):
     form = MedicUpdateForm(request.POST, instance=medic)
     if form.is_valid():
         print('entro aquiiiii 2')
-        form.save()
+        medic = form.save(commit=False)
+        medic.origen_natural = bool(request.POST.get('origen', False))
+        medic.save()
         return JsonResponse({'success': True})
     else:
+        print(form.errors)
         return JsonResponse({'success': False, 'errors': form.errors})
 
 

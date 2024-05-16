@@ -55,6 +55,7 @@ urlpatterns = [
      path('gestionar_medicamentos/', views.gestionarMedicamentos),
      path('lista_de_medicamentos/', views.listaDeMedicamentos, name='lista_de_medicamentos'),
      path('registrar_medicamento/', views.registrarMedicamento),
+     path('gestionar_medicamentos/obtenerDescripcion/<uuid>/', views.obtenerDescripcion, name ='obtener_descripcion'),
      path('gestionar_medicamentos/obtenerMedicamento/<uuid>/', views.obtenerMedicamento, name ='obtener_medicamento'),
      path('gestionar_medicamentos/editarMedicamento/', views.editarMedicamento, name ='editar_medicamento'),
      path('gestionar_restricciones_de_medicamentos/', views.gestionarRestriccionesMedicamentos),

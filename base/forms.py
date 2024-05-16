@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, SetPasswordForm, PasswordResetForm, UserChangeForm
 from .models import CustomUser, FarmaUser, Farmacia, Municipio, Provincia, TipoFarmacia, TurnoFarmacia, Medicamento, RestriccionMedicamento, ClasificacionMedicamento
+from .widgets import BooleanCheckbox
 from django.contrib.auth import get_user_model
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
@@ -202,7 +203,13 @@ class ProvUpdateForm(forms.ModelForm):
 
 class MedicUpdateForm(forms.ModelForm):
     nombre = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
-    
+
+    cant_max = forms.IntegerField(required=True, label="Cantidad Máxima")
+    precio_unidad = forms.FloatField(required=True)
+    origen_natural = forms.BooleanField(widget=BooleanCheckbox, required=False, label="Origen")
+    id_restriccion = forms.ModelChoiceField(queryset=RestriccionMedicamento.objects.all(), required=True, label="Restricción")
+    id_clasificacion = forms.ModelChoiceField(queryset=ClasificacionMedicamento.objects.all(), required=True, label="Clasificación")
+
     class Meta:
         model = Medicamento
         fields = ('nombre', 'description', 'cant_max', 'precio_unidad', 'origen_natural', 'id_restriccion', 'id_clasificacion')
