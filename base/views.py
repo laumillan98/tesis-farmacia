@@ -1,11 +1,14 @@
 from os import name
 from typing import Protocol
+import io
 from io import StringIO
 import subprocess
 import json
+from django.http import HttpResponse
 from datetime import datetime, timedelta
 from django.db.models import Count
 from django.db.models.query_utils import Q
+from django.http.response import FileResponse
 from django.http.response import JsonResponse
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
@@ -28,6 +31,20 @@ from .forms import CustomUserCreationForm, FarmaUserCreationForm, UserLoginForm,
 from .decorators import usuarios_permitidos, unauthenticated_user
 from .tokens import account_activation_token
 from FirstApp.tasks import send_activation_email
+from django_tables2 import RequestConfig
+
+# Librería ReportLab
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.lib.units import inch
+from reportlab.lib.pagesizes import A4, landscape
+from io import BytesIO
+from reportlab.lib.pagesizes import letter
+from django.views.decorators.csrf import csrf_exempt
+
 
 # Create your views here.
 
@@ -571,6 +588,7 @@ def listaDeTiposDeFarmacias(request):
     return JsonResponse(data, safe=False)
 
 
+@login_required(login_url='/acceder')
 @usuarios_permitidos(roles_permitidos=['admin'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarTipoFarmacia(request):
@@ -634,6 +652,7 @@ def listaDeTurnosDeFarmacias(request):
     return JsonResponse(data, safe=False)
 
 
+@login_required(login_url='/acceder')
 @usuarios_permitidos(roles_permitidos=['admin'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarTurnoFarmacia(request):
@@ -698,6 +717,9 @@ def listaDeMunicipios(request):
     return JsonResponse(data, safe=False)
 
 
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['admin'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarMunicipio(request):
     if request.method =='POST':
         form = MunicUpdateForm(data=request.POST)
@@ -763,6 +785,7 @@ def listaDeProvincias(request):
     return JsonResponse(data, safe=False)
 
 
+@login_required(login_url='/acceder')
 @usuarios_permitidos(roles_permitidos=['admin'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarProvincia(request):
@@ -855,7 +878,7 @@ def listaDeMedicFarma(request):
     return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
 
 
-def listaDeMedic(request):
+#def listaDeMedic(request):
     if request.user.is_authenticated:
         try:
             farmaceutico = FarmaUser.objects.get(username=request.user.username)
@@ -904,7 +927,23 @@ def listaDeMedic(request):
     
     return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
 
+@require_POST
+def actualizarExistencia(request):
+    id_medic = request.POST.get('id_medic')
+    existencia = request.POST.get('existencia')
 
+    try:
+        farmacia_medicamento = FarmaciaMedicamento.objects.get(id_medic=id_medic)
+        farmacia_medicamento.existencia = existencia
+        farmacia_medicamento.save()
+        return JsonResponse({'message': 'Existencia actualizada correctamente'}, status=200)
+    except FarmaciaMedicamento.DoesNotExist:
+        return JsonResponse({'error': 'Medicamento no encontrado'}, status=404)
+
+
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['farmaceuticos'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def agregarMedicFarma(request):
     if request.method == 'POST':
         try:
@@ -940,7 +979,7 @@ def agregarMedicFarma(request):
 
         medicamentos_disponibles = Medicamento.objects.exclude(
             farmaciamedicamento__id_farma=id_farma
-        )
+        ).order_by('nombre') 
 
     except FarmaUser.DoesNotExist:
         medicamentos_disponibles = Medicamento.objects.none()  # Devolver queryset vacío
@@ -996,6 +1035,7 @@ def listaDeMedicamentos(request):
     return JsonResponse(data, safe=False)
 
 
+@login_required(login_url='/acceder')
 @usuarios_permitidos(roles_permitidos=['farmaceuticos']) #farmaveutico o admin? consultar ya que la lista de medicamentos seria un nomenclador
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarMedicamento(request):
@@ -1084,6 +1124,7 @@ def listaDeRestriccionesDeMedicamentos(request):
     return JsonResponse(data, safe=False)
 
 
+@login_required(login_url='/acceder')
 @usuarios_permitidos(roles_permitidos=['farmaceuticos'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarRestriccionMedicamento(request):
@@ -1147,6 +1188,7 @@ def listaDeClasificacionesDeMedicamentos(request):
     return JsonResponse(data, safe=False)
 
 
+@login_required(login_url='/acceder')
 @usuarios_permitidos(roles_permitidos=['farmaceuticos'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarClasificacionMedicamento(request):
@@ -1189,100 +1231,7 @@ def editarClasificacionMedicamento(request):
         return JsonResponse({'success': False, 'errors': form.errors})
 
 
-
-
-
-
-
-"""@login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['farmaceuticos'])
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def gestionarMedicamentos(request):
-    print('Entro aqui 1')
-    if request.user.is_authenticated:
-        print('Entro aqui 2')
-
-        farmaceutico = FarmaUser.objects.get(username=request.user.username)
-        farmacia_del_farmaceutico = farmaceutico.id_farma
-        
-        farmacia_medicamento = FarmaciaMedicamento.objects.filter(
-            id_farma=farmacia_del_farmaceutico.pk)
-        lista_tipo_medicamentos = TipoMedicamento.objects.all()
-        print(farmacia_medicamento)
-        return render(
-            request, "gestionar_medicamentos.html",
-            {
-                "farmacia": farmacia_del_farmaceutico,
-                "medicamentos": farmacia_medicamento,
-                "tipo_medicamento": lista_tipo_medicamentos
-            }
-        )
-    else:
-        return redirect('/acceder')
-
-
-def registrarMedicamento(request):
-    id_farma = request.POST['idFarmacia']
-    nombre = request.POST['txtNombre']
-    description = request.POST['txtDescription']
-    cantidad = request.POST['numCantidad']
-    precio = request.POST['txtPrecio']
-    restriccion = request.POST['txtRestriccion']
-    origen = request.POST['radioOrigen']
-
-    farmacia = Farmacia.objects.get(pk=id_farma)
-    tipo_medicamento = TipoMedicamento.objects.get(pk=restriccion)
-    medicamento = Medicamento.objects.create(nombre=nombre, description=description,
-                                             cant_max=cantidad, precio_unidad=precio, origen_natural=origen, id_restriccion=tipo_medicamento)
-    farmacia_medicamento = FarmaciaMedicamento.objects.create(
-        id_medic=medicamento, id_farma=farmacia, existencia=0)
-
-    messages.success(request, 'Medicamento registrado :)')
-
-    return redirect('/gestionar/')
-
-
-@usuarios_permitidos(roles_permitidos=['farmaceuticos'])
-def editarMedicamento(request, uuid):
-    medicamento = Medicamento.objects.get(pk=uuid)
-    lista_tipo_medicamentos = TipoMedicamento.objects.all()
-    return render(request, "editar_medicamento.html", {"medicamento": medicamento, "tipo_medicamento": lista_tipo_medicamentos})
-
-
-def edicionMedicamento(request):
-    uuid = request.POST['uuid']
-    nombre = request.POST['txtNombre']
-    description = request.POST['txtDescription']
-    cantidad = request.POST['numCantidad']
-    precio = request.POST['txtPrecio']
-    restriccion = request.POST['txtRestriccion']
-    origen = request.POST['radioOrigen']
-
-    tipo_medicamento = TipoMedicamento.objects.get(pk=restriccion)
-    medicamento = Medicamento.objects.get(pk=uuid)
-    medicamento.nombre = nombre
-    medicamento.description = description
-    medicamento.cant_max = cantidad
-    medicamento.precio_unidad = precio
-    medicamento.id_restriccion = tipo_medicamento
-    medicamento.origen_natural = origen
-    medicamento.save()
-
-    messages.success(request, 'Medicamento actualizado :)')
-
-    return redirect('/gestionar/')
-
-
-def eliminarMedicamento(request, uuid):
-    medicamento = Medicamento.objects.get(pk=uuid)
-    medicamento.delete()
-
-    messages.success(request, 'Medicamento elminado :)')
-
-    return redirect('/gestionar')"""
-
-
-def actualizarCantidad(request):
+#def actualizarCantidad(request):
     if request.method == 'POST':
         farmacia = request.POST['farmacia']
         medicamento = request.POST['medicamento']
@@ -1434,6 +1383,15 @@ def visualizarTrazas(request):
 def listaDeTrazas(request):
     trazas = LogEntry.objects.all()  # Obtener todas las trazas de LogEntry (acciones registradas por Django)
 
+    # Si se solicita un reporte PDF
+    if 'reporte_pdf' in request.GET:
+        buffer = BytesIO()
+        generar_reporte_pdf(trazas, buffer)
+        buffer.seek(0)
+        response = JsonResponse({'pdf_url': buffer.getvalue()})
+        response['Content-Disposition'] = 'attachment; filename="reporte_trazas.pdf"'
+        return response
+
     paginator = Paginator(trazas, request.GET.get('length', 10))  # Cantidad de objetos por página
     start = int(request.GET.get('start', 0))
     page_number = start // paginator.per_page + 1  # Calcular el número de página basado en 'start'
@@ -1520,3 +1478,99 @@ def usuariosXGruposChart(request):
 
 def map_view(request):
     return render(request, 'mapa.html')
+
+
+##############################################################################################################################
+################################################    REPORTES    ##################################################################
+
+@csrf_exempt
+def generar_reporte_pdf(request):
+    if request.method == 'POST':
+        # Crear un buffer para el PDF
+        buffer = io.BytesIO()
+
+        # Obtener los datos del formulario de filtro
+        usuario = request.POST.get('usuario')
+        fecha_inicio = request.POST.get('fecha_inicio')
+        fecha_fin = request.POST.get('fecha_fin')
+        tipo_accion = request.POST.get('tipo_accion')
+        contenido = request.POST.get('contenido')
+
+        print('Usuario:', usuario)  # Mensaje de depuración
+        print('Fecha Inicio:', fecha_inicio)  # Mensaje de depuración
+        print('Fecha Fin:', fecha_fin)  # Mensaje de depuración
+        print('Tipo de Acción:', tipo_accion)  # Mensaje de depuración
+        print('Contenido:', contenido)  # Mensaje de depuración
+
+        # Filtrar las trazas según los datos del formulario
+        trazas = LogEntry.objects.all()
+
+        if usuario:
+            trazas = trazas.filter(user__username__icontains=usuario)
+        if fecha_inicio:
+            try:
+                fecha_inicio_dt = datetime.strptime(fecha_inicio, '%Y-%m-%d')
+                trazas = trazas.filter(action_time__gte=fecha_inicio_dt)
+            except ValueError as e:
+                print(f"Error al convertir fecha_inicio: {e}")
+        if fecha_fin:
+            try:
+                fecha_fin_dt = datetime.strptime(fecha_fin, '%Y-%m-%d')
+                trazas = trazas.filter(action_time__lte=fecha_fin_dt)
+            except ValueError as e:
+                print(f"Error al convertir fecha_fin: {e}")
+        if tipo_accion:
+            try:
+                tipo_accion_int = int(tipo_accion)
+                trazas = trazas.filter(action_flag=tipo_accion_int)
+            except ValueError as e:
+                print(f"Error al convertir tipo_accion: {e}")
+        if contenido:
+            trazas = trazas.filter(object_repr__icontains=contenido)
+
+        print('Trazas encontradas:', trazas.count())  # Mensaje de depuración
+
+        # Generar el reporte PDF
+        doc = SimpleDocTemplate(buffer, pagesize=landscape(A4))
+        elements = []
+
+        style_table = TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONT', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONT', (0, 1), (-1, -1), 'Helvetica'),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.gray)
+        ])
+
+        # Datos para la tabla
+        data = [
+            ['#', 'ID', 'Fecha y Hora', 'Usuario', 'Tipo de Objeto', 'Objeto', 'Acción', 'Detalles']
+        ]
+
+        for index, traza in enumerate(trazas):
+            change_message = json.loads(traza.change_message) if traza.change_message else {}
+            data.append([
+                index + 1,
+                traza.id,
+                traza.action_time.strftime('%Y-%m-%d %H:%M:%S'),
+                traza.user.username if traza.user else 'System',
+                str(traza.content_type),
+                traza.object_repr,
+                traza.get_action_flag_display(),
+                change_message.get('message', '')
+            ])
+
+        print('Datos para la tabla:', data)  # Mensaje de depuración
+
+        table = Table(data)
+        table.setStyle(style_table)
+        elements.append(table)
+
+        doc.build(elements)
+
+        # Devolver el reporte PDF al frontend
+        buffer.seek(0)
+        return FileResponse(buffer, as_attachment=True, filename='reporte_trazas.pdf')
+
+    return JsonResponse({'error': 'Método no permitido'}, status=405)

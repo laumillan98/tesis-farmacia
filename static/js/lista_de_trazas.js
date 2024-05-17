@@ -32,4 +32,12 @@ $(document).ready(function () {
             }
         ]
     });
+
+
+    
+
 });
+
+//modal para descargar pdf
+    
+

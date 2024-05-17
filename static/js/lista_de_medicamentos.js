@@ -25,7 +25,7 @@ $(document).ready(function () {
               searchable: false,
               render: function (data, type, row, meta) {
                   let mostrarButton = `
-                  <button id='mostrar' class='btn btn-sm btn-secondary' data-id='${row.id}' data-toggle='modal' data-target='#modaldesc-lg'>
+                  <button id='mostrar' class='btn btn-sm btn-info' data-id='${row.id}' data-toggle='modal' data-target='#modaldesc-lg'>
                       <i class="fa-solid fa-eye"></i>
                   </button>`;
                   return mostrarButton;
@@ -37,7 +37,7 @@ $(document).ready(function () {
               searchable: false,
               render: function (data, type, row, meta) {
                   let editButton = `
-                  <button id='editar' class='btn btn-sm btn-secondary' data-id='${row.id}' data-toggle='modal' data-target='#modal-lg'>
+                  <button id='editar' class='btn btn-sm btn-success' data-id='${row.id}' data-toggle='modal' data-target='#modal-lg'>
                       <i class="fas fa-pencil-alt"></i>
                   </button>`;
                   return editButton;

@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'dbbackup',
     'django.contrib.gis',
     'leaflet',
+    'django_filters',
+    'django_tables2',
 ]
 
 AUTH_USER_MODEL = 'base.CustomUser'

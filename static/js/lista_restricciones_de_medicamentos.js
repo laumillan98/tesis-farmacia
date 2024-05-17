@@ -15,7 +15,7 @@ $(document).ready(function() {
                     // Verifica si estás en la columna de acciones
                     if (meta.col === 3) { 
                         let editButton = `
-                        <button id='editar' class='btn btn-sm btn-secondary' data-id='${row.id}' data-toggle='modal' data-target='#modal-lg'>
+                        <button id='editar' class='btn btn-sm btn-success' data-id='${row.id}' data-toggle='modal' data-target='#modal-lg'>
                             <i class="fas fa-pencil-alt"></i>
                         </button>&nbsp`
                         return editButton;

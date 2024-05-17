@@ -50,7 +50,7 @@ urlpatterns = [
      path('gestionar_provincias/editarProvincia/', views.editarProvincia, name ='editar_provincia'),
      path('gestionar_medicfarma/', views.gestionarMedicFarma),
      path('lista_de_medicfarma/', views.listaDeMedicFarma, name='lista_de_medicfarma'),
-     path('lista_de_medic/', views.listaDeMedic, name='lista_de_medic'),
+     path('actualizar_existencia/', views.actualizarExistencia, name='actualizar_existencia'),
      path('agregar_medicfarma/', views.agregarMedicFarma, name='agregar_medicfarma'),
      path('gestionar_medicamentos/', views.gestionarMedicamentos),
      path('lista_de_medicamentos/', views.listaDeMedicamentos, name='lista_de_medicamentos'),
@@ -69,10 +69,8 @@ urlpatterns = [
      path('gestionar_clasificaciones_de_medicamentos/obtenerClasificacionMedicamento/<uuid>/', views.obtenerClasificacionMedicamento, name ='obtener_clasificacion_de_medicamento'),
      path('gestionar_clasificaciones_de_medicamentos/editarClasificacionMedicamento/', views.editarClasificacionMedicamento, name ='editar_clasificacion_de_medicamento'),
     
-     #path('gestionar/editarMedicamento/<uuid>', views.editarMedicamento),
-     #path('edicionMedicamento/', views.edicionMedicamento),
-     #path('gestionar/eliminarMedicamento/<uuid>', views.eliminarMedicamento),
-     path('actualizarCantidad', views.actualizarCantidad),
+     
+     #path('actualizarCantidad', views.actualizarCantidad),
      path('farmacias_tabla/', views.farmaciasTabla),
      path('medicamentos_tabla/', views.medicamentosTabla),
      path('existencias_tabla/', views.existenciasTabla),
@@ -86,5 +84,6 @@ urlpatterns = [
      path('visualizar_charts/', views.visualizarCharts),
      path('usuarios_xgrupos_chart/', views.usuariosXGruposChart, name='usuarios_xgrupos_chart'),
      path('mapa/', views.map_view, name='mapa'),
+     path('generar_reporte/', views.generar_reporte_pdf, name='generar_reporte_pdf'),
 
 ]
