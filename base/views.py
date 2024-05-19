@@ -37,7 +37,7 @@ from django_tables2 import RequestConfig
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib import colors
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.lib.pagesizes import A4, landscape
@@ -467,7 +467,18 @@ def editarUsuario(request):
 @usuarios_permitidos(roles_permitidos=['admin'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def gestionarFarmacias(request):
-    return render(request, "gestionar_farmacias.html")
+    #Codigo para poder seleccionar de las listas siguientes en el filtrado para exportar la tabla
+    provincias = Provincia.objects.all()
+    municipios = Municipio.objects.all()
+    tipos = TipoFarmacia.objects.all()
+    turnos = TurnoFarmacia.objects.all()
+    context = {
+        'provincias': provincias,
+        'municipios': municipios,
+        'tipos': tipos,
+        'turnos': turnos
+    }
+    return render(request, "gestionar_farmacias.html", context)
 
 
 def listaDeFarmacias(request):
@@ -1383,15 +1394,6 @@ def visualizarTrazas(request):
 def listaDeTrazas(request):
     trazas = LogEntry.objects.all()  # Obtener todas las trazas de LogEntry (acciones registradas por Django)
 
-    # Si se solicita un reporte PDF
-    if 'reporte_pdf' in request.GET:
-        buffer = BytesIO()
-        generar_reporte_pdf(trazas, buffer)
-        buffer.seek(0)
-        response = JsonResponse({'pdf_url': buffer.getvalue()})
-        response['Content-Disposition'] = 'attachment; filename="reporte_trazas.pdf"'
-        return response
-
     paginator = Paginator(trazas, request.GET.get('length', 10))  # Cantidad de objetos por página
     start = int(request.GET.get('start', 0))
     page_number = start // paginator.per_page + 1  # Calcular el número de página basado en 'start'
@@ -1483,57 +1485,15 @@ def map_view(request):
 ##############################################################################################################################
 ################################################    REPORTES    ##################################################################
 
+
 @csrf_exempt
 def generar_reporte_pdf(request):
     if request.method == 'POST':
-        # Crear un buffer para el PDF
         buffer = io.BytesIO()
 
-        # Obtener los datos del formulario de filtro
-        usuario = request.POST.get('usuario')
-        fecha_inicio = request.POST.get('fecha_inicio')
-        fecha_fin = request.POST.get('fecha_fin')
-        tipo_accion = request.POST.get('tipo_accion')
-        contenido = request.POST.get('contenido')
+        tipo_objeto = request.POST.get('tipo_objeto')
 
-        print('Usuario:', usuario)  # Mensaje de depuración
-        print('Fecha Inicio:', fecha_inicio)  # Mensaje de depuración
-        print('Fecha Fin:', fecha_fin)  # Mensaje de depuración
-        print('Tipo de Acción:', tipo_accion)  # Mensaje de depuración
-        print('Contenido:', contenido)  # Mensaje de depuración
-
-        # Filtrar las trazas según los datos del formulario
-        trazas = LogEntry.objects.all()
-
-        if usuario:
-            trazas = trazas.filter(user__username__icontains=usuario)
-        if fecha_inicio:
-            try:
-                fecha_inicio_dt = datetime.strptime(fecha_inicio, '%Y-%m-%d')
-                trazas = trazas.filter(action_time__gte=fecha_inicio_dt)
-            except ValueError as e:
-                print(f"Error al convertir fecha_inicio: {e}")
-        if fecha_fin:
-            try:
-                fecha_fin_dt = datetime.strptime(fecha_fin, '%Y-%m-%d')
-                trazas = trazas.filter(action_time__lte=fecha_fin_dt)
-            except ValueError as e:
-                print(f"Error al convertir fecha_fin: {e}")
-        if tipo_accion:
-            try:
-                tipo_accion_int = int(tipo_accion)
-                trazas = trazas.filter(action_flag=tipo_accion_int)
-            except ValueError as e:
-                print(f"Error al convertir tipo_accion: {e}")
-        if contenido:
-            trazas = trazas.filter(object_repr__icontains=contenido)
-
-        print('Trazas encontradas:', trazas.count())  # Mensaje de depuración
-
-        # Generar el reporte PDF
-        doc = SimpleDocTemplate(buffer, pagesize=landscape(A4))
-        elements = []
-
+        # Definir el estilo de tabla una vez
         style_table = TableStyle([
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('FONT', (0, 0), (-1, 0), 'Helvetica-Bold'),
@@ -1543,34 +1503,155 @@ def generar_reporte_pdf(request):
             ('BACKGROUND', (0, 0), (-1, 0), colors.gray)
         ])
 
-        # Datos para la tabla
-        data = [
-            ['#', 'ID', 'Fecha y Hora', 'Usuario', 'Tipo de Objeto', 'Objeto', 'Acción', 'Detalles']
-        ]
+        if tipo_objeto == 'usuario':
+            objetos = CustomUser.objects.all()
+            username = request.POST.get('username')
+            fecha_inicio = request.POST.get('fecha_inicio')
+            fecha_fin = request.POST.get('fecha_fin')
+            rol = request.POST.get('rol')
+            activo = request.POST.get('activo')
+            filename = 'reporte_usuarios.pdf'
 
-        for index, traza in enumerate(trazas):
-            change_message = json.loads(traza.change_message) if traza.change_message else {}
-            data.append([
-                index + 1,
-                traza.id,
-                traza.action_time.strftime('%Y-%m-%d %H:%M:%S'),
-                traza.user.username if traza.user else 'System',
-                str(traza.content_type),
-                traza.object_repr,
-                traza.get_action_flag_display(),
-                change_message.get('message', '')
-            ])
+            if fecha_inicio:
+                try:
+                    fecha_inicio_dt = datetime.strptime(fecha_inicio, '%Y-%m-%d')
+                    objetos = objetos.filter(date_joined__gte=fecha_inicio_dt)
+                except ValueError:
+                    pass
+            if fecha_fin:
+                try:
+                    fecha_fin_dt = datetime.strptime(fecha_fin, '%Y-%m-%d')
+                    objetos = objetos.filter(date_joined__lte=fecha_fin_dt)
+                except ValueError:
+                    pass
+            if username:
+                objetos = objetos.filter(username__icontains=username)
 
-        print('Datos para la tabla:', data)  # Mensaje de depuración
+            if rol: 
+                objetos = objetos.filter(groups__name__icontains=rol.lower())
+
+            if activo:
+                is_active = True if activo == 'True' else False
+                objetos = objetos.filter(is_active=is_active)
+            
+            data = [
+                ['#', 'ID', 'Nombre', 'Apellidos', 'Usuario', 'Correo', 'Roles', 'Fecha de registro', 'Último acceso', 'Activo']
+            ]
+        elif tipo_objeto == 'farmacia':
+            objetos = Farmacia.objects.all()
+            nombre = request.POST.get('nombre')
+            provincia = request.POST.get('provincia')
+            municipio = request.POST.get('municipio')
+            tipo = request.POST.get('tipo')
+            turno = request.POST.get('turno')
+            filename = 'reporte_farmacias.pdf'
+
+            if nombre:
+                objetos = objetos.filter(nombre__icontains=nombre)
+            if provincia:
+                objetos = objetos.filter(id_munic__id_prov__nombre=provincia)
+            if municipio:
+                objetos = objetos.filter(id_munic__nombre=municipio)
+            if tipo:
+                objetos = objetos.filter(id_tipo__nombre=tipo)
+            if turno:
+                objetos = objetos.filter(id_turno__nombre=turno)
+
+            data = [
+                ['#', 'Nombre', 'Provincia', 'Municipio', 'Direccion', 'Telefono', 'Tipo', 'Turno', 'Farmacéutico']
+            ]
+        elif tipo_objeto == 'traza':
+            objetos = LogEntry.objects.all()
+            usuario = request.POST.get('usuario')
+            fecha_inicio = request.POST.get('fecha_inicio')
+            fecha_fin = request.POST.get('fecha_fin')
+            tipo_accion = request.POST.get('tipo_accion')
+            contenido = request.POST.get('contenido')
+            filename = 'reporte_trazas.pdf'
+
+            if usuario:
+                objetos = objetos.filter(user__username__icontains=usuario)
+            if fecha_inicio:
+                try:
+                    fecha_inicio_dt = datetime.strptime(fecha_inicio, '%Y-%m-%d')
+                    objetos = objetos.filter(action_time__gte=fecha_inicio_dt)
+                except ValueError as e:
+                    print(f"Error al convertir fecha_inicio: {e}")
+            if fecha_fin:
+                try:
+                    fecha_fin_dt = datetime.strptime(fecha_fin, '%Y-%m-%d')
+                    objetos = objetos.filter(action_time__lte=fecha_fin_dt)
+                except ValueError as e:
+                    print(f"Error al convertir fecha_fin: {e}")
+            if tipo_accion:
+                try:
+                    tipo_accion_int = int(tipo_accion)
+                    objetos = objetos.filter(action_flag=tipo_accion_int)
+                except ValueError as e:
+                    print(f"Error al convertir tipo_accion: {e}")
+            if contenido:
+                objetos = objetos.filter(object_repr__icontains=contenido)
+
+            data = [
+                ['#', 'ID', 'Fecha y Hora', 'Usuario', 'Tipo de Objeto', 'Objeto', 'Acción']
+            ]
+        else:
+            return JsonResponse({'error': 'Tipo de objeto no válido'}, status=400)
+        if not objetos.exists():
+            return JsonResponse({'error': 'No se encontraron datos para generar el reporte.'}, status=404)
+
+
+        buffer = io.BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=landscape(A4))
+        elements = []
+
+        for index, objeto in enumerate(objetos):
+            if tipo_objeto == 'usuario':
+                roles = ', '.join([group.name for group in objeto.groups.all()])
+                data.append([
+                    index + 1,
+                    objeto.id,
+                    objeto.first_name,
+                    objeto.last_name,
+                    objeto.username,
+                    objeto.email,
+                    roles,
+                    objeto.date_joined.strftime('%Y-%m-%d %H:%M:%S'),
+                    objeto.last_login.strftime('%Y-%m-%d %H:%M:%S') if objeto.last_login else 'N/A',
+                    'Sí' if objeto.is_active else 'No'
+                ])
+            elif tipo_objeto == 'farmacia':
+                farmaceutico = FarmaUser.objects.filter(id_farma=objeto.id_farma).first()
+                farmaceutico_username = farmaceutico.username if farmaceutico else 'N/A'
+                data.append([
+                    index + 1,
+                    objeto.nombre,
+                    objeto.id_munic.id_prov.nombre,
+                    objeto.id_munic.nombre,
+                    objeto.direccion,
+                    objeto.telefono,
+                    objeto.id_tipo.nombre,
+                    objeto.id_turno.nombre,
+                    farmaceutico_username
+                ])
+            elif tipo_objeto == 'traza':
+                #change_message = json.loads(objeto.change_message) if objeto.change_message else {}
+                data.append([
+                    index + 1,
+                    objeto.id,
+                    objeto.action_time.strftime('%Y-%m-%d %H:%M:%S'),
+                    objeto.user.username if objeto.user else 'System',
+                    str(objeto.content_type),
+                    objeto.object_repr,
+                    objeto.get_action_flag_display(),
+                    #change_message.get('message', '')
+                ])
 
         table = Table(data)
         table.setStyle(style_table)
         elements.append(table)
-
         doc.build(elements)
-
-        # Devolver el reporte PDF al frontend
         buffer.seek(0)
-        return FileResponse(buffer, as_attachment=True, filename='reporte_trazas.pdf')
+        return FileResponse(buffer, as_attachment=True, filename=filename)
 
     return JsonResponse({'error': 'Método no permitido'}, status=405)

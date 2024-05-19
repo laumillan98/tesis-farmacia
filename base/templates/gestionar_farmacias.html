@@ -14,6 +14,7 @@
         <div class="card">
             <div class="card-header">
                 <a href="/registrar_farmacia" class="btn btn-md btn-secondary">Registrar Farmacia</a>
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#filtroModal" style="margin-left: 10px;">Exportar Farmacias</button>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -98,11 +99,127 @@
     </div>
     <!-- /.modal -->
 
+
+     <!-- Filtro Modal -->
+     <div class="modal fade" id="filtroModal" tabindex="-1" role="dialog" aria-labelledby="filtroModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="filtroModalLabel">Filtrar Farmacias</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="filtroForm">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="nombre">Nombre</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre">
+                            <input type="hidden" name="tipo_objeto" value="farmacia">
+                        </div>
+                        <div class="form-group">
+                            <label for="provincia">Provincia</label>
+                            <select class="form-control" id="provincia" name="provincia">
+                                <option value="">Seleccione una provincia</option>
+                                {% for provincia in provincias %}
+                                    <option value="{{ provincia.nombre }}">{{ provincia.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="municipio">Municipio</label>
+                            <select class="form-control" id="municipio" name="municipio">
+                                <option value="">Seleccione un municipio</option>
+                                {% for municipio in municipios %}
+                                    <option value="{{ municipio.nombre }}">{{ municipio.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tipo">Tipo</label>
+                            <select class="form-control" id="tipo" name="tipo">
+                                <option value="">Seleccione un tipo</option>
+                                {% for tipo in tipos %}
+                                    <option value="{{ tipo.nombre }}">{{ tipo.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="turno">Turno</label>
+                            <select class="form-control" id="turno" name="turno">
+                                <option value="">Seleccione un turno</option>
+                                {% for turno in turnos %}
+                                    <option value="{{ turno.nombre }}">{{ turno.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="button" class="btn btn-primary" id="generarReporteBtn">Generar Reporte</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.modal -->
+
+    
+
+
 {% endblock %}      
 
 {% block subtitle %}Farmacias{% endblock %}
 
 {% block custom_scripts %}
+
+<script>
+    $(document).ready(function() {
+        $('#generarReporteBtn').click(function() {
+            var form = $('#filtroForm');
+            $.ajax({
+                url: '{% url "generar_reporte_pdf" %}',
+                type: 'POST',
+                data: form.serialize(),
+                success: function(response, status, xhr) {
+                    if (xhr.getResponseHeader('content-type') === 'application/json') {
+                        var jsonResponse = JSON.parse(response);
+                        Swal.fire({
+                            title: 'Error',
+                            text: jsonResponse.error,
+                            icon: 'error',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    } else {
+                        var blob = new Blob([response], { type: 'application/pdf' });
+                        var link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        link.download = 'reporte_farmacias.pdf';
+                        link.click();
+                        $('#filtroModal').modal('hide');
+
+                        // Show SweetAlert notification
+                        Swal.fire({
+                            title: 'Éxito',
+                            text: 'El reporte se ha generado exitosamente.',
+                            icon: 'success',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    }
+                },
+                error: function(response) {
+                    var jsonResponse = response.responseJSON;
+                    Swal.fire({
+                        title: 'Error',
+                        text: jsonResponse.error,
+                        icon: 'error',
+                        confirmButtonText: 'Aceptar'
+                    });
+                }
+            });
+        });
+    });
+</script>
+
+
 <script src="{% static 'plugins/jquery-validation/jquery.validate.min.js' %}"></script>
 <script src="{% static 'plugins/jquery-validation/additional-methods.min.js' %}"></script>
 <script src="{% static 'js/lista_de_farmacias.js' %}"></script>

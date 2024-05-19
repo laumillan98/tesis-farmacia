@@ -14,6 +14,7 @@
         <div class="card">
             <div class="card-header">
                 <a href="/registrar_farmaceutico" class="btn btn-md btn-secondary">Registrar farmacéutico</a>
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#filtroModal" style="margin-left: 10px;">Exportar Usuarios</button>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -82,12 +83,120 @@
     </div>
     <!-- /.modal -->
 
-    
+
+
+    <!-- Filtro Modal -->
+    <div class="modal fade" id="filtroModal" tabindex="-1" role="dialog" aria-labelledby="filtroModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="filtroModalLabel">Filtrar Usuarios</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <form id="filtroForm">
+                      {% csrf_token %}
+                      <div class="form-group">
+                          <label for="username">Usuario</label>
+                          <input type="text" class="form-control" id="username" name="username" placeholder="Usuario">
+                          <input type="hidden" name="tipo_objeto" value="usuario">
+                      </div>
+                      <div class="form-group">
+                          <label for="fecha_inicio">Fecha de Registro Inicio</label>
+                          <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio">
+                      </div>
+                      <div class="form-group">
+                          <label for="fecha_fin">Fecha de Registro Fin</label>
+                          <input type="date" class="form-control" id="fecha_fin" name="fecha_fin">
+                      </div>
+                      <div class="form-group">
+                          <label for="rol">Rol</label>
+                          <select class="form-control" id="rol" name="rol">
+                              <option value="">Todos</option>
+                              <option value="admin">Administrador</option>
+                              <option value="farmaceuticos">Farmacéuticos</option>
+                              <option value="clientes">Clientes</option> 
+                          </select>
+                      </div>
+                      <div class="form-group">
+                          <label for="activo">Activo</label>
+                          <select class="form-control" id="activo" name="activo">
+                              <option value="">Todos</option>
+                              <option value="True">Si</option>
+                              <option value="False">No</option>
+                          </select>
+                      </div>
+                      <button type="button" class="btn btn-primary" id="generarReporteBtn">Generar Reporte</button>
+                  </form>
+              </div>
+          </div>
+      </div>
+  </div>
+  <!-- /.modal -->
+
+
 {% endblock %}   
 
 {% block subtitle %}Usuarios{% endblock %}
 
 {% block custom_scripts %}
+
+<script>
+    $(document).ready(function() {
+        $('#generarReporteBtn').click(function() {
+            var form = $('#filtroForm');
+            $.ajax({
+                url: '{% url "generar_reporte_pdf" %}',
+                type: 'POST',
+                data: form.serialize(),
+                success: function(response, status, xhr) {
+                    if (xhr.getResponseHeader('content-type') === 'application/json') {
+                        var jsonResponse = JSON.parse(response);
+                        Swal.fire({
+                            title: 'Error',
+                            text: jsonResponse.error,
+                            icon: 'error',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    } else {
+                        var blob = new Blob([response], { type: 'application/pdf' });
+                        var link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        link.download = 'reporte_usuarios.pdf';
+                        link.click();
+                        $('#filtroModal').modal('hide');
+
+                        // Show SweetAlert notification
+                        Swal.fire({
+                            title: 'Éxito',
+                            text: 'El reporte se ha generado exitosamente.',
+                            icon: 'success',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    }
+                },
+                error: function(response) {
+                    var jsonResponse = response.responseJSON;
+                    Swal.fire({
+                        title: 'Error',
+                        text: jsonResponse.error,
+                        icon: 'error',
+                        confirmButtonText: 'Aceptar'
+                    });
+                }
+            });
+        });
+
+        // Configurar el atributo max en los campos de fecha para evitar fechas futuras
+        var today = new Date().toISOString().split('T')[0];
+        $('#fecha_inicio').attr('max', today);
+        $('#fecha_fin').attr('max', today);
+    });
+</script>
+
+
 <script src="{% static 'plugins/jquery-validation/jquery.validate.min.js' %}"></script>
 <script src="{% static 'plugins/jquery-validation/additional-methods.min.js' %}"></script>
 <script src="{% static 'js/lista_de_usuarios.js' %}"></script>
