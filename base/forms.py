@@ -198,3 +198,17 @@ class ProvUpdateForm(forms.ModelForm):
     class Meta:
         model = Provincia
         fields = ('nombre',)
+
+class FarmaciaAdminForm(forms.ModelForm):
+    latitud = forms.FloatField(required=False)
+    longitud = forms.FloatField(required=False)
+
+    class Meta:
+        model = Farmacia
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super(FarmaciaAdminForm, self).__init__(*args, **kwargs)
+        if self.instance and self.instance.ubicacion:
+            self.fields['latitud'].initial = self.instance.ubicacion.y
+            self.fields['longitud'].initial = self.instance.ubicacion.x

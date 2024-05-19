@@ -437,19 +437,13 @@ def gestionarFarmacias(request):
 def listaDeFarmacias(request):
     farmacias = Farmacia.objects.all()
 
-    # Configurar la paginación
-    paginator = Paginator(farmacias, 10)  # Mostrar 10 elementos por página (ajusta según sea necesario)
-
-    # Obtener el número de página actual del parámetro de solicitud (si no está presente, por defecto a la página 1)
-    page_number = request.GET.get('page', 1)
-
-    try:
-        page = paginator.page(page_number)
-    except EmptyPage:
-        page = paginator.page(1)  # Si el número de página está fuera de rango, devolver la primera página
+    paginator = Paginator(farmacias, request.GET.get('length', 10))  # Cantidad de objetos por página
+    start = int(request.GET.get('start', 0))
+    page_number = start // paginator.per_page + 1  # Calcular el número de página basado en 'start'
+    page_obj = paginator.get_page(page_number)
 
     farmacias_list = []
-    for index,farma in enumerate(page.object_list):
+    for index,farma in enumerate(page_obj.object_list):
         usuario_asignado = FarmaUser.objects.filter(id_farma=farma.id_farma).first()
         if usuario_asignado:
             nombre_usuario_asignado = usuario_asignado.username
@@ -469,6 +463,7 @@ def listaDeFarmacias(request):
         }
         farmacias_list.append(farma_data)
     data = {
+        "draw": int(request.GET.get('draw', 0)),
         'recordsTotal': paginator.count,
         'recordsFiltered': paginator.count,
         'data': farmacias_list
@@ -1053,6 +1048,28 @@ def listaDeTrazas(request):
     data = {'data': trazas_list}
     return JsonResponse(data, safe=False)
     
+
+def generar_lote_farmacias(request):
+    turno = TurnoFarmacia.objects.get(id_turno_farmacia="d331dd6a-9436-48f6-8c1a-ca83cf9707b2")
+    tipo = TipoFarmacia.objects.get(id_tipo_farmacia="a6e903a9-e962-4fcd-98bb-4c5dd2779964")
+    mun = Municipio.objects.get(id_munic="efa53364-32d2-4a33-ac33-dd30c985bb5f")
+    for i in range(1, 3000):
+        farmacia = Farmacia(
+            nombre = f'Farmacia {i}',
+            direccion = f'Direccion random {i}',
+            telefono = 6440141, 
+            id_turno = turno,
+            id_tipo = tipo,
+            id_munic = mun,
+            is_active = True
+        )
+        farmacia.save()
+    return JsonResponse({'success': True})
+
+def borrar_lote_farmacias(request):
+    farmacias = Farmacia.objects.all()
+    farmacias.delete()
+    return JsonResponse({'success': True})
 
 
 

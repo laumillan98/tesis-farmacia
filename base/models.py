@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.contrib.gis.db import models as gis_models
 import uuid
 # Create your models here.
 
@@ -87,6 +88,7 @@ class Farmacia(models.Model):
             "Unselect this instead of deleting farmas."
         ),
     )
+    ubicacion = gis_models.PointField(geography=True, blank=True, null=True)
 
     def __str__(self):
         return self.nombre
@@ -103,8 +105,8 @@ class FarmaUser(CustomUser):
 
 
 class FarmaciaMedicamento(models.Model):
-    id_medic = models.ForeignKey(Medicamento, on_delete=models.CASCADE)
-    id_farmacia = models.ForeignKey(Farmacia, on_delete=models.RESTRICT)
+    id_medic = models.ForeignKey(Medicamento, on_delete=models.CASCADE,  null=True)
+    id_farmacia = models.ForeignKey(Farmacia, on_delete=models.RESTRICT, to_field='id_farma', null=True)
     existencia = models.IntegerField(default=0)
 
     def __str__(self):

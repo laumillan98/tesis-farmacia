@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'base.apps.BaseConfig',
     'django_recaptcha',
     'dbbackup',
+    'django.contrib.gis',
+    'leaflet'
 ]
 
 AUTH_USER_MODEL = 'base.CustomUser'
@@ -96,7 +98,7 @@ WSGI_APPLICATION = 'FirstApp.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'tesisfarma',
         'USER': 'postgres',
         'PASSWORD': 'admin',
@@ -170,3 +172,12 @@ EMAIL_USE_TLS = True
 # Backup de la bd 
 DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
 DBBACKUP_STORAGE_OPTIONS = {'location': 'C:/Users/laumi/Downloads/example/FirstApp/backup_bd'}
+
+GDAL_LIBRARY_PATH = r'C:\OSGeo4W\bin\gdal308'
+GEOS_LIBRARY_PATH = r'C:\OSGeo4W\bin\geos_c'
+LEAFLET_CONFIG = {
+    'DEFAULT_CENTER': (23.113592, -82.366596),  # Coordenadas de La Habana
+    'DEFAULT_ZOOM': 12,
+    'MIN_ZOOM': 3,
+    'MAX_ZOOM': 18,
+}

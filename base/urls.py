@@ -63,5 +63,6 @@ urlpatterns = [
      path('buscarDescripcionMedicamento/', views.buscarDescripcionMedicamento),
      path('visualizar_trazas/', views.visualizarTrazas),
      path('lista_de_trazas/', views.listaDeTrazas, name='lista_de_trazas'),
-
+     path('lote_farmacias/', views.generar_lote_farmacias, name='generar_lote_farmacias'),
+     path('borrar_lote_farmacias/', views.borrar_lote_farmacias, name='borrar_lote_farmacias'),
 ]
