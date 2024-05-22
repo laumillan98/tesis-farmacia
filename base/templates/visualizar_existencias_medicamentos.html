@@ -1,0 +1,78 @@
+{% extends "./index_cliente.html" %}
+
+{% load static %}
+
+{% block mytitle %}Medicamentos Existentes{% endblock %}
+
+{% block mycss %}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+{% endblock %}
+
+{% block title %}Existencias{% endblock %}
+
+{% block content %}
+
+
+    <div class="container">
+        <h1>Buscar Medicamento</h1>
+        <form id="buscarMedicamentoForm">
+            <div class="form-group">
+                <label for="nombre_medicamento">Nombre del Medicamento:</label>
+                <input type="text" class="form-control" id="nombre_medicamento" name="nombre_medicamento">
+            </div>
+            <button type="button" class="btn btn-success" id="buscarMedicamentoBtn">Buscar</button>
+        </form>
+
+        <div class="table-responsive mt-4">
+            <table class="table table-bordered table-striped" id="resultadosTabla">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre de la Farmacia</th>
+                        <th>Dirección</th>
+                        <th>Teléfono</th>
+                        <th>Provincia</th>
+                        <th>Municipio</th>
+                        <th>Tipo</th>
+                        <th>Turno</th>
+                        <th>Existencia</th>
+                        <th>Mapa</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Los resultados de la búsqueda se agregarán aquí -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <!-- Modal para el mapa -->
+    <div class="modal fade" id="mapaModal" tabindex="-1" role="dialog" aria-labelledby="mapaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mapaModalLabel">Ubicación</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="mapa" style="height: 500px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}   
+
+{% block subtitle %}Existencias{% endblock %}
+
+{% block custom_scripts %}
+
+<script>
+    var buscarMedicamentoUrl = "{% url 'buscar_medicamento' %}";
+</script>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="{% static 'js/lista_existencias_de_medicamentos.js' %}"></script>
+{% endblock %}

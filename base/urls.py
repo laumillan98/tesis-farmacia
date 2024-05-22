@@ -69,16 +69,20 @@ urlpatterns = [
      path('gestionar_clasificaciones_de_medicamentos/obtenerClasificacionMedicamento/<uuid>/', views.obtenerClasificacionMedicamento, name ='obtener_clasificacion_de_medicamento'),
      path('gestionar_clasificaciones_de_medicamentos/editarClasificacionMedicamento/', views.editarClasificacionMedicamento, name ='editar_clasificacion_de_medicamento'),
     
+     path('visualizar_existencias_medicamentos/', views.visualizarExistenciasMedicamentos),
+     path('buscar_medicamento/', views.buscarMedicamento, name='buscar_medicamento'),
+
      
      #path('actualizarCantidad', views.actualizarCantidad),
      path('farmacias_tabla/', views.farmaciasTabla),
      path('medicamentos_tabla/', views.medicamentosTabla),
-     path('existencias_tabla/', views.existenciasTabla),
-     path('buscarMedicamento/', views.buscarMedicamento),
-     path('buscarDisponibilidad/', views.buscarDisponibilidad),
+     #path('existencias_tabla/', views.existenciasTabla),
+     #path('buscarMedicamento/', views.buscarMedicamento),
+     #path('buscarDisponibilidad/', views.buscarDisponibilidad),
      path('buscarMunicipio/', views.buscarMunicipio),
      path('buscarDisponibilidadFarmacia/', views.buscarDisponibilidadFarmacia),
      path('buscarDescripcionMedicamento/', views.buscarDescripcionMedicamento),
+
      path('visualizar_trazas/', views.visualizarTrazas),
      path('lista_de_trazas/', views.listaDeTrazas, name='lista_de_trazas'),
      path('visualizar_charts/', views.visualizarCharts),

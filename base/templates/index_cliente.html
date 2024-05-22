@@ -33,6 +33,7 @@
 
 
   <!-- MIOSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS --> 
+  <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
   <!-- Font Awesome mio --> 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <!-- DataTables.js mio 
@@ -119,7 +120,7 @@
     <!-- Brand Logo -->
     <a href="https://salud.msp.gob.cu/tag/infomed/" class="brand-link">
       <img src="{% static 'dist/img/InfomedLogo.png' %}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">Farmacéutico</span>
+      <span class="brand-text font-weight-light">Cliente</span>
     </a>
 
     <!-- Sidebar -->
@@ -155,15 +156,15 @@
             <a href="#" class="nav-link">
               <i class="nav-icon fa-solid fa-pen-to-square"></i>
               <p>
-                Gestionar
+                Menu
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="/gestionar_medicfarma" class="nav-link {% if request.path == '/gestionar_medicfarma/' %}active{% endif %}">
+                <a href="/visualizar_existencias_medicamentos" class="nav-link {% if request.path == '/visualizar_existencias_medicamentos/' %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Mi Farmacia</p>
+                  <p>¿Dónde hay?</p>
                 </a>
               </li>
             </ul>
@@ -284,5 +285,4 @@
 {% block custom_scripts %}{% endblock %}
 </body>
 </html>
-
 

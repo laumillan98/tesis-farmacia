@@ -183,6 +183,12 @@
                   <p>Trazas</p>
                 </a>
               </li>
+              <li class="nav-item">
+                <a href="/gestionar_medicamentos" class="nav-link {% if request.path == '/gestionar_medicamentos/' %}active{% endif %}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Medicamentos</p>
+                </a>
+              </li>
               <li class="nav-item menu-open">
                 <a href="#" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
@@ -214,6 +220,18 @@
                     <a href="/gestionar_turnos_de_farmacias" class="nav-link {% if request.path == '/gestionar_turnos_de_farmacias/' %}active{% endif %}">
                       <i class="far fa-circle nav-icon"></i>
                       <p>Turnos de Farmacia</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="/gestionar_restricciones_de_medicamentos" class="nav-link {% if request.path == '/gestionar_restricciones_de_medicamentos/' %}active{% endif %}">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Restricciones de Medicamentos</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="/gestionar_clasificaciones_de_medicamentos" class="nav-link {% if request.path == '/gestionar_clasificaciones_de_medicamentos/' %}active{% endif %}">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Clasificaciones de Medicamentos</p>
                     </a>
                   </li>
                 </ul>

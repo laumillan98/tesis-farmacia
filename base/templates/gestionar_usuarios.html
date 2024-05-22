@@ -90,7 +90,7 @@
       <div class="modal-dialog" role="document">
           <div class="modal-content">
               <div class="modal-header">
-                  <h5 class="modal-title" id="filtroModalLabel">Filtrar Usuarios</h5>
+                  <h5 class="modal-title" id="filtroModalLabel">Filtrar Usuarios por:</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                       <span aria-hidden="true">&times;</span>
                   </button>
@@ -99,8 +99,8 @@
                   <form id="filtroForm">
                       {% csrf_token %}
                       <div class="form-group">
-                          <label for="username">Usuario</label>
-                          <input type="text" class="form-control" id="username" name="username" placeholder="Usuario">
+                          <label for="username">Nombre de Usuario</label>
+                          <input type="text" class="form-control" id="username" name="username" placeholder="Todos">
                           <input type="hidden" name="tipo_objeto" value="usuario">
                       </div>
                       <div class="form-group">
@@ -121,11 +121,11 @@
                           </select>
                       </div>
                       <div class="form-group">
-                          <label for="activo">Activo</label>
+                          <label for="activo">Actividad</label>
                           <select class="form-control" id="activo" name="activo">
                               <option value="">Todos</option>
-                              <option value="True">Si</option>
-                              <option value="False">No</option>
+                              <option value="True">Activos</option>
+                              <option value="False">Inactivos</option>
                           </select>
                       </div>
                       <button type="button" class="btn btn-primary" id="generarReporteBtn">Generar Reporte</button>
