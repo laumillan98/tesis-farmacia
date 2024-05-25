@@ -44,9 +44,10 @@ from reportlab.lib.pagesizes import A4, landscape
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
 from django.views.decorators.csrf import csrf_exempt
-
+from .pdf_utils import header_footer
 
 # Create your views here.
+
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def inicio(request):
@@ -68,14 +69,14 @@ def farmaceutico(request):
 def backup_database(request):
     try:
         now = datetime.now()
-        date_time = now.strftime("%Y-%m-%d %H:%M:%S")  #Formatear la fecha y hora
+        date_time = now.strftime("%Y-%m-%d %H:%M:%S")  # Formatear la fecha y hora
         call_command('dbbackup')
         with open('backup_log.txt', 'a') as f:
             f.write(f"Backup realizado el {date_time}\n")
         return JsonResponse({'status': 'success'})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)})
-
+    
 
 def restore_database(request):
     try:
@@ -95,7 +96,7 @@ def restore_database(request):
 def salir(request):
     logout(request)
     messages.success(request, f"Su sesión se ha cerrado correctamente")
-    return redirect('/acceder')
+    return redirect('/acceder/')
 
 
 @unauthenticated_user
@@ -115,11 +116,11 @@ def autenticar(request):
                 grupo_admin = Group.objects.get(name='admin')
                 grupo_clientes = Group.objects.get(name='clientes')
                 if grupo_admin in usuario.groups.all():
-                    return redirect('/gestionar_usuarios')
+                    return redirect('/gestionar_usuarios/')
                 elif grupo_clientes in usuario.groups.all():
-                    return redirect('/visualizar_existencias_medicamentos')
+                    return redirect('/visualizar_existencias_medicamentos/')
                 else:
-                    return redirect('/gestionar_medicfarma')  
+                    return redirect('/gestionar_medicfarma/')  
                      
        # else:
         #    for key, error in list(form.errors.items()):
@@ -377,7 +378,7 @@ def registrarFarmaceutico(request):
             user.save()
             group = Group.objects.get(name='farmaceuticos')
             user.groups.add(group)
-            return redirect('/gestionar_usuarios')
+            return redirect('/gestionar_usuarios/')
 
         else:
             for error in list(form.errors.values()):
@@ -1282,6 +1283,8 @@ def buscarMedicamento(request):
                         'nombre_provincia': farmacia.id_farma.id_munic.id_prov.nombre,
                         'tipo': farmacia.id_farma.id_tipo.nombre,
                         'turno': farmacia.id_farma.id_turno.nombre,
+                        'latitud': farmacia.id_farma.ubicacion.y if farmacia.id_farma.ubicacion else None,
+                        'longitud': farmacia.id_farma.ubicacion.x if farmacia.id_farma.ubicacion else None,
                     })
             return JsonResponse(resultados, safe=False)
         else:
@@ -1527,8 +1530,7 @@ def usuariosXGruposChart(request):
 ################################################    MAPA    ##################################################################
 
 
-def map_view(request):
-    return render(request, 'mapa.html')
+
 
 
 ##############################################################################################################################
@@ -1538,6 +1540,7 @@ def map_view(request):
 @csrf_exempt
 def generar_reporte_pdf(request):
     if request.method == 'POST':
+        entity = ''
         buffer = io.BytesIO()
 
         tipo_objeto = request.POST.get('tipo_objeto')
@@ -1587,6 +1590,7 @@ def generar_reporte_pdf(request):
                 ['#', 'ID', 'Nombre', 'Apellidos', 'Usuario', 'Correo', 'Roles', 'Fecha de registro', 'Último acceso', 'Activo']
             ]
         elif tipo_objeto == 'farmacia':
+            entity = 'Farmacia'
             objetos = Farmacia.objects.all()
             nombre = request.POST.get('nombre')
             provincia = request.POST.get('provincia')
@@ -1651,7 +1655,7 @@ def generar_reporte_pdf(request):
 
 
         buffer = io.BytesIO()
-        doc = SimpleDocTemplate(buffer, pagesize=landscape(A4))
+        doc = SimpleDocTemplate(buffer, pagesize=landscape(A4), topMargin=125)
         elements = []
 
         for index, objeto in enumerate(objetos):
@@ -1699,7 +1703,9 @@ def generar_reporte_pdf(request):
         table = Table(data)
         table.setStyle(style_table)
         elements.append(table)
-        doc.build(elements)
+        user = request.user.username
+        doc.build(elements, onFirstPage=lambda c, d: header_footer(c, d, user, entity), 
+                  onLaterPages=lambda c, d: header_footer(c, d, user, entity))
         buffer.seek(0)
         return FileResponse(buffer, as_attachment=True, filename=filename)
 

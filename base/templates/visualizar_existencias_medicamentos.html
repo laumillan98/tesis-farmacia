@@ -11,8 +11,6 @@
 {% block title %}Existencias{% endblock %}
 
 {% block content %}
-
-
     <div class="container">
         <h1>Buscar Medicamento</h1>
         <form id="buscarMedicamentoForm">
@@ -46,7 +44,6 @@
         </div>
     </div>
 
-
     <!-- Modal para el mapa -->
     <div class="modal fade" id="mapaModal" tabindex="-1" role="dialog" aria-labelledby="mapaModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
@@ -63,13 +60,11 @@
             </div>
         </div>
     </div>
-
-{% endblock %}   
+{% endblock %}
 
 {% block subtitle %}Existencias{% endblock %}
 
 {% block custom_scripts %}
-
 <script>
     var buscarMedicamentoUrl = "{% url 'buscar_medicamento' %}";
 </script>
