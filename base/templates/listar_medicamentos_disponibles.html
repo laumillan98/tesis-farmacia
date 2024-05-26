@@ -1,0 +1,74 @@
+{% extends "./index_farmaceutico.html" %}
+
+{% load static %}
+
+{% block mytitle %}Gestionar Medicamentos{% endblock %}
+
+{% block mycss %}{% endblock %}
+
+{% block title %}Gestionar Medicamentos{% endblock %}
+
+{% block content %}
+
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <a href="/completarrrrr" class="btn btn-md btn-primary">Exportar Grupo</a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <br>
+                    <table id="miTabla" class="table table-bordered table-striped" data-url="{% url 'lista_de_medicamentos' %}">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nombre</th>
+                                <th>Cantidad máxima</th>
+                                <th>Precio</th>
+                                <th>Origen</th>
+                                <th>Restricción</th>
+                                <th>Clasificación</th>
+                                <th>Descripción</th>
+                                <th>Exportar</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+     <!-- /.modal Mostrar Descripcion-->
+     <div class="modal fade" id="modaldesc-lg">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Descripción</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <p id="descripcionMostrar" class="form-control-plaintext"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.modal Mostrar Descripcion -->
+
+
+{% endblock %}   
+
+{% block subtitle %}Medicamentos{% endblock %}
+
+{% block custom_scripts %}
+<script src="{% static 'js/lista_de_medicamentos_disponibles.js' %}"></script>
+{% endblock %}

@@ -74,6 +74,7 @@ $(document).ready(function () {
         });
     });
 
+    
     // Función para obtener el valor de una cookie por su nombre
     function getCookie(name) {
         var cookieValue = null;

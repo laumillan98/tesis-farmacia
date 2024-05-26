@@ -903,60 +903,10 @@ def listaDeMedicFarma(request):
     return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
 
 
-#def listaDeMedic(request):
-    if request.user.is_authenticated:
-        try:
-            farmaceutico = FarmaUser.objects.get(username=request.user.username)
-            farmacia_del_farmaceutico = farmaceutico.id_farma
-            farmacia_medicamento = FarmaciaMedicamento.objects.filter(id_farma=farmacia_del_farmaceutico)
-            medicamentos_list = []
-
-            for index, farmaMedic in enumerate(farmacia_medicamento):
-                medic = farmaMedic.id_medic
-
-                if medic.cant_max == 1:
-                    cant_max_texto = f'{medic.cant_max} unidad'
-                else:
-                    cant_max_texto = f'{medic.cant_max} unidades'
-
-                origen_texto = "Natural" if medic.origen_natural else "Fármaco"
-                medic_data = {
-                    'index': index + 1,
-                    'id': str(medic.id_medic),
-                    'farma': farmaMedic.id_farma.nombre,
-                    'nombre': medic.nombre,
-                    'descripcion': medic.description,
-                    'cant_max': cant_max_texto,
-                    'precio': f'{medic.precio_unidad} CUP/u',
-                    'origen': origen_texto,
-                    'restriccion': medic.id_restriccion.nombre if medic.id_restriccion else None,
-                    'clasificacion': medic.id_clasificacion.nombre if medic.id_clasificacion else None,
-                    'existencia': farmaMedic.existencia,
-                }
-                medicamentos_list.append(medic_data)
-
-            # Crear el contexto con los datos de los medicamentos
-            context = {
-                'medicamentos_list': medicamentos_list  # Pasar la lista de medicamentos al contexto
-            }
-
-            # Renderizar la plantilla con el contexto
-            return render(
-                request=request,
-                template_name="gestionar_medicfarma.html", 
-                context={"farmacia_del_farmaceutico": farmacia_del_farmaceutico}
-                )
-        
-        except FarmaUser.DoesNotExist:
-            return JsonResponse({'error': 'Usuario farmacéutico no encontrado'}, status=404)
-    
-    return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
-
 @require_POST
 def actualizarExistencia(request):
     id_medic = request.POST.get('id_medic')
     existencia = request.POST.get('existencia')
-
     try:
         farmacia_medicamento = FarmaciaMedicamento.objects.get(id_medic=id_medic)
         farmacia_medicamento.existencia = existencia
@@ -964,56 +914,39 @@ def actualizarExistencia(request):
         return JsonResponse({'message': 'Existencia actualizada correctamente'}, status=200)
     except FarmaciaMedicamento.DoesNotExist:
         return JsonResponse({'error': 'Medicamento no encontrado'}, status=404)
+    
+
+def listarMedicamentosDisponibles(request):
+     return render(request, "listar_medicamentos_disponibles.html") 
 
 
-@login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['farmaceuticos'])
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def agregarMedicFarma(request):
+@csrf_exempt
+def exportarMedicamento(request, uuid):
     if request.method == 'POST':
         try:
-            farmaceutico = FarmaUser.objects.get(username=request.user.username)
-            idfarma_del_farmaceutico = farmaceutico.id_farma.id_farma
-        except FarmaUser.DoesNotExist:
-            return redirect('/')
+            medicamento = Medicamento.objects.get(id_medic=uuid)
+            usuario = request.user
+            farmaceutico = FarmaUser.objects.get(username=usuario.username)
+            farmacia = farmaceutico.id_farma
 
-        # Obtener lista de IDs de medicamentos seleccionados del formulario
-        selected_medicamento_ids = request.POST.getlist('medicamentos')
-    
-        for id_medic in selected_medicamento_ids:
-            try:
-                # Obtener el objeto del medicamento y la farmacia
-                medicamento = Medicamento.objects.get(id_medic=id_medic)
-                farmacia = Farmacia.objects.get(id_farma=idfarma_del_farmaceutico)
-                # Verificar si ya existe la relación para este medicamento y farmacia
-                farmacia_medicamento, created = FarmaciaMedicamento.objects.get_or_create(
+            if farmacia:
+                # Verificar si el medicamento ya está en la farmacia
+                if FarmaciaMedicamento.objects.filter(id_medic=medicamento, id_farma=farmacia).exists():
+                    return JsonResponse({'status': 'error', 'message': 'El medicamento ya está en tu farmacia.'}, status=400)
+
+                FarmaciaMedicamento.objects.create(
                     id_medic=medicamento,
                     id_farma=farmacia,
-                    defaults={'existencia': 0} 
+                    existencia=0  # Ajusta este valor según lo necesario
                 )
-                # Guardar la relación en la base de datos
-                #farmacia_medicamento.save()
-            except Medicamento.DoesNotExist:
-                pass
-
-        return redirect('/gestionar_medicfarma')
-
-    try:
-        farmaceutico = FarmaUser.objects.get(username=request.user.username)
-        id_farma = farmaceutico.id_farma.id_farma
-
-        medicamentos_disponibles = Medicamento.objects.exclude(
-            farmaciamedicamento__id_farma=id_farma
-        ).order_by('nombre') 
-
-    except FarmaUser.DoesNotExist:
-        medicamentos_disponibles = Medicamento.objects.none()  # Devolver queryset vacío
-
-    return render(
-        request=request,
-        template_name="agregar_medicfarma.html",
-        context={"medicamentos": medicamentos_disponibles}
-    )
+                return JsonResponse({'status': 'success'}, status=200)
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Farmacia no encontrada'}, status=400)
+        except Medicamento.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Medicamento no encontrado'}, status=404)
+        except FarmaUser.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Usuario no encontrado'}, status=404)
+    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
 
 
 @login_required(login_url='/acceder')
