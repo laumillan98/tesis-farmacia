@@ -45,6 +45,15 @@ class ClasificacionMedicamento(models.Model):
 
     def __str__(self):
         return self.nombre    
+    
+
+class FormatoMedicamento(models.Model):
+    id_formato = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False)
+    nombre = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.nombre    
    
 
 class Provincia(models.Model):
@@ -76,7 +85,7 @@ class Medicamento(models.Model):
     origen_natural = models.BooleanField(default=False)
     id_restriccion = models.ForeignKey(RestriccionMedicamento, on_delete=models.RESTRICT, null=True, blank=True, to_field='id_restriccion')
     id_clasificacion = models.ForeignKey(ClasificacionMedicamento, on_delete=models.RESTRICT, null=True, blank=True, to_field='id_clasificacion')
-   
+    id_formato = models.ForeignKey(FormatoMedicamento, on_delete=models.RESTRICT, null=True, blank=True, to_field='id_formato')
     
     def __str__(self):
         return self.nombre      

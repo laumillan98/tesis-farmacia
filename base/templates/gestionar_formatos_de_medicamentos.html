@@ -2,28 +2,28 @@
 
 {% load static %}
 
-{% block mytitle %}Gestionar Clasificación de Medicamentos{% endblock %}
+{% block mytitle %}Gestionar Formato de Medicamentos{% endblock %}
 
 {% block mycss %}{% endblock %}
 
-{% block title %}Gestionar Clasificaciones de Medicamentos{% endblock %}
+{% block title %}Gestionar Formato de Medicamentos{% endblock %}
 
 {% block content %}
 
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <a href="/registrar_clasificacion_de_medicamento" class="btn btn-md btn-secondary">Registrar Clasificación de Medicamento</a>
+                <a href="/registrar_formato_de_medicamento" class="btn btn-md btn-secondary">Registrar Formato de Medicamento</a>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <br>
-                    <table id="miTabla" class="table table-bordered table-striped" data-url="{% url 'lista_clasificaciones_de_medicamentos' %}">
+                    <table id="miTabla" class="table table-bordered table-striped" data-url="{% url 'lista_formatos_de_medicamentos' %}">
                         <thead>
                             <tr>
                                 <th>#</th>
                                 <th>id</th>
-                                <th>Clasificación de Medicamentos</th>
+                                <th>Formato de Medicamentos</th>
                                 <th>Opciones</th>
                             </tr>
                         </thead>
@@ -45,12 +45,12 @@
                 </button>
                 </div>
                 <div class="modal-body">
-                    <form id="edicionClasificacionMedicamentoForm">
+                    <form id="edicionFormatoMedicamentoForm">
                         {% csrf_token %}
                         <div class="card-body">
                             <div class="form-group">
-                                <label for="name">Clasificación de Medicamento</label>
-                                <input type="text" class="form-control" id="clasificacion" name="nombre" placeholder="Clasificacion">
+                                <label for="name">Formato de Medicamento</label>
+                                <input type="text" class="form-control" id="formato" name="nombre" placeholder="Formato">
                                 <input type="text" class="form-control" id="id" hidden name="id">
                             </div>
                         </div>
@@ -70,10 +70,10 @@
 
 {% endblock %}   
 
-{% block subtitle %}Clasificación{% endblock %}
+{% block subtitle %}Formatos{% endblock %}
 
 {% block custom_scripts %}
 <script src="{% static 'plugins/jquery-validation/jquery.validate.min.js' %}"></script>
 <script src="{% static 'plugins/jquery-validation/additional-methods.min.js' %}"></script>
-<script src="{% static 'js/lista_clasificaciones_de_medicamentos.js' %}"></script>
+<script src="{% static 'js/lista_formatos_de_medicamentos.js' %}"></script>
 {% endblock %}

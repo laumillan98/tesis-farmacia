@@ -14,6 +14,7 @@ $(document).ready(function () {
         columns: [
             { data: "index" },
             { data: "nombre" },
+            { data: "formato" },
             { data: "cant_max" },
             { data: "precio_unidad" },
             { data: "origen" },
@@ -94,6 +95,7 @@ $(document).ready(function () {
 
                 $('#restriccion').val(response.restriccion_name);
                 $('#clasificacion').val(response.clasificacion_name);
+                $('#formato').val(response.formato_name);
                 $('#id').val(response.id);
 
                 var $selector = $("#restriccion_selector");
@@ -114,11 +116,22 @@ $(document).ready(function () {
                     text: element.nombre,
                     }))
                 });
-                $selector.val(response.selected_clasificacion_name);   
+                $selector.val(response.selected_clasificacion_name); 
+                
+                var $selector = $("#formato_selector");
+                $selector.empty();
+                response.formatos.forEach(element => {
+                    $selector.append($('<option>', {
+                    value: element.id_formato,
+                    text: element.nombre,
+                    }))
+                });
+                $selector.val(response.selected_formato_name);
             },
         })
     }
 
+    
     function editarMedicamento(form) {
         var formData = $(form).serialize()
     

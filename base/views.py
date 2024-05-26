@@ -26,8 +26,8 @@ from django.views.decorators.cache import cache_control
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 
-from .models import CustomUser, Medicamento, Farmacia, FarmaUser, FarmaciaMedicamento, TipoFarmacia, TurnoFarmacia, Municipio, Provincia, RestriccionMedicamento, ClasificacionMedicamento
-from .forms import CustomUserCreationForm, FarmaUserCreationForm, UserLoginForm, SetPasswordForm, PasswordResetForm, UserProfileForm, UserUpdateForm, FarmaUserUpdateForm, FarmaUpdateForm, TipoFarmaciaUpdateForm, TurnoFarmaciaUpdateForm, MunicUpdateForm, ProvUpdateForm, MedicUpdateForm, RestriccionMedicamentoUpdateForm, ClasificacionMedicamentoUpdateForm
+from .models import CustomUser, Medicamento, Farmacia, FarmaUser, FarmaciaMedicamento, TipoFarmacia, TurnoFarmacia, Municipio, Provincia, RestriccionMedicamento, ClasificacionMedicamento, FormatoMedicamento
+from .forms import CustomUserCreationForm, FarmaUserCreationForm, UserLoginForm, SetPasswordForm, PasswordResetForm, UserProfileForm, UserUpdateForm, FarmaUserUpdateForm, FarmaUpdateForm, TipoFarmaciaUpdateForm, TurnoFarmaciaUpdateForm, MunicUpdateForm, ProvUpdateForm, MedicUpdateForm, RestriccionMedicamentoUpdateForm, ClasificacionMedicamentoUpdateForm, FormatoMedicamentoUpdateForm
 from .decorators import usuarios_permitidos, unauthenticated_user
 from .tokens import account_activation_token
 from FirstApp.tasks import send_activation_email
@@ -982,6 +982,7 @@ def listaDeMedicamentos(request):
             'origen': origen_texto,
             'restriccion': medic.id_restriccion.nombre if medic.id_restriccion else None,
             'clasificacion': medic.id_clasificacion.nombre if medic.id_clasificacion else None,
+            'formato': medic.id_formato.nombre if medic.id_formato else None,
         }
         medicamentos_list.append(medic_data)
     data = {
@@ -1003,6 +1004,7 @@ def registrarMedicamento(request):
             medic = form.save(commit=False)
             medic.id_restriccion = form.cleaned_data['id_restriccion']
             medic.id_clasificacion = form.cleaned_data['id_clasificacion']
+            medic.id_formato = form.cleaned_data['id_formato']
             medic.save()
             return redirect('/gestionar_medicamentos')
         else:
@@ -1029,6 +1031,7 @@ def obtenerDescripcion(request, uuid):
 def obtenerMedicamento(request, uuid):
     restriccion = RestriccionMedicamento.objects.all()
     clasificacion = ClasificacionMedicamento.objects.all()
+    formato = FormatoMedicamento.objects.all()
     medic = Medicamento.objects.get(id_medic = uuid)   
     return JsonResponse({
         'id': medic.id_medic,
@@ -1041,6 +1044,8 @@ def obtenerMedicamento(request, uuid):
         'restricciones': [{'id_restriccion': obj.id_restriccion, 'nombre': obj.nombre} for obj in restriccion],
         'selected_clasificacion_name': medic.id_clasificacion.id_clasificacion,
         'clasificaciones': [{'id_clasificacion': obj.id_clasificacion, 'nombre': obj.nombre} for obj in clasificacion],
+        'selected_formato_name': medic.id_formato.id_formato,
+        'formatos': [{'id_formato': obj.id_formato, 'nombre': obj.nombre} for obj in formato],
     })
 
 
@@ -1186,8 +1191,72 @@ def editarClasificacionMedicamento(request):
         form.save()
         return JsonResponse({'success': True})
     else:
-        return JsonResponse({'success': False, 'errors': form.errors})
+        return JsonResponse({'success': False, 'errors': form.errors})    
+
+
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['admin'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def gestionarFormatosMedicamentos(request):
+    return render(request, "gestionar_formatos_de_medicamentos.html")
+
+
+def listaDeFormatosDeMedicamentos(request):
+    formatos = FormatoMedicamento.objects.all()
+    formatos_list = []
+    for index,format in enumerate(formatos):
+        restric_data = {
+            'index': index + 1,
+            'id': format.id_formato,
+            'nombre': format.nombre,
+        }
+        formatos_list.append(restric_data)
+    data = {'data': formatos_list}
+    return JsonResponse(data, safe=False)
+
+
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['admin'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def registrarFormatoMedicamento(request):
+    if request.method =='POST':
+        form = FormatoMedicamentoUpdateForm(data=request.POST)
+        if form.is_valid():
+            formato = form.save(commit=False)
+            formato.save()
+            return redirect('/gestionar_formatos_de_medicamentos')
+        else:
+            for error in list(form.errors.values()):
+                messages.error(request, error)
+    else:
+        form = FormatoMedicamentoUpdateForm()
     
+    return render(
+        request=request,
+        template_name="registrar_formato_de_medicamento.html",
+        context={"form": form}
+    )
+
+
+def obtenerFormatoMedicamento(request, uuid):
+    formato = FormatoMedicamento.objects.get(id_formato = uuid)
+    return JsonResponse({
+        'id': formato.id_formato,
+        'name': formato.nombre,
+    })
+
+
+@login_required(login_url='/acceder')
+@require_POST
+def editarFormatoMedicamento(request):
+    formato = FormatoMedicamento.objects.get(id_formato = request.POST.get('id'))
+    form = FormatoMedicamentoUpdateForm(request.POST, instance=formato)
+    if form.is_valid():
+        form.save()
+        return JsonResponse({'success': True})
+    else:
+        return JsonResponse({'success': False, 'errors': form.errors})
+
 
 @login_required(login_url='/acceder')
 @usuarios_permitidos(roles_permitidos=['clientes'])
