@@ -18,9 +18,9 @@ $(document).ready(function() {
             { data: "munic" },
             { data: "direccion" },
             { data: "telefono" },
-            { data: "tipo" },
-            { data: "turno" },
-            { data: "usuario_asignado"},
+            { data: "tipo",  orderable: false, },
+            { data: "turno",  orderable: false, },
+            { data: "usuario_asignado",  orderable: false,},
             {
                 data: null,
                 orderable: false,
@@ -29,7 +29,7 @@ $(document).ready(function() {
                     // Verifica si estás en la columna de acciones
                     if (meta.col === 9) { 
                         let editButton = `
-                            <button id='editar' class='btn btn-sm btn-secondary' data-action='editar' data-id='${row.id}' data-toggle='modal' data-target='#modal-lg'>
+                            <button id='editar' class='btn btn-sm btn-success' data-action='editar' data-id='${row.id}' data-toggle='modal' data-target='#modal-lg'>
                                 <i class="fas fa-pencil-alt"></i>
                             </button>&nbsp`
                         return editButton 

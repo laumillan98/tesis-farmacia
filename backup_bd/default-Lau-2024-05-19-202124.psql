@@ -1,0 +1,1721 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 16.2
+-- Dumped by pg_dump version 16.2
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+ALTER TABLE ONLY public.django_admin_log DROP CONSTRAINT django_admin_log_user_id_c564eba6_fk_base_customuser_id;
+ALTER TABLE ONLY public.django_admin_log DROP CONSTRAINT django_admin_log_content_type_id_c4bce8eb_fk_django_co;
+ALTER TABLE ONLY public.base_municipio DROP CONSTRAINT base_municipio_id_prov_id_559f64a6_fk_base_provincia_id_prov;
+ALTER TABLE ONLY public.base_medicamento DROP CONSTRAINT base_medicamento_id_restriccion_id_266d8f06_fk_base_rest;
+ALTER TABLE ONLY public.base_medicamento DROP CONSTRAINT base_medicamento_id_clasificacion_id_7047a2fc_fk_base_clas;
+ALTER TABLE ONLY public.base_farmauser DROP CONSTRAINT base_farmauser_id_farma_id_4eb5dcf3_fk_base_farmacia_id_farma;
+ALTER TABLE ONLY public.base_farmauser DROP CONSTRAINT base_farmauser_customuser_ptr_id_62ce4952_fk_base_customuser_id;
+ALTER TABLE ONLY public.base_farmaciamedicamento DROP CONSTRAINT base_farmaciamedicam_id_medic_id_e4c0853d_fk_base_medi;
+ALTER TABLE ONLY public.base_farmaciamedicamento DROP CONSTRAINT base_farmaciamedicam_id_farma_id_732b7923_fk_base_farm;
+ALTER TABLE ONLY public.base_farmacia DROP CONSTRAINT base_farmacia_id_turno_id_ee8c4576_fk_base_turn;
+ALTER TABLE ONLY public.base_farmacia DROP CONSTRAINT base_farmacia_id_tipo_id_4607f30a_fk_base_tipo;
+ALTER TABLE ONLY public.base_farmacia DROP CONSTRAINT base_farmacia_id_munic_id_3e5918ce_fk_base_municipio_id_munic;
+ALTER TABLE ONLY public.base_customuser_user_permissions DROP CONSTRAINT base_customuser_user_permission_id_e62eddd3_fk_auth_perm;
+ALTER TABLE ONLY public.base_customuser_user_permissions DROP CONSTRAINT base_customuser_user_customuser_id_4f46199a_fk_base_cust;
+ALTER TABLE ONLY public.base_customuser_groups DROP CONSTRAINT base_customuser_groups_group_id_d1822349_fk_auth_group_id;
+ALTER TABLE ONLY public.base_customuser_groups DROP CONSTRAINT base_customuser_grou_customuser_id_04d7166b_fk_base_cust;
+ALTER TABLE ONLY public.auth_permission DROP CONSTRAINT auth_permission_content_type_id_2f476e4b_fk_django_co;
+ALTER TABLE ONLY public.auth_group_permissions DROP CONSTRAINT auth_group_permissions_group_id_b120cbf9_fk_auth_group_id;
+ALTER TABLE ONLY public.auth_group_permissions DROP CONSTRAINT auth_group_permissio_permission_id_84c5c92e_fk_auth_perm;
+DROP INDEX public.django_session_session_key_c0390e0f_like;
+DROP INDEX public.django_session_expire_date_a5c62663;
+DROP INDEX public.django_admin_log_user_id_c564eba6;
+DROP INDEX public.django_admin_log_content_type_id_c4bce8eb;
+DROP INDEX public.base_municipio_nombre_9db9b416_like;
+DROP INDEX public.base_municipio_id_prov_id_559f64a6;
+DROP INDEX public.base_medicamento_nombre_fb209e34_like;
+DROP INDEX public.base_medicamento_id_restriccion_id_266d8f06;
+DROP INDEX public.base_medicamento_id_clasificacion_id_7047a2fc;
+DROP INDEX public.base_farmauser_id_farma_id_4eb5dcf3;
+DROP INDEX public.base_farmaciamedicamento_id_medic_id_e4c0853d;
+DROP INDEX public.base_farmaciamedicamento_id_farma_id_732b7923;
+DROP INDEX public.base_farmacia_ubicacion_763f3b28_id;
+DROP INDEX public.base_farmacia_id_turno_id_ee8c4576;
+DROP INDEX public.base_farmacia_id_tipo_id_4607f30a;
+DROP INDEX public.base_farmacia_id_munic_id_3e5918ce;
+DROP INDEX public.base_customuser_username_e2c38001_like;
+DROP INDEX public.base_customuser_user_permissions_permission_id_e62eddd3;
+DROP INDEX public.base_customuser_user_permissions_customuser_id_4f46199a;
+DROP INDEX public.base_customuser_groups_group_id_d1822349;
+DROP INDEX public.base_customuser_groups_customuser_id_04d7166b;
+DROP INDEX public.auth_permission_content_type_id_2f476e4b;
+DROP INDEX public.auth_group_permissions_permission_id_84c5c92e;
+DROP INDEX public.auth_group_permissions_group_id_b120cbf9;
+DROP INDEX public.auth_group_name_a6ea08ec_like;
+ALTER TABLE ONLY public.django_session DROP CONSTRAINT django_session_pkey;
+ALTER TABLE ONLY public.django_migrations DROP CONSTRAINT django_migrations_pkey;
+ALTER TABLE ONLY public.django_content_type DROP CONSTRAINT django_content_type_pkey;
+ALTER TABLE ONLY public.django_content_type DROP CONSTRAINT django_content_type_app_label_model_76bd3d3b_uniq;
+ALTER TABLE ONLY public.django_admin_log DROP CONSTRAINT django_admin_log_pkey;
+ALTER TABLE ONLY public.base_turnofarmacia DROP CONSTRAINT base_turnofarmacia_pkey;
+ALTER TABLE ONLY public.base_clasificacionmedicamento DROP CONSTRAINT base_tipomedicamento_pkey;
+ALTER TABLE ONLY public.base_tipofarmacia DROP CONSTRAINT base_tipofarmacia_pkey;
+ALTER TABLE ONLY public.base_restriccionmedicamento DROP CONSTRAINT base_restriccionmedicamento_pkey;
+ALTER TABLE ONLY public.base_provincia DROP CONSTRAINT base_provincia_pkey;
+ALTER TABLE ONLY public.base_municipio DROP CONSTRAINT base_municipio_pkey;
+ALTER TABLE ONLY public.base_municipio DROP CONSTRAINT base_municipio_nombre_key;
+ALTER TABLE ONLY public.base_medicamento DROP CONSTRAINT base_medicamento_pkey;
+ALTER TABLE ONLY public.base_medicamento DROP CONSTRAINT base_medicamento_nombre_key;
+ALTER TABLE ONLY public.base_farmauser DROP CONSTRAINT base_farmauser_pkey;
+ALTER TABLE ONLY public.base_farmaciamedicamento DROP CONSTRAINT base_farmaciamedicamento_pkey;
+ALTER TABLE ONLY public.base_farmacia DROP CONSTRAINT base_farmacia_id_farma_06ab42cb_pk;
+ALTER TABLE ONLY public.base_customuser DROP CONSTRAINT base_customuser_username_key;
+ALTER TABLE ONLY public.base_customuser_user_permissions DROP CONSTRAINT base_customuser_user_permissions_pkey;
+ALTER TABLE ONLY public.base_customuser_user_permissions DROP CONSTRAINT base_customuser_user_per_customuser_id_permission_90414b11_uniq;
+ALTER TABLE ONLY public.base_customuser DROP CONSTRAINT base_customuser_pkey;
+ALTER TABLE ONLY public.base_customuser_groups DROP CONSTRAINT base_customuser_groups_pkey;
+ALTER TABLE ONLY public.base_customuser_groups DROP CONSTRAINT base_customuser_groups_customuser_id_group_id_d4e28d0b_uniq;
+ALTER TABLE ONLY public.auth_permission DROP CONSTRAINT auth_permission_pkey;
+ALTER TABLE ONLY public.auth_permission DROP CONSTRAINT auth_permission_content_type_id_codename_01ab375a_uniq;
+ALTER TABLE ONLY public.auth_group DROP CONSTRAINT auth_group_pkey;
+ALTER TABLE ONLY public.auth_group_permissions DROP CONSTRAINT auth_group_permissions_pkey;
+ALTER TABLE ONLY public.auth_group_permissions DROP CONSTRAINT auth_group_permissions_group_id_permission_id_0cd325b0_uniq;
+ALTER TABLE ONLY public.auth_group DROP CONSTRAINT auth_group_name_key;
+DROP TABLE public.django_session;
+DROP TABLE public.django_migrations;
+DROP TABLE public.django_content_type;
+DROP TABLE public.django_admin_log;
+DROP TABLE public.base_turnofarmacia;
+DROP TABLE public.base_tipofarmacia;
+DROP TABLE public.base_restriccionmedicamento;
+DROP TABLE public.base_provincia;
+DROP TABLE public.base_municipio;
+DROP TABLE public.base_medicamento;
+DROP TABLE public.base_farmauser;
+DROP TABLE public.base_farmaciamedicamento;
+DROP TABLE public.base_farmacia;
+DROP TABLE public.base_customuser_user_permissions;
+DROP TABLE public.base_customuser_groups;
+DROP TABLE public.base_customuser;
+DROP TABLE public.base_clasificacionmedicamento;
+DROP TABLE public.auth_permission;
+DROP TABLE public.auth_group_permissions;
+DROP TABLE public.auth_group;
+DROP EXTENSION postgis;
+--
+-- Name: postgis; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION postgis; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION postgis IS 'PostGIS geometry and geography spatial types and functions';
+
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: auth_group; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.auth_group (
+    id integer NOT NULL,
+    name character varying(150) NOT NULL
+);
+
+
+ALTER TABLE public.auth_group OWNER TO postgres;
+
+--
+-- Name: auth_group_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.auth_group ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.auth_group_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: auth_group_permissions; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.auth_group_permissions (
+    id bigint NOT NULL,
+    group_id integer NOT NULL,
+    permission_id integer NOT NULL
+);
+
+
+ALTER TABLE public.auth_group_permissions OWNER TO postgres;
+
+--
+-- Name: auth_group_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.auth_group_permissions ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.auth_group_permissions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: auth_permission; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.auth_permission (
+    id integer NOT NULL,
+    name character varying(255) NOT NULL,
+    content_type_id integer NOT NULL,
+    codename character varying(100) NOT NULL
+);
+
+
+ALTER TABLE public.auth_permission OWNER TO postgres;
+
+--
+-- Name: auth_permission_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.auth_permission ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.auth_permission_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: base_clasificacionmedicamento; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.base_clasificacionmedicamento (
+    id_clasificacion uuid NOT NULL,
+    nombre character varying(20) NOT NULL
+);
+
+
+ALTER TABLE public.base_clasificacionmedicamento OWNER TO postgres;
+
+--
+-- Name: base_customuser; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.base_customuser (
+    id bigint NOT NULL,
+    password character varying(128) NOT NULL,
+    last_login timestamp with time zone,
+    is_superuser boolean NOT NULL,
+    username character varying(150) NOT NULL,
+    first_name character varying(150) NOT NULL,
+    last_name character varying(150) NOT NULL,
+    email character varying(254) NOT NULL,
+    is_staff boolean NOT NULL,
+    is_active boolean NOT NULL,
+    date_joined timestamp with time zone NOT NULL,
+    description text NOT NULL
+);
+
+
+ALTER TABLE public.base_customuser OWNER TO postgres;
+
+--
+-- Name: base_customuser_groups; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.base_customuser_groups (
+    id bigint NOT NULL,
+    customuser_id bigint NOT NULL,
+    group_id integer NOT NULL
+);
+
+
+ALTER TABLE public.base_customuser_groups OWNER TO postgres;
+
+--
+-- Name: base_customuser_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.base_customuser_groups ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.base_customuser_groups_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: base_customuser_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.base_customuser ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.base_customuser_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: base_customuser_user_permissions; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.base_customuser_user_permissions (
+    id bigint NOT NULL,
+    customuser_id bigint NOT NULL,
+    permission_id integer NOT NULL
+);
+
+
+ALTER TABLE public.base_customuser_user_permissions OWNER TO postgres;
+
+--
+-- Name: base_customuser_user_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.base_customuser_user_permissions ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.base_customuser_user_permissions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: base_farmacia; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.base_farmacia (
+    id_farma uuid NOT NULL,
+    nombre character varying(100) NOT NULL,
+    direccion character varying(200) NOT NULL,
+    telefono integer,
+    id_munic_id uuid NOT NULL,
+    id_tipo_id uuid NOT NULL,
+    id_turno_id uuid,
+    ubicacion public.geography(Point,4326)
+);
+
+
+ALTER TABLE public.base_farmacia OWNER TO postgres;
+
+--
+-- Name: base_farmaciamedicamento; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.base_farmaciamedicamento (
+    id bigint NOT NULL,
+    existencia integer NOT NULL,
+    id_farma_id uuid,
+    id_medic_id uuid
+);
+
+
+ALTER TABLE public.base_farmaciamedicamento OWNER TO postgres;
+
+--
+-- Name: base_farmaciamedicamento_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.base_farmaciamedicamento ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.base_farmaciamedicamento_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: base_farmauser; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.base_farmauser (
+    customuser_ptr_id bigint NOT NULL,
+    id_farma_id uuid
+);
+
+
+ALTER TABLE public.base_farmauser OWNER TO postgres;
+
+--
+-- Name: base_medicamento; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.base_medicamento (
+    id_medic uuid NOT NULL,
+    nombre character varying(50) NOT NULL,
+    description text,
+    cant_max integer NOT NULL,
+    precio_unidad double precision NOT NULL,
+    origen_natural boolean NOT NULL,
+    id_clasificacion_id uuid,
+    id_restriccion_id uuid
+);
+
+
+ALTER TABLE public.base_medicamento OWNER TO postgres;
+
+--
+-- Name: base_municipio; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.base_municipio (
+    id_munic uuid NOT NULL,
+    nombre character varying(25) NOT NULL,
+    id_prov_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.base_municipio OWNER TO postgres;
+
+--
+-- Name: base_provincia; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.base_provincia (
+    id_prov uuid NOT NULL,
+    nombre character varying(20) NOT NULL
+);
+
+
+ALTER TABLE public.base_provincia OWNER TO postgres;
+
+--
+-- Name: base_restriccionmedicamento; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.base_restriccionmedicamento (
+    id_restriccion uuid NOT NULL,
+    nombre character varying(20) NOT NULL
+);
+
+
+ALTER TABLE public.base_restriccionmedicamento OWNER TO postgres;
+
+--
+-- Name: base_tipofarmacia; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.base_tipofarmacia (
+    id_tipo_farmacia uuid NOT NULL,
+    nombre character varying(20) NOT NULL
+);
+
+
+ALTER TABLE public.base_tipofarmacia OWNER TO postgres;
+
+--
+-- Name: base_turnofarmacia; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.base_turnofarmacia (
+    id_turno_farmacia uuid NOT NULL,
+    nombre character varying(20) NOT NULL
+);
+
+
+ALTER TABLE public.base_turnofarmacia OWNER TO postgres;
+
+--
+-- Name: django_admin_log; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.django_admin_log (
+    id integer NOT NULL,
+    action_time timestamp with time zone NOT NULL,
+    object_id text,
+    object_repr character varying(200) NOT NULL,
+    action_flag smallint NOT NULL,
+    change_message text NOT NULL,
+    content_type_id integer,
+    user_id bigint NOT NULL,
+    CONSTRAINT django_admin_log_action_flag_check CHECK ((action_flag >= 0))
+);
+
+
+ALTER TABLE public.django_admin_log OWNER TO postgres;
+
+--
+-- Name: django_admin_log_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.django_admin_log ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.django_admin_log_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: django_content_type; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.django_content_type (
+    id integer NOT NULL,
+    app_label character varying(100) NOT NULL,
+    model character varying(100) NOT NULL
+);
+
+
+ALTER TABLE public.django_content_type OWNER TO postgres;
+
+--
+-- Name: django_content_type_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.django_content_type ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.django_content_type_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: django_migrations; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.django_migrations (
+    id bigint NOT NULL,
+    app character varying(255) NOT NULL,
+    name character varying(255) NOT NULL,
+    applied timestamp with time zone NOT NULL
+);
+
+
+ALTER TABLE public.django_migrations OWNER TO postgres;
+
+--
+-- Name: django_migrations_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.django_migrations ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.django_migrations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: django_session; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.django_session (
+    session_key character varying(40) NOT NULL,
+    session_data text NOT NULL,
+    expire_date timestamp with time zone NOT NULL
+);
+
+
+ALTER TABLE public.django_session OWNER TO postgres;
+
+--
+-- Data for Name: auth_group; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.auth_group (id, name) FROM stdin;
+1	clientes
+2	admin
+3	farmaceuticos
+\.
+
+
+--
+-- Data for Name: auth_group_permissions; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.auth_group_permissions (id, group_id, permission_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: auth_permission; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
+1	Can add log entry	1	add_logentry
+2	Can change log entry	1	change_logentry
+3	Can delete log entry	1	delete_logentry
+4	Can view log entry	1	view_logentry
+5	Can add permission	2	add_permission
+6	Can change permission	2	change_permission
+7	Can delete permission	2	delete_permission
+8	Can view permission	2	view_permission
+9	Can add group	3	add_group
+10	Can change group	3	change_group
+11	Can delete group	3	delete_group
+12	Can view group	3	view_group
+13	Can add content type	4	add_contenttype
+14	Can change content type	4	change_contenttype
+15	Can delete content type	4	delete_contenttype
+16	Can view content type	4	view_contenttype
+17	Can add session	5	add_session
+18	Can change session	5	change_session
+19	Can delete session	5	delete_session
+20	Can view session	5	view_session
+21	Can add user	6	add_customuser
+22	Can change user	6	change_customuser
+23	Can delete user	6	delete_customuser
+24	Can view user	6	view_customuser
+25	Can add farmacia	7	add_farmacia
+26	Can change farmacia	7	change_farmacia
+27	Can delete farmacia	7	delete_farmacia
+28	Can view farmacia	7	view_farmacia
+29	Can add medicamento	8	add_medicamento
+30	Can change medicamento	8	change_medicamento
+31	Can delete medicamento	8	delete_medicamento
+32	Can view medicamento	8	view_medicamento
+33	Can add municipio	9	add_municipio
+34	Can change municipio	9	change_municipio
+35	Can delete municipio	9	delete_municipio
+36	Can view municipio	9	view_municipio
+37	Can add provincia	10	add_provincia
+38	Can change provincia	10	change_provincia
+39	Can delete provincia	10	delete_provincia
+40	Can view provincia	10	view_provincia
+41	Can add tipo farmacia	11	add_tipofarmacia
+42	Can change tipo farmacia	11	change_tipofarmacia
+43	Can delete tipo farmacia	11	delete_tipofarmacia
+44	Can view tipo farmacia	11	view_tipofarmacia
+45	Can add tipo medicamento	12	add_tipomedicamento
+46	Can change tipo medicamento	12	change_tipomedicamento
+47	Can delete tipo medicamento	12	delete_tipomedicamento
+48	Can view tipo medicamento	12	view_tipomedicamento
+49	Can add turno farmacia	13	add_turnofarmacia
+50	Can change turno farmacia	13	change_turnofarmacia
+51	Can delete turno farmacia	13	delete_turnofarmacia
+52	Can view turno farmacia	13	view_turnofarmacia
+53	Can add Farmaceutico	14	add_farmauser
+54	Can change Farmaceutico	14	change_farmauser
+55	Can delete Farmaceutico	14	delete_farmauser
+56	Can view Farmaceutico	14	view_farmauser
+57	Can add farmacia medicamento	15	add_farmaciamedicamento
+58	Can change farmacia medicamento	15	change_farmaciamedicamento
+59	Can delete farmacia medicamento	15	delete_farmaciamedicamento
+60	Can view farmacia medicamento	15	view_farmaciamedicamento
+61	Can add restriccion medicamento	16	add_restriccionmedicamento
+62	Can change restriccion medicamento	16	change_restriccionmedicamento
+63	Can delete restriccion medicamento	16	delete_restriccionmedicamento
+64	Can view restriccion medicamento	16	view_restriccionmedicamento
+65	Can add clasificacion medicamento	12	add_clasificacionmedicamento
+66	Can change clasificacion medicamento	12	change_clasificacionmedicamento
+67	Can delete clasificacion medicamento	12	delete_clasificacionmedicamento
+68	Can view clasificacion medicamento	12	view_clasificacionmedicamento
+\.
+
+
+--
+-- Data for Name: base_clasificacionmedicamento; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.base_clasificacionmedicamento (id_clasificacion, nombre) FROM stdin;
+557ffdc5-2634-4fd4-80cf-01261f1ce22b	Antiparasitario
+8b210e25-2b5e-4d7e-8ae7-ef5f4bac5f61	Antialérgico
+b309561a-c87d-4a18-8b23-42d86d5e45e5	Anestésico
+024db9ac-5431-4f03-bfff-9f05032a9131	Antiinflamatorio
+5d36d19f-dbd8-46b4-9178-9c40adb67627	Antigotoso
+23fb65fd-62dd-4a94-8c56-cfb1a1e0cbe4	Antituberculoso
+be5b6eef-b827-4a4d-a2dd-235cda4d793f	Antimigrañoso
+df83b092-16cf-4d60-a5b9-6e5956189557	Antimicótico
+6708f9db-9584-4f12-9f45-516afe90ed1d	Antihipertensivo
+c6bc30fb-4c04-4f8a-8755-fdd850f410a7	anti
+\.
+
+
+--
+-- Data for Name: base_customuser; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.base_customuser (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined, description) FROM stdin;
+2	pbkdf2_sha256$720000$S3IUIfmEpwdo3qrZ22FONf$fIeE16JGZXHg7wwStH6hRTplZW1/lYUuon2ekvxQSHY=	2024-05-16 20:26:14.220203-04	f	aleida71	Aleida	Sanchez Iglesias	testtesisfarma@gmail.com	f	t	2024-04-21 00:01:34-04	
+1	pbkdf2_sha256$720000$aPs0XO6UveHGHZykXR4b4x$7fbpqXRYwOnV3KmqpgHteEpufYTaMsleEo6wU3nHFvg=	2024-05-19 19:01:16.957486-04	t	laumillan98	Lidia Laura	Millan Sanchez	laumillan98@mail.com	t	t	2024-04-20 23:44:32-04	<p>hola soy laura</p>
+18	pbkdf2_sha256$720000$fsgHpFTQzCs2XUaWeblGjt$2s1yijyVIu1xtNrQH8KbYefSZJYAqX3ZzVVo2gy6w9k=	2024-05-16 13:28:02.20853-04	f	cepero91	Jose Manuel	Cepero Gonzalez	cepero911001@gmail.com	f	t	2024-05-04 21:50:44.13696-04	
+\.
+
+
+--
+-- Data for Name: base_customuser_groups; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.base_customuser_groups (id, customuser_id, group_id) FROM stdin;
+1	1	2
+2	2	3
+18	18	1
+\.
+
+
+--
+-- Data for Name: base_customuser_user_permissions; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.base_customuser_user_permissions (id, customuser_id, permission_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: base_farmacia; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.base_farmacia (id_farma, nombre, direccion, telefono, id_munic_id, id_tipo_id, id_turno_id, ubicacion) FROM stdin;
+9e6d2fbd-f1ff-4cf2-8052-be578f8e3c5b	Vieja Linda	Vieja Linda Arroyo Naranjo	76440142	efa53364-32d2-4a33-ac33-dd30c985bb5f	a6e903a9-e962-4fcd-98bb-4c5dd2779964	d331dd6a-9436-48f6-8c1a-ca83cf9707b2	0101000020E610000088BCE5EAC79754C040868E1D540E3740
+5c04e165-ba9f-454f-866a-acbf46ad4c75	Perla	Calle perla numero 89	76440242	7ead35a9-ead2-4416-9771-467c15ab8ba7	a6e903a9-e962-4fcd-98bb-4c5dd2779964	394ca359-3b9b-4dd1-b417-6275ebd2c8eb	0101000020E6100000328E91EC119954C0601F9DBAF2153740
+9395ac69-39d6-45b0-b6a8-44f4901c7b0c	San Antonio	san antonio y calzada florida	76440246	efa53364-32d2-4a33-ac33-dd30c985bb5f	a6e903a9-e962-4fcd-98bb-4c5dd2779964	fcb4ff27-8663-4f7d-bdc6-bc5641ca5ad6	0101000020E610000099A66329ED9654C0324E8DE1FB123740
+\.
+
+
+--
+-- Data for Name: base_farmaciamedicamento; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.base_farmaciamedicamento (id, existencia, id_farma_id, id_medic_id) FROM stdin;
+18	12	9e6d2fbd-f1ff-4cf2-8052-be578f8e3c5b	7a4e5fa5-0be3-48c0-955f-1f8ba8c873fd
+5	55	9e6d2fbd-f1ff-4cf2-8052-be578f8e3c5b	208a1cc2-a13f-41a6-8184-d3f3877422a0
+19	0	9e6d2fbd-f1ff-4cf2-8052-be578f8e3c5b	a4d2bdfa-5711-4976-a52f-be0205c7a3b5
+17	1	9e6d2fbd-f1ff-4cf2-8052-be578f8e3c5b	aed0fc6e-99ca-4557-8be0-b7524103b725
+\.
+
+
+--
+-- Data for Name: base_farmauser; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.base_farmauser (customuser_ptr_id, id_farma_id) FROM stdin;
+2	9e6d2fbd-f1ff-4cf2-8052-be578f8e3c5b
+\.
+
+
+--
+-- Data for Name: base_medicamento; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.base_medicamento (id_medic, nombre, description, cant_max, precio_unidad, origen_natural, id_clasificacion_id, id_restriccion_id) FROM stdin;
+208a1cc2-a13f-41a6-8184-d3f3877422a0	Enalapril	El enalapril se usa solo o en combinación con otros medicamentos para tratar la presión arterial alta. También se usa en combinación con otros medicamentos para tratar la insuficiencia cardíaca. El enalapril pertenece a una clase de medicamentos llamados inhibidores de la enzima convertidora de la angiotensina (ACE, por sus siglas en inglés). Actúa disminuyendo determinadas sustancias químicas que contraen los vasos sanguíneos, de modo que la sangre fluye mejor y el corazón puede bombearla con mayor eficiencia.  La hipertensión arterial es una condición común y cuando no se trata, puede causar daños en el cerebro, el corazón, los vasos sanguíneos, los riñones y otras partes del cuerpo. El daño a estos órganos puede causar enfermedades del corazón, un infarto, insuficiencia cardíaca, apoplejía, insuficiencia renal, pérdida de la visión y otros problemas. Además de tomar medicamentos, hacer cambios de estilo de vida también le ayudará a controlar su presión arterial. Estos cambios incluyen comer una dieta que sea baja en grasa y sal, mantener un peso saludable, hacer ejercicio al menos 30 minutos casi todos los días, no fumar y consumir alcohol con moderación.	1	12	f	6708f9db-9584-4f12-9f45-516afe90ed1d	e817794a-7c54-4ee5-897f-f7a1841d684c
+7a4e5fa5-0be3-48c0-955f-1f8ba8c873fd	Ibuprofeno	holiiiiiiiiiii	2	11	f	024db9ac-5431-4f03-bfff-9f05032a9131	9733ac19-3c87-4302-bfc9-4fcc906ac13b
+a4d2bdfa-5711-4976-a52f-be0205c7a3b5	Paracetamol	hhhhl	2	10	f	be5b6eef-b827-4a4d-a2dd-235cda4d793f	9733ac19-3c87-4302-bfc9-4fcc906ac13b
+aed0fc6e-99ca-4557-8be0-b7524103b725	Gentamicina	yyyyyyyyy	1	20	f	df83b092-16cf-4d60-a5b9-6e5956189557	9733ac19-3c87-4302-bfc9-4fcc906ac13b
+\.
+
+
+--
+-- Data for Name: base_municipio; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.base_municipio (id_munic, nombre, id_prov_id) FROM stdin;
+efa53364-32d2-4a33-ac33-dd30c985bb5f	Arroyo Naranjo	c9778cd3-bbb6-4dc5-b73e-1c1d87eb36e8
+b16f97a0-0c02-4fd7-b005-4e493c2ab540	Playa	7ef27f8c-3440-4986-b279-c370997c8e09
+7ead35a9-ead2-4416-9771-467c15ab8ba7	Boyeros	c9778cd3-bbb6-4dc5-b73e-1c1d87eb36e8
+\.
+
+
+--
+-- Data for Name: base_provincia; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.base_provincia (id_prov, nombre) FROM stdin;
+35852e22-1829-4534-93e9-90046a7463f9	Pinar del Río
+c9778cd3-bbb6-4dc5-b73e-1c1d87eb36e8	La Habana
+7ef27f8c-3440-4986-b279-c370997c8e09	Matanzas
+7c82c74a-02d7-4f66-bdca-898bd04efb22	Granma
+\.
+
+
+--
+-- Data for Name: base_restriccionmedicamento; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.base_restriccionmedicamento (id_restriccion, nombre) FROM stdin;
+9733ac19-3c87-4302-bfc9-4fcc906ac13b	Receta Médica
+274071f3-e5fe-4a9e-8f33-32c7d5f0d343	Venta Libre
+e817794a-7c54-4ee5-897f-f7a1841d684c	Tarjetón
+\.
+
+
+--
+-- Data for Name: base_tipofarmacia; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.base_tipofarmacia (id_tipo_farmacia, nombre) FROM stdin;
+3a675300-6dcc-4bf4-b70a-86a8e9159874	Hospitalaria
+703cfe3b-377b-45e1-a410-bf59d067c2a6	Especializada
+a6e903a9-e962-4fcd-98bb-4c5dd2779964	Comunitaria
+874759a9-7d29-447f-8ff3-e0cbc30954ca	Internacional
+\.
+
+
+--
+-- Data for Name: base_turnofarmacia; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.base_turnofarmacia (id_turno_farmacia, nombre) FROM stdin;
+394ca359-3b9b-4dd1-b417-6275ebd2c8eb	Permanente
+fcb4ff27-8663-4f7d-bdc6-bc5641ca5ad6	Corrido
+d331dd6a-9436-48f6-8c1a-ca83cf9707b2	Normal
+\.
+
+
+--
+-- Data for Name: django_admin_log; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.django_admin_log (id, action_time, object_id, object_repr, action_flag, change_message, content_type_id, user_id) FROM stdin;
+1	2024-04-20 23:45:52.32474-04	c9778cd3-bbb6-4dc5-b73e-1c1d87eb36e8	La Habana	1	[{"added": {}}]	10	1
+2	2024-04-20 23:46:50.55406-04	efa53364-32d2-4a33-ac33-dd30c985bb5f	Arroyo Naranjo	1	[{"added": {}}]	9	1
+3	2024-04-20 23:47:04.035978-04	7ead35a9-ead2-4416-9771-467c15ab8ba7	Boyeros	1	[{"added": {}}]	9	1
+4	2024-04-20 23:52:25.432519-04	3d0ca222-cd2f-4059-a06b-330be5d538f3	Venta Libre	1	[{"added": {}}]	12	1
+5	2024-04-20 23:52:34.17746-04	6f73e9f1-8cc7-4e54-a6cb-3ca9cdbbb17a	Tarjetón Médico	1	[{"added": {}}]	12	1
+6	2024-04-20 23:52:39.420896-04	e3bbb0be-fdf0-4c67-a506-428b37fb4881	Receta Médica	1	[{"added": {}}]	12	1
+7	2024-04-20 23:53:06.253331-04	1a9e89ee-751d-45bf-a33e-a287ae610ad5	Enalapril	1	[{"added": {}}]	8	1
+8	2024-04-20 23:53:22.400527-04	0706ebbb-32d9-41db-b075-b898a7405a4d	Paracetamol	1	[{"added": {}}]	8	1
+9	2024-04-20 23:53:44.924939-04	a6e903a9-e962-4fcd-98bb-4c5dd2779964	Comunitaria	1	[{"added": {}}]	11	1
+10	2024-04-20 23:53:49.601204-04	3a675300-6dcc-4bf4-b70a-86a8e9159874	Hospitalaria	1	[{"added": {}}]	11	1
+11	2024-04-20 23:56:25.687084-04	394ca359-3b9b-4dd1-b417-6275ebd2c8eb	Permanente	1	[{"added": {}}]	13	1
+12	2024-04-20 23:56:34.491903-04	fcb4ff27-8663-4f7d-bdc6-bc5641ca5ad6	Corrido	1	[{"added": {}}]	13	1
+13	2024-04-20 23:56:38.776178-04	d331dd6a-9436-48f6-8c1a-ca83cf9707b2	Normal	1	[{"added": {}}]	13	1
+14	2024-04-20 23:56:53.05684-04	703cfe3b-377b-45e1-a410-bf59d067c2a6	Especializada	1	[{"added": {}}]	11	1
+15	2024-04-20 23:57:51.529118-04	1	Vieja Linda	1	[{"added": {}}]	7	1
+16	2024-04-20 23:58:23.218087-04	2	San Antonio	1	[{"added": {}}]	7	1
+17	2024-04-20 23:58:42.782375-04	1	Enalapril Vieja Linda8	1	[{"added": {}}]	15	1
+18	2024-04-20 23:59:00.043396-04	1	clientes	1	[{"added": {}}]	3	1
+19	2024-04-20 23:59:07.265337-04	2	admin	1	[{"added": {}}]	3	1
+20	2024-04-20 23:59:12.428072-04	3	farmaceuticos	1	[{"added": {}}]	3	1
+21	2024-04-20 23:59:35.449217-04	1	laumillan98	2	[{"changed": {"fields": ["Groups", "First name", "Last name"]}}]	6	1
+22	2024-04-23 00:11:30.422418-04	2	aleida71	2	[{"changed": {"fields": ["Active"]}}]	14	1
+23	2024-04-23 01:04:30.079564-04	2	aleida71	2	[{"changed": {"fields": ["Active"]}}]	14	1
+24	2024-04-23 01:10:37.069534-04	2	aleida71	2	[{"changed": {"fields": ["Active"]}}]	14	1
+25	2024-04-23 23:49:24.671907-04	2	aleida71	2	[{"changed": {"fields": ["First name", "Last name", "Email address"]}}]	6	1
+26	2024-04-23 23:51:14.5978-04	2	aleida71	2	[{"changed": {"fields": ["First name", "Last name"]}}]	14	1
+27	2024-04-28 22:08:05.600596-04	3	cepero91	3		6	1
+28	2024-04-28 22:12:22.315142-04	4	cepero91	3		6	1
+29	2024-04-28 22:22:42.651182-04	5	cepero91	3		6	1
+30	2024-04-28 22:27:47.483856-04	6	cepero91	3		6	1
+31	2024-04-28 23:24:27.408623-04	2	aleida71	2	[{"changed": {"fields": ["Farma"]}}]	14	1
+32	2024-04-28 23:33:43.545355-04	7	cepero91	3		6	1
+33	2024-04-28 23:36:32.903427-04	8	cepero91	3		6	1
+34	2024-04-29 01:19:54.667475-04	9	cepero91	3		6	1
+35	2024-04-29 13:28:13.421834-04	10	cepero91	3		6	1
+36	2024-04-29 13:30:11.546449-04	11	cepero91	3		6	1
+37	2024-04-29 23:13:59.344415-04	12	cepero91	3		6	1
+38	2024-05-04 21:19:33.434956-04	13	cepero91	3		6	1
+39	2024-05-04 21:22:45.33644-04	14	cepero91	3		6	1
+40	2024-05-04 21:37:19.534112-04	15	cepero91	3		6	1
+41	2024-05-04 21:46:00.511847-04	16	cepero91	3		6	1
+42	2024-05-04 21:49:16.981377-04	17	cepero91	3		6	1
+43	2024-05-05 17:08:51.164399-04	7ef27f8c-3440-4986-b279-c370997c8e09	Matanzas	1	[{"added": {}}]	10	1
+44	2024-05-05 17:09:12.345807-04	35852e22-1829-4534-93e9-90046a7463f9	Pinar del Río	1	[{"added": {}}]	10	1
+45	2024-05-05 17:09:52.76414-04	2	aleida71	2	[{"changed": {"fields": ["Farma"]}}]	14	1
+46	2024-05-05 23:40:03.895393-04	2	aleida71	2	[{"changed": {"fields": ["Farma"]}}]	14	1
+47	2024-05-10 23:01:56.17797-04	2	aleida71	2	[{"changed": {"fields": ["Farma"]}}]	14	1
+48	2024-05-11 02:23:40.998935-04	6	ssddndsn	3		7	1
+49	2024-05-11 02:23:45.999616-04	4	sdsd	3		7	1
+50	2024-05-11 02:23:51.712726-04	5	asasasa	3		7	1
+51	2024-05-11 16:05:56.389296-04	80bc43d5-681e-4e83-992d-8e922872c561	sahjdh	3		11	1
+52	2024-05-11 16:06:06.244792-04	2d90f06d-117a-4778-a461-cd8e710b1643	compet	3		13	1
+53	2024-05-11 18:34:59.45996-04	2	aleida71	2	[{"changed": {"fields": ["Id farma"]}}]	14	1
+54	2024-05-11 19:19:21.525755-04	2	aleida71	2	[]	14	1
+55	2024-05-11 19:20:47.577346-04	2	aleida71	2	[{"changed": {"fields": ["Id farma"]}}]	14	1
+56	2024-05-12 18:52:10.337196-04	1	8	3		15	1
+57	2024-05-12 18:55:46.17045-04	2	Enalapril San Antonio2	1	[{"added": {}}]	15	1
+58	2024-05-12 19:04:43.039321-04	2	Enalapril Vieja Linda2	2	[{"changed": {"fields": ["Id farma"]}}]	15	1
+59	2024-05-12 22:48:01.07876-04	2	Enalapril Vieja Linda2	3		15	1
+60	2024-05-12 22:48:17.093093-04	1a9e89ee-751d-45bf-a33e-a287ae610ad5	Enalapril	3		8	1
+61	2024-05-12 22:48:21.841995-04	0706ebbb-32d9-41db-b075-b898a7405a4d	Paracetamol	3		8	1
+62	2024-05-12 23:10:20.176313-04	e3bbb0be-fdf0-4c67-a506-428b37fb4881	Receta Médica	3		12	1
+63	2024-05-12 23:10:25.067359-04	6f73e9f1-8cc7-4e54-a6cb-3ca9cdbbb17a	Tarjetón Médico	3		12	1
+64	2024-05-12 23:10:30.501259-04	3d0ca222-cd2f-4059-a06b-330be5d538f3	Venta Libre	3		12	1
+65	2024-05-13 00:14:43.885277-04	3caf1cdc-f619-48e6-831c-caadfb136cd0	Tarjeton	1	[{"added": {}}]	12	1
+66	2024-05-13 00:14:50.297126-04	4c9fa56c-40bd-4321-bc80-8274bde0d437	Venta Libre	1	[{"added": {}}]	12	1
+67	2024-05-13 00:14:55.432714-04	3f231318-2506-4dba-8740-89e8f9c33c97	Receta Medica	1	[{"added": {}}]	12	1
+68	2024-05-13 00:15:34.114322-04	33b43293-ace8-4c35-a963-83ddc6fa0b9c	Enalapril	1	[{"added": {}}]	8	1
+69	2024-05-13 00:15:59.913984-04	e9b80bde-1bf8-4d74-b964-7e62da71a523	Paracetamol	1	[{"added": {}}]	8	1
+70	2024-05-13 00:16:16.380177-04	3	Enalapril Vieja Linda3	1	[{"added": {}}]	15	1
+71	2024-05-13 00:16:27.471405-04	4	Paracetamol Vieja Linda4	1	[{"added": {}}]	15	1
+72	2024-05-13 01:49:10.296029-04	fbe6b5a6-eadb-47c2-b5b4-0110b1bce685	Ibuprofeno	2	[{"changed": {"fields": ["Description"]}}]	8	1
+73	2024-05-13 03:01:35.83147-04	6705e02c-c33f-4d22-8c55-bb01bffe34ee	fjgfkdh	3		12	1
+74	2024-05-13 03:15:15.564869-04	8ae17595-6801-4d8c-9e39-67e32e41628e	jjj888	3		12	1
+75	2024-05-13 20:47:24.385822-04	4	Paracetamol Vieja Linda4	3		15	1
+76	2024-05-13 20:47:29.292975-04	3	Enalapril Vieja Linda3	3		15	1
+77	2024-05-13 20:47:46.422569-04	fbe6b5a6-eadb-47c2-b5b4-0110b1bce685	Ibuprofeno	3		8	1
+78	2024-05-13 20:47:52.164784-04	e9b80bde-1bf8-4d74-b964-7e62da71a523	Paracetamol	3		8	1
+79	2024-05-13 20:47:57.857971-04	33b43293-ace8-4c35-a963-83ddc6fa0b9c	Enalapril	3		8	1
+80	2024-05-13 20:48:08.170536-04	4c9fa56c-40bd-4321-bc80-8274bde0d437	Venta Libre	3		12	1
+81	2024-05-13 20:48:13.421551-04	3f231318-2506-4dba-8740-89e8f9c33c97	Receta Médica	3		12	1
+82	2024-05-13 20:48:18.669952-04	3caf1cdc-f619-48e6-831c-caadfb136cd0	Tarjetón	3		12	1
+83	2024-05-13 21:14:23.162791-04	6708f9db-9584-4f12-9f45-516afe90ed1d	Antihipertensivo	1	[{"added": {}}]	12	1
+84	2024-05-13 21:14:34.178756-04	557ffdc5-2634-4fd4-80cf-01261f1ce22b	Antiparasitario	1	[{"added": {}}]	12	1
+85	2024-05-13 21:14:41.566433-04	8b210e25-2b5e-4d7e-8ae7-ef5f4bac5f61	Antialérgico	1	[{"added": {}}]	12	1
+86	2024-05-13 21:14:48.230954-04	b309561a-c87d-4a18-8b23-42d86d5e45e5	Anestésico	1	[{"added": {}}]	12	1
+87	2024-05-13 21:14:55.665857-04	024db9ac-5431-4f03-bfff-9f05032a9131	Antiinflamatorio	1	[{"added": {}}]	12	1
+88	2024-05-13 21:15:08.483283-04	5d36d19f-dbd8-46b4-9178-9c40adb67627	Antigotoso	1	[{"added": {}}]	12	1
+89	2024-05-13 21:15:40.405063-04	23fb65fd-62dd-4a94-8c56-cfb1a1e0cbe4	Antituberculoso	1	[{"added": {}}]	12	1
+90	2024-05-13 21:15:46.445066-04	be5b6eef-b827-4a4d-a2dd-235cda4d793f	Antimigrañoso	1	[{"added": {}}]	12	1
+91	2024-05-13 21:15:53.712097-04	df83b092-16cf-4d60-a5b9-6e5956189557	Antimicótico	1	[{"added": {}}]	12	1
+92	2024-05-13 21:16:06.41929-04	274071f3-e5fe-4a9e-8f33-32c7d5f0d343	Venta Libre	1	[{"added": {}}]	16	1
+93	2024-05-13 21:16:15.271655-04	e817794a-7c54-4ee5-897f-f7a1841d684c	Tarjetón	1	[{"added": {}}]	16	1
+94	2024-05-13 21:16:24.456589-04	9733ac19-3c87-4302-bfc9-4fcc906ac13b	Receta Médica	1	[{"added": {}}]	16	1
+95	2024-05-13 21:17:02.59301-04	208a1cc2-a13f-41a6-8184-d3f3877422a0	Enalapril	1	[{"added": {}}]	8	1
+96	2024-05-13 21:17:48.8856-04	a4d2bdfa-5711-4976-a52f-be0205c7a3b5	Paracetamol	1	[{"added": {}}]	8	1
+97	2024-05-13 21:18:05.775308-04	5	Enalapril Vieja Linda3	1	[{"added": {}}]	15	1
+98	2024-05-13 21:18:21.057045-04	6	Paracetamol Vieja Linda12	1	[{"added": {}}]	15	1
+99	2024-05-14 22:43:46.188279-04	9e6d2fbd-f1ff-4cf2-8052-be578f8e3c5b	Vieja Linda	2	[{"changed": {"fields": ["Ubicacion"]}}]	7	1
+100	2024-05-14 22:51:41.866771-04	9e6d2fbd-f1ff-4cf2-8052-be578f8e3c5b	Vieja Linda	2	[]	7	1
+101	2024-05-14 22:56:31.42544-04	9395ac69-39d6-45b0-b6a8-44f4901c7b0c	San Antonio	2	[{"changed": {"fields": ["latitud", "longitud"]}}]	7	1
+102	2024-05-15 13:57:22.504078-04	a4d2bdfa-5711-4976-a52f-be0205c7a3b5	Paracetamol	2	[{"changed": {"fields": ["Origen natural"]}}]	8	1
+103	2024-05-15 13:57:28.969936-04	208a1cc2-a13f-41a6-8184-d3f3877422a0	Enalapril	2	[{"changed": {"fields": ["Origen natural"]}}]	8	1
+104	2024-05-15 13:57:36.987418-04	a4d2bdfa-5711-4976-a52f-be0205c7a3b5	Paracetamol	2	[{"changed": {"fields": ["Description"]}}]	8	1
+105	2024-05-15 13:57:44.368613-04	208a1cc2-a13f-41a6-8184-d3f3877422a0	Enalapril	2	[{"changed": {"fields": ["Description"]}}]	8	1
+106	2024-05-15 14:06:43.603789-04	a4d2bdfa-5711-4976-a52f-be0205c7a3b5	Paracetamol	2	[{"changed": {"fields": ["Description", "Origen natural"]}}]	8	1
+107	2024-05-15 14:06:48.797865-04	208a1cc2-a13f-41a6-8184-d3f3877422a0	Enalapril	2	[]	8	1
+108	2024-05-15 14:52:29.070055-04	570a7b5a-feb7-42c2-b36c-7ff7f778a8d2	Ibuprofeno	3		8	1
+109	2024-05-15 15:07:24.804172-04	dd1298bd-a2bf-4297-a75b-e035bf14d8f6	dfdgfdg	3		8	1
+110	2024-05-15 17:51:17.725036-04	9e6d2fbd-f1ff-4cf2-8052-be578f8e3c5b	Vieja Linda	2	[]	7	1
+111	2024-05-15 17:52:36.568375-04	5c04e165-ba9f-454f-866a-acbf46ad4c75	Perla	2	[{"changed": {"fields": ["Ubicacion"]}}]	7	1
+112	2024-05-15 18:29:57.026159-04	2	aleida71	2	[{"changed": {"fields": ["Id farma"]}}]	14	1
+113	2024-05-16 01:22:33.072953-04	7	Gentamicina Vieja Linda0	3		15	1
+114	2024-05-16 01:22:45.945616-04	8	Ibuprofeno Vieja Linda0	3		15	1
+115	2024-05-16 02:01:42.345014-04	10	Gentamicina Vieja Linda0	3		15	1
+116	2024-05-16 02:01:51.338483-04	9	Ibuprofeno Vieja Linda0	3		15	1
+117	2024-05-16 02:01:58.603484-04	6	Paracetamol Vieja Linda12	3		15	1
+118	2024-05-16 13:11:48.806996-04	13	Gentamicina Vieja Linda0	3		15	1
+119	2024-05-16 13:11:53.677091-04	12	Paracetamol Vieja Linda0	3		15	1
+120	2024-05-16 13:11:57.714301-04	11	Ibuprofeno Vieja Linda0	3		15	1
+121	2024-05-16 13:35:50.565249-04	9395ac69-39d6-45b0-b6a8-44f4901c7b0c	San Antonio	2	[{"changed": {"fields": ["Ubicacion"]}}]	7	1
+122	2024-05-16 13:36:08.0766-04	9395ac69-39d6-45b0-b6a8-44f4901c7b0c	San Antonio	2	[{"changed": {"fields": ["Ubicacion"]}}]	7	1
+123	2024-05-16 13:36:35.135572-04	9395ac69-39d6-45b0-b6a8-44f4901c7b0c	San Antonio	2	[{"changed": {"fields": ["Ubicacion"]}}]	7	1
+124	2024-05-16 13:37:02.700726-04	9395ac69-39d6-45b0-b6a8-44f4901c7b0c	San Antonio	2	[{"changed": {"fields": ["Ubicacion"]}}]	7	1
+125	2024-05-16 13:37:59.984037-04	9395ac69-39d6-45b0-b6a8-44f4901c7b0c	San Antonio	2	[{"changed": {"fields": ["Ubicacion"]}}]	7	1
+126	2024-05-16 14:14:47.715637-04	16	Gentamicina Vieja Linda0	3		15	1
+127	2024-05-16 14:14:55.458895-04	15	Paracetamol Vieja Linda0	3		15	1
+128	2024-05-16 16:46:13.200475-04	14	Ibuprofeno Vieja Linda0	3		15	1
+\.
+
+
+--
+-- Data for Name: django_content_type; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.django_content_type (id, app_label, model) FROM stdin;
+1	admin	logentry
+2	auth	permission
+3	auth	group
+4	contenttypes	contenttype
+5	sessions	session
+6	base	customuser
+7	base	farmacia
+8	base	medicamento
+9	base	municipio
+10	base	provincia
+11	base	tipofarmacia
+13	base	turnofarmacia
+14	base	farmauser
+15	base	farmaciamedicamento
+12	base	clasificacionmedicamento
+16	base	restriccionmedicamento
+\.
+
+
+--
+-- Data for Name: django_migrations; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.django_migrations (id, app, name, applied) FROM stdin;
+1	contenttypes	0001_initial	2024-04-20 23:39:51.874765-04
+2	contenttypes	0002_remove_content_type_name	2024-04-20 23:39:51.887931-04
+3	auth	0001_initial	2024-04-20 23:39:51.963875-04
+4	auth	0002_alter_permission_name_max_length	2024-04-20 23:39:51.970586-04
+5	auth	0003_alter_user_email_max_length	2024-04-20 23:39:51.976599-04
+6	auth	0004_alter_user_username_opts	2024-04-20 23:39:51.988241-04
+7	auth	0005_alter_user_last_login_null	2024-04-20 23:39:51.993859-04
+8	auth	0006_require_contenttypes_0002	2024-04-20 23:39:51.995724-04
+9	auth	0007_alter_validators_add_error_messages	2024-04-20 23:39:52.004712-04
+10	auth	0008_alter_user_username_max_length	2024-04-20 23:39:52.012052-04
+11	auth	0009_alter_user_last_name_max_length	2024-04-20 23:39:52.020054-04
+12	auth	0010_alter_group_name_max_length	2024-04-20 23:39:52.030966-04
+13	auth	0011_update_proxy_permissions	2024-04-20 23:39:52.039003-04
+14	auth	0012_alter_user_first_name_max_length	2024-04-20 23:39:52.045911-04
+15	base	0001_initial	2024-04-20 23:39:52.260932-04
+16	admin	0001_initial	2024-04-20 23:39:52.299403-04
+17	admin	0002_logentry_remove_auto_add	2024-04-20 23:39:52.308449-04
+18	admin	0003_logentry_add_action_flag_choices	2024-04-20 23:39:52.31841-04
+19	sessions	0001_initial	2024-04-20 23:39:52.341315-04
+20	base	0002_rename_uid_farmacia_id_farma_remove_farmauser_test_and_more	2024-04-20 23:43:11.564712-04
+21	base	0003_remove_farmauser_farma_farmauser_prueba	2024-05-11 18:18:38.820125-04
+22	base	0004_remove_farmacia_id_alter_farmacia_id_farma	2024-05-11 18:21:36.321054-04
+23	base	0005_remove_farmauser_prueba_farmauser_id_farma	2024-05-11 18:25:19.270576-04
+24	base	0006_alter_farmauser_id_farma	2024-05-11 19:20:27.355083-04
+25	base	0007_remove_farmaciamedicamento_id_farmacia_and_more	2024-05-12 18:48:26.493619-04
+26	base	0008_farmaciamedicamento_id_farma_and_more	2024-05-12 18:55:23.999253-04
+27	base	0009_restriccionmedicamento_and_more	2024-05-13 21:00:19.445497-04
+28	base	0010_medicamento_id_clasificacion_and_more	2024-05-13 21:00:56.209493-04
+29	base	0011_remove_farmacia_is_active_farmacia_ubicacion	2024-05-14 22:22:30.992476-04
+\.
+
+
+--
+-- Data for Name: django_session; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.django_session (session_key, session_data, expire_date) FROM stdin;
+uc7flpwsjq0iu3nalx9gbr1e16zjnm2v	.eJxVjEsOAiEQBe_C2hBaPoJL956BdNMgowaSYWZlvLtOMgvdvqp6LxFxXWpcR57jxOIsQBx-N8L0yG0DfMd26zL1tswTyU2ROx3y2jk_L7v7d1Bx1G-N6DEYXdwJSBMrc0zgPViwAYA8aS4MZBKRdYqTNt5RCCoVGxwgB_H-AN2AN8o:1ryO8U:Th_OemNZ73nxPVzitXg3tMqgeD4p8wYsCKmoxfucEV4	2024-05-04 23:45:02.377319-04
+1vj89dcyrxgbhkaqkyveeypgmspitl4f	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s3Tbk:ijpHrsDGLzmppr9Ol8CHO-DhIrEiJoQxH3eQqpL8A3k	2024-05-19 00:36:16.232955-04
+5fdcwnstzv4rvg51p9ru5omsxtha8fv5	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s3hoK:hrtReC-m8C9wDoA1v3dfSzcMXOfwikb3V3VXFZ2wQ3E	2024-05-19 15:46:12.423561-04
+67wvcrxcv8sxj84pph5c1qs8ucwcfdpj	.eJxVjEsOAiEQBe_C2hBaPoJL956BdNMgowaSYWZlvLtOMgvdvqp6LxFxXWpcR57jxOIsQBx-N8L0yG0DfMd26zL1tswTyU2ROx3y2jk_L7v7d1Bx1G-N6DEYXdwJSBMrc0zgPViwAYA8aS4MZBKRdYqTNt5RCCoVGxwgB_H-AN2AN8o:1rykNu:AHKKlwtdDQgIu3eFasrSKVP-RgvsTCzBEVW6gps3nvM	2024-05-05 23:30:26.587895-04
+j0zohc8604nzkon6nzehreyylme5akck	.eJxVjEsOAiEQBe_C2hBaPoJL956BdNMgowaSYWZlvLtOMgvdvqp6LxFxXWpcR57jxOIsQBx-N8L0yG0DfMd26zL1tswTyU2ROx3y2jk_L7v7d1Bx1G-N6DEYXdwJSBMrc0zgPViwAYA8aS4MZBKRdYqTNt5RCCoVGxwgB_H-AN2AN8o:1rykqq:A22qlqjX-QCUr2YPqaGfirSUNG1FHXBFs1UvQc09U80	2024-05-06 00:00:20.660612-04
+fqbf1d47dpwl7ea9xa9a984pzign6w2z	.eJxVjEsOAiEQBe_C2hBaPoJL956BdNMgowaSYWZlvLtOMgvdvqp6LxFxXWpcR57jxOIsQBx-N8L0yG0DfMd26zL1tswTyU2ROx3y2jk_L7v7d1Bx1G-N6DEYXdwJSBMrc0zgPViwAYA8aS4MZBKRdYqTNt5RCCoVGxwgB_H-AN2AN8o:1rykrg:VONCDO7n-GZFt2LG7cj2Ourjj_kiOedoxvyoi6EDTTA	2024-05-06 00:01:12.333207-04
+tpdeatcwf6sxyqfdkdzj76csenx4j5g6	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s3j4X:9dLj0ehFZmeYYE9nw6MZQLT2_E7aOZQpLfEyV2VOot4	2024-05-19 17:07:01.49946-04
+imu60rvixkp4o7qhf39mdcwj0p1k2k9g	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s3kJ0:VfNNY1QdkoucgK-gVdv9Oocr-VjuWBJvyNkzDRVasgM	2024-05-19 18:26:02.01322-04
+fzork1gsfhzkxrg8y8zkm0ka0rvmsdjn	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s3lYu:Iy3Do5ubN4XIHCtZpr_L96geFLvXmZRE7hJGdry9x9c	2024-05-19 19:46:32.274238-04
+w95epxctre5ovzlcepjm53fln9q7616m	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s1UrK:bA441sFxJ_DN6PRjwII4f1xwdHcN5tUzlV3VY-d-lb8	2024-05-13 13:32:10.386593-04
+7g17367jg392ztat8nx2osmepn9hm0go	.eJxVjEsOAiEQBe_C2hBaPoJL956BdNMgowaSYWZlvLtOMgvdvqp6LxFxXWpcR57jxOIsQBx-N8L0yG0DfMd26zL1tswTyU2ROx3y2jk_L7v7d1Bx1G-N6DEYXdwJSBMrc0zgPViwAYA8aS4MZBKRdYqTNt5RCCoVGxwgB_H-AN2AN8o:1rz6ec:ce9qbj5bYxDDaLomTeqLvQH4eIAWqAC6mM4TbegWhV0	2024-05-06 23:17:10.809728-04
+72j0v4udfvbd2vx2r1mmo8w1zfubytte	.eJxVjEsOAiEQBe_C2hBaPoJL956BdNMgowaSYWZlvLtOMgvdvqp6LxFxXWpcR57jxOIsQBx-N8L0yG0DfMd26zL1tswTyU2ROx3y2jk_L7v7d1Bx1G-N6DEYXdwJSBMrc0zgPViwAYA8aS4MZBKRdYqTNt5RCCoVGxwgB_H-AN2AN8o:1rzQve:Y6nAs2JfpIgGLhckNzl1y6MuLPVy9iwzcwPUDxkNWFU	2024-05-07 20:56:06.840398-04
+afepgyc04ioov15ls4ewxr49vmd70314	.eJxVjEsOAiEQBe_C2hBaPoJL956BdNMgowaSYWZlvLtOMgvdvqp6LxFxXWpcR57jxOIsQBx-N8L0yG0DfMd26zL1tswTyU2ROx3y2jk_L7v7d1Bx1G-N6DEYXdwJSBMrc0zgPViwAYA8aS4MZBKRdYqTNt5RCCoVGxwgB_H-AN2AN8o:1rzRH1:0QksrpOdK6kB5vbHaK4gm2z4XxkIac_NWmTqFph2uNE	2024-05-07 21:18:11.443216-04
+07zpo7genohayzq436ud7k6mfhdc8tq1	.eJxVjEsOAiEQBe_C2hBaPoJL956BdNMgowaSYWZlvLtOMgvdvqp6LxFxXWpcR57jxOIsQBx-N8L0yG0DfMd26zL1tswTyU2ROx3y2jk_L7v7d1Bx1G-N6DEYXdwJSBMrc0zgPViwAYA8aS4MZBKRdYqTNt5RCCoVGxwgB_H-AN2AN8o:1rzRtJ:tfOOOsmnNPNEybEVU3DeYXGQ8DFOmLXMHbxM-QK2sAU	2024-05-07 21:57:45.815634-04
+qs6lorqhvvzjek2ct9thj2c97jn5tmcf	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s1WUi:SiNryLflv_g9cUjOTPOVBPNJR_ygz_4ufCC3nJAdglE	2024-05-13 15:16:56.733151-04
+m5zrhtljdjl5mjbfo7fjja7ffr9mfs5k	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s1XTo:nA-ht5x79eABaopB5AYob0dFROlE1BxE7FGJlJQyGuQ	2024-05-13 16:20:04.039501-04
+8nsncj9dnee9v8rvwqtm894lr1lct3vb	.eJxVjEsOAiEQBe_C2hBaPoJL956BdNMgowaSYWZlvLtOMgvdvqp6LxFxXWpcR57jxOIsQBx-N8L0yG0DfMd26zL1tswTyU2ROx3y2jk_L7v7d1Bx1G-N6DEYXdwJSBMrc0zgPViwAYA8aS4MZBKRdYqTNt5RCCoVGxwgB_H-AN2AN8o:1s1EUN:7XnxqFRaqsinbxPLhqpW-YFcPWE4_2skD1vZr1N6mkw	2024-05-12 20:03:23.747364-04
+4z3jm6uys12iz4t556r8m45zxbwm96f4	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s1YxZ:z0kNpefmpV58AXXweobLrjka10Yd-okTPq9cj9r46EU	2024-05-13 17:54:53.891223-04
+4m0xymhuoukwhecph0nt13s3503ier2d	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s1Z2R:5dZWlFIL4gyjf6cTEzI7JqaFShFeFc92jAgikY8oSpc	2024-05-13 17:59:55.003361-04
+flp6o13dxid2yfoib1kblolmfm3lf737	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s1ZsT:tL2MXmW8stia3cVgRFgVfnrnf0OVasXVLe7TKf0bP84	2024-05-13 18:53:41.144673-04
+elw69b05zhif0g1qowg9vnd9hyrcsm4r	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s1aiE:xhSzBKPLmN9dMiHpbMz_nDKpmOhLgab0RkYmGEGHI88	2024-05-13 19:47:10.389882-04
+14tjjq7qxak1b146v7273qxppmyd674y	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s1bkB:xlQmfHF4hY0N3_zrgKeer2wgCsKRTjM1h3lLXw6qHbQ	2024-05-13 20:53:15.094244-04
+4dq1qskeqjz6n54un4acmd5zuh75kqkc	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s1cCN:uQsiZJO3M--lua2MWieqUKwcXPOcQN4_kwoQXLAvLt8	2024-05-13 21:22:23.084559-04
+gnimgcopkmxpicbb55kajfizqs8ykpov	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s3KtK:b4fqejakiaugmJTMKSwwMgXeuEdTjZ5tzjgfMjYvumE	2024-05-18 15:17:50.558677-04
+14y0jgiw32dlt1hnkbwjz116z08pxuco	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s3L7R:UIHU03ssxQM3-_5JiNX8lbzeP0EP5FvQq8mkTC8HlbU	2024-05-18 15:32:25.709001-04
+atqlsapnyhvnccp0aq59wqs3xdsl849f	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s3LGK:xfM2grp37IGsbkU8ej_4hdUiTAhWZO_YTJKSGxOlW5U	2024-05-18 15:41:36.441741-04
+mm9brwdixlmz0h9p5rmauucxnnrcmwln	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s3lhg:H9uAS0-dTysTbT_MmGBq5NuL4DM_zGeCaD8Z_GJIf8E	2024-05-19 19:55:36.809482-04
+1nql2sq5rrzfcx8ianybo6u5geyn4jzp	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s3m9a:zIolgF5eTl1yHE_o_0T6Us7v3cRhGmAMDkj7owqLcKE	2024-05-19 20:24:26.156226-04
+pvnprobro4eoh1v64ym5asi68jkplnja	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s3mUW:PGHxtjLUPQFjB0S9MoXUui8VpiFkPj_7_-qxxgANgQ0	2024-05-19 20:46:04.713549-04
+w4fdxx2wj0df7bujnyjf9ciaqjr8rn6t	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s3meQ:xK4pNW07XCkCMbBkUQmRvWL3B8hFRUjSm7bqi9OXldo	2024-05-19 20:56:18.031187-04
+f2pm1a8mkwkz3yluyy4g7dl90f54h29k	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s3nLQ:C1CqaxBPBmM9sN3Z_2_AVTlrSF_GiijvPZgA7AQmkCk	2024-05-19 21:40:44.098337-04
+jnusqcss8cv4bzku6edzlzebtqkdthrc	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s4Xt7:m_-jeuDvJePQBHiN0Ra-k8SEm8BWkME4NeSkE5GX0a0	2024-05-21 23:22:37.261025-04
+lqr2e7plkjkpz63k0dhl81g4edp3pnyt	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s4YAu:-ebhdK7juc2VkcWIeC6mvBnNTznTMR3qV_YxfQgPzuU	2024-05-21 23:41:00.292409-04
+kj5mkjhk7xn4llpy0mip3mdahkx8r7hg	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s4n5q:hFOaijqmhez8uNWmm2eD9WrP6vzP07z3DZnwcfbMzoI	2024-05-22 15:36:46.351327-04
+u6cwwzzsvzu48905dfvfi7tozf8garbm	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s4nuP:cxfnzh1JluQC4kBWJa7W-KSJFCBxtZwW_ME1VBLPnRg	2024-05-22 16:29:01.2224-04
+vfuk4tdgtjiyct09whilicgcx2x4vpl7	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s4o9k:VQjttqhhR3UXudEWMIL2Ea-AyIi_vLnaLiEt72eW0xQ	2024-05-22 16:44:52.278682-04
+eiwmpsz7x9qc98ml4ukra9wk0qkv44w2	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s4oRe:wtt2wEbBDCl4xLZG5Om4umKdlvyseFuEWfOU0xJnjgc	2024-05-22 17:03:22.34513-04
+1kk2de71j91d3wixcz09z29qxagvgukr	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s4rRO:Q0gl9gdwzYlxD9RtKgdg5Ci7OQHhxTpKiUY_UHeJeD4	2024-05-22 20:15:18.787882-04
+doaadeta9ecs2wb2ln5z0yni40jq2of2	.eJxVy70OwjAMBOB3yYyqxImJy4jEc0S24yoVPwNpJ8S7U6QOMN59dy9XeF1aWbs9y1zdyYE7_HbCerXHF4S7DXscLneeb-fd_g6Ne9vWxIA51ckjgNGYiFRS9NX0qORRxiAEaD4jiWYIFONmFGo0NYbJvT_oCzGG:1s6Oht:bKT7TeMg8wV_KhRgxm71WbJowCPDNbbJ08CKKSmiTII	2024-05-27 01:58:41.221264-04
+5p1n8iwu05lea624svgkwmvi50ll8y35	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s5bU5:4Qlo6mp-FW2Tzo2Jn0yVJrNvMHikBJDic0dXVlrLKjU	2024-05-24 21:25:09.732344-04
+isnluda5djatgwc07zok0dmos5iw6o1h	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s8pWm:WZUd5wepwL0S7mmTMkVkAHhizIAl0z1AmLItmAozXaA	2024-06-02 19:01:16.970148-04
+0h8nrqu6jsfdbmtjwxau9lp0ii94cdbv	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s5cyQ:aiL4JL-PHrJModPFcAp0-iGeodalVO0xBKSBuxOg8KA	2024-05-24 23:00:34.963361-04
+jf7vf1dj78el9qmd001i49yfsy1jlmea	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s5f70:pgH5fSzECjPtdF8E4z_e5BRmtxhFSGKTD_XL_s0I0is	2024-05-25 01:17:34.434829-04
+a1yybu77v7yry56bwvcpu7o1aa9l1htf	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s5fAy:63Iczh31Y5d904BFbTe92CkvVU0P-JafP2CjWejGEj0	2024-05-25 01:21:40.645203-04
+cewczvtwor1mgd4e3490u5guxyvtkgtq	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s5ti1:tAIStvmw7dWZcntNTIqa4sbUZbmH60QcTW_6emxSs-8	2024-05-25 16:52:45.659606-04
+equw2duxfqy3ra1qn5zcjqwp70hlsxaf	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s5vWu:y9BsEtjSmbA1pUF-c7HWtdqD6Yyym1xR3ECtfVeGBm4	2024-05-25 18:49:24.312625-04
+4qcxuo29n4g3jj06a1mzsf30t0znbv9s	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s5wHT:LpBmUM7_TKIvcS5sKwFuIi-yVBii8nqV9r0T_Fgi05c	2024-05-25 19:37:31.825262-04
+6yprrrb34l6sgscmccu5kxjyk9s1b487	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s60Fd:OaEJfn5llAE-NN7TBZY3xjPUEMhvCtTs0Z9A9cMoejs	2024-05-25 23:51:53.882673-04
+py161wumal4pfxly4gltd55mse0icfer	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s61yd:C8llwU6Si3XuifGOg1B8eYRIXOEiyK9sqQDYz-tBheg	2024-05-26 01:42:27.277724-04
+j426aas7he16vy8bxbva9a8ag6llkn0j	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s6Dcj:CwrbRjrowN5X7OjdbJTYFlzwgr9rciodyQTcwsp9GDk	2024-05-26 14:08:37.349537-04
+9wndma6nbo4bpogm2r6xydc4cgtleayo	.eJxVy70OwjAMBOB3yYyqxImJy4jEc0S24yoVPwNpJ8S7U6QOMN59dy9XeF1aWbs9y1zdyYE7_HbCerXHF4S7DXscLneeb-fd_g6Ne9vWxIA51ckjgNGYiFRS9NX0qORRxiAEaD4jiWYIFONmFGo0NYbJvT_oCzGG:1s6Hjv:KarVE_Ug3unYfDQUEK01pYwARFde8Wlhmt7fREPdfBs	2024-05-26 18:32:19.983511-04
+l0ybo4ofsh3kzu3w0fhsqxnk9nvskm4w	.eJxVy70OwjAMBOB3yYyqxImJy4jEc0S24yoVPwNpJ8S7U6QOMN59dy9XeF1aWbs9y1zdyYE7_HbCerXHF4S7DXscLneeb-fd_g6Ne9vWxIA51ckjgNGYiFRS9NX0qORRxiAEaD4jiWYIFONmFGo0NYbJvT_oCzGG:1s6MbP:MkEziW8hbWdwyCjgKZG0oGsyQ02RREcCPMHGxs7ZJKw	2024-05-26 23:43:51.911956-04
+gzq1f0kcef3rzkdov370b6mwmg8db7yj	.eJxVy70OwjAMBOB3yYyqxImJy4jEc0S24yoVPwNpJ8S7U6QOMN59dy9XeF1aWbs9y1zdyYE7_HbCerXHF4S7DXscLneeb-fd_g6Ne9vWxIA51ckjgNGYiFRS9NX0qORRxiAEaD4jiWYIFONmFGo0NYbJvT_oCzGG:1s6Mcv:Q_iAaU1KCd3BaaTjBNKUpLeZFpNuD9FeqHrtsuokS9A	2024-05-26 23:45:25.267185-04
+rmrg8y628welg70c6m4h9lyvrtd6lpcb	.eJxVy70OwjAMBOB3yYyqxImJy4jEc0S24yoVPwNpJ8S7U6QOMN59dy9XeF1aWbs9y1zdyYE7_HbCerXHF4S7DXscLneeb-fd_g6Ne9vWxIA51ckjgNGYiFRS9NX0qORRxiAEaD4jiWYIFONmFGo0NYbJvT_oCzGG:1s6N7i:qc5UA-zFbgd32W8cMmSps29-P5vFmuPP5i2tt4WSER8	2024-05-27 00:17:14.11896-04
+3g5zukkpigmacqkbc94j47yqaq56l28s	.eJxVizkOwjAQRe8yNYq8JOMxJRLnsGZx5IilwKRC3B0ipYDy_fffCwqvz1bWXh9lMTiCJzj8jsJ6qffNCPc67Dicb7xcT7v7Cxr39n1XJyF7JEbEaBY1pEBJs6EGNQpkpqQOs0TnnfDIOsYJvcxp9pkF3h8Z1THg:1s7MdW:41IlA2oOy1C4ioye6GuQqdXnKlqrDFko2-JCEGw1Q20	2024-05-29 17:58:10.674063-04
+kw7xh1of1tm5pr41mmx9dn9mxl4ezjrv	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s7oc2:450P1iKY8-8ozM_FwnXdzhQnOiphsfxBCuZFIoESZoY	2024-05-30 23:50:30.747017-04
+wjwkz228y2jervroy4ozf447qj5ls42y	.eJxVy70OwjAMBOB3yYyqxImJy4jEc0S24yoVPwNpJ8S7U6QOMN59dy9XeF1aWbs9y1zdyYE7_HbCerXHF4S7DXscLneeb-fd_g6Ne9vWxIA51ckjgNGYiFRS9NX0qORRxiAEaD4jiWYIFONmFGo0NYbJvT_oCzGG:1s6OzK:sLfACIdowxMG3P3XMSfmernrTpDah_59cpPJWvHex2U	2024-05-27 02:16:42.292331-04
+efo9z9xfzkoatl93j6oyoaj8ffmkrh2u	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s7p7E:88ELaMphCVcCR-33pD0y8LUzBq51b6XaVyFCYJDF5eU	2024-05-31 00:22:44.630161-04
+pxfwcoc0h5jc80zbfix4jr5rlhooswue	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s7pEL:TE7qXZwwGXYY4NodBgBSN03KHoY8OAaEZn4SCly1MfE	2024-05-31 00:30:05.240227-04
+52yx3b8uygy1dey4qgcvzf12jbiib380	.eJxVy70OwjAMBOB3yYyqxImJy4jEc0S24yoVPwNpJ8S7U6QOMN59dy9XeF1aWbs9y1zdyYE7_HbCerXHF4S7DXscLneeb-fd_g6Ne9vWxIA51ckjgNGYiFRS9NX0qORRxiAEaD4jiWYIFONmFGo0NYbJvT_oCzGG:1s7N9M:Gir7uIrpqAlMiZ-hFn8eKMcqZ8DF5gGEWThwgXZjUuc	2024-05-29 18:31:04.790657-04
+sc6elrnunnclt8higutsha5m4liwijwk	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s7pHj:gmQreAAjfcQLUR02b28qHGDuWo6GpYtqNqJXg1nKDjY	2024-05-31 00:33:35.298547-04
+8ahci9nvmwhlm6ahsag7xv5awwhrblgc	.eJxVy70OwjAMBOB3yYyqxImJy4jEc0S24yoVPwNpJ8S7U6QOMN59dy9XeF1aWbs9y1zdyYE7_HbCerXHF4S7DXscLneeb-fd_g6Ne9vWxIA51ckjgNGYiFRS9NX0qORRxiAEaD4jiWYIFONmFGo0NYbJvT_oCzGG:1s7NJB:NsLL66hSxi5xsCrsyskJs9M3Ltjn_yWK1xDEz0SnqoM	2024-05-29 18:41:13.024619-04
+ffzypd35tz9bjch2z0rq5ehf8s8ophzz	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s8jqy:dE8WT3vEdX-pGBwzUwk0uqOohGFazDEcxeHfXYtpXrU	2024-06-02 12:57:44.867742-04
+58m2de8au6ixzyigg2orugqank6nocu7	.eJxVy70OwjAMBOB3yYyqxImJy4jEc0S24yoVPwNpJ8S7U6QOMN59dy9XeF1aWbs9y1zdyYE7_HbCerXHF4S7DXscLneeb-fd_g6Ne9vWxIA51ckjgNGYiFRS9NX0qORRxiAEaD4jiWYIFONmFGo0NYbJvT_oCzGG:1s7OfT:WGaW0tRPM9Ls2nIHV7b5O_sEIcKXR0m95f8b9_-Kg20	2024-05-29 20:08:19.516458-04
+jqskt0e2sx9l1dbftljqb9irbi0msrhk	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s8lnk:2zUVqDp2pWKpYKjnn5YqRyhZ087RfZy71BY87k0CUFU	2024-06-02 15:02:32.761409-04
+v9k15x7f9ymsm95xdli7enom67kygv0v	.eJxVy70OwjAMBOB3yYyqxImJy4jEc0S24yoVPwNpJ8S7U6QOMN59dy9XeF1aWbs9y1zdyYE7_HbCerXHF4S7DXscLneeb-fd_g6Ne9vWxIA51ckjgNGYiFRS9NX0qORRxiAEaD4jiWYIFONmFGo0NYbJvT_oCzGG:1s6PuL:-IMrQB0jsZXDDHc86xNb30oskR0RBqVY6m73mlJszOc	2024-05-27 03:15:37.095625-04
+68m9uj9m6pta34flbzf0by4nlfke3dba	.eJxVy70OwjAMBOB3yYyqxImJy4jEc0S24yoVPwNpJ8S7U6QOMN59dy9XeF1aWbs9y1zdyYE7_HbCerXHF4S7DXscLneeb-fd_g6Ne9vWxIA51ckjgNGYiFRS9NX0qORRxiAEaD4jiWYIFONmFGo0NYbJvT_oCzGG:1s7Ojy:vIOidPz7qkUGDM7VwsHyaOxsZTgfglSf3VjJnTioZF0	2024-05-29 20:12:58.767868-04
+7e1a9lfpculbjjqgib7ciknxewra1cuk	.eJxVy70OwjAMBOB3yYyqxImJy4jEc0S24yoVPwNpJ8S7U6QOMN59dy9XeF1aWbs9y1zdyYE7_HbCerXHF4S7DXscLneeb-fd_g6Ne9vWxIA51ckjgNGYiFRS9NX0qORRxiAEaD4jiWYIFONmFGo0NYbJvT_oCzGG:1s7Omh:XYzbNwX6osBlFHKxtqDQ84zM7Um2J-GV8bcFj25l4DU	2024-05-29 20:15:47.805108-04
+iyiotrz74jcfuayuctc2ajernrwymima	.eJxVy70OwjAMBOB3yYyqxImJy4jEc0S24yoVPwNpJ8S7U6QOMN59dy9XeF1aWbs9y1zdyYE7_HbCerXHF4S7DXscLneeb-fd_g6Ne9vWxIA51ckjgNGYiFRS9NX0qORRxiAEaD4jiWYIFONmFGo0NYbJvT_oCzGG:1s7PQe:1A1_ly3kwPOGcU5TbBrPZt5jdz8OphthTni8sKeNX1c	2024-05-29 20:57:04.907352-04
+04skgktl5cvsqbyy8306l3k8ubccpdq2	.eJxVy70OwjAMBOB3yYyqxImJy4jEc0S24yoVPwNpJ8S7U6QOMN59dy9XeF1aWbs9y1zdyYE7_HbCerXHF4S7DXscLneeb-fd_g6Ne9vWxIA51ckjgNGYiFRS9NX0qORRxiAEaD4jiWYIFONmFGo0NYbJvT_oCzGG:1s7Puo:uwKE3-4RRuW3R_1rhz8o_hF20Vg5WMsPpcPUQB7NEUI	2024-05-29 21:28:14.665645-04
+1emtk71r5x7e6rhymha9sefzdlfo0hht	.eJxVy70OwjAMBOB3yYyqxImJy4jEc0S24yoVPwNpJ8S7U6QOMN59dy9XeF1aWbs9y1zdyYE7_HbCerXHF4S7DXscLneeb-fd_g6Ne9vWxIA51ckjgNGYiFRS9NX0qORRxiAEaD4jiWYIFONmFGo0NYbJvT_oCzGG:1s7R6Z:2AsbEiZIHMiKI3aLyTNz5m4OEbkWdorY4a3GgOJxw9M	2024-05-29 22:44:27.351323-04
+0tjtdyhj61t0benwm1y6q2atve9qxckw	.eJxVy70OwjAMBOB3yYyqxImJy4jEc0S24yoVPwNpJ8S7U6QOMN59dy9XeF1aWbs9y1zdyYE7_HbCerXHF4S7DXscLneeb-fd_g6Ne9vWxIA51ckjgNGYiFRS9NX0qORRxiAEaD4jiWYIFONmFGo0NYbJvT_oCzGG:1s6kPC:Drm8miK_byNii5EU0lCC1NVbnLnc1Jf5PsH5nsbyvwg	2024-05-28 01:08:50.243483-04
+aseuyjl853ay4c2hj27tjn0cybhfgmyy	.eJxVy70OwjAMBOB3yYyqxImJy4jEc0S24yoVPwNpJ8S7U6QOMN59dy9XeF1aWbs9y1zdyYE7_HbCerXHF4S7DXscLneeb-fd_g6Ne9vWxIA51ckjgNGYiFRS9NX0qORRxiAEaD4jiWYIFONmFGo0NYbJvT_oCzGG:1s6kmf:saPraUMANZ9f__lo9nRpr9BwlBXD14sF3IJ-ISFzcVw	2024-05-28 01:33:05.715299-04
+5g8j3nlxshjafx5wm32qzbcabaryyq3y	.eJxVy70OwjAMBOB3yYyqxImJy4jEc0S24yoVPwNpJ8S7U6QOMN59dy9XeF1aWbs9y1zdyYE7_HbCerXHF4S7DXscLneeb-fd_g6Ne9vWxIA51ckjgNGYiFRS9NX0qORRxiAEaD4jiWYIFONmFGo0NYbJvT_oCzGG:1s6ksk:u2VTSBNxnQzALoDUFBGTrmu4zq2PzTYrT9XZfVaCliI	2024-05-28 01:39:22.424068-04
+ozd51q2n8n7c3x9dinjtxf0rim7dil4q	.eJxVy70OwjAMBOB3yYyqxImJy4jEc0S24yoVPwNpJ8S7U6QOMN59dy9XeF1aWbs9y1zdyYE7_HbCerXHF4S7DXscLneeb-fd_g6Ne9vWxIA51ckjgNGYiFRS9NX0qORRxiAEaD4jiWYIFONmFGo0NYbJvT_oCzGG:1s7UC1:po9r-bf0hJE5Y6Bh-V7WzuEo4nTaq_TMJyueYYH-dyA	2024-05-30 02:02:17.934284-04
+51ujdkd8xa07k9iidv066hmz6w7ak6xe	.eJxVy70OwjAMBOB3yYyqxImJy4jEc0S24yoVPwNpJ8S7U6QOMN59dy9XeF1aWbs9y1zdyYE7_HbCerXHF4S7DXscLneeb-fd_g6Ne9vWxIA51ckjgNGYiFRS9NX0qORRxiAEaD4jiWYIFONmFGo0NYbJvT_oCzGG:1s7IGK:2MHi3lam5lyiC_4cj0q4W34Bbapui0q0Ob5M4PisPYk	2024-05-29 13:17:56.805715-04
+rq6qyytpq9fcigmzz1ulcvsx6vt34dld	.eJxVy70OwjAMBOB3yYyqxImJy4jEc0S24yoVPwNpJ8S7U6QOMN59dy9XeF1aWbs9y1zdyYE7_HbCerXHF4S7DXscLneeb-fd_g6Ne9vWxIA51ckjgNGYiFRS9NX0qORRxiAEaD4jiWYIFONmFGo0NYbJvT_oCzGG:1s7J27:djRXWS1qAY5KscukGMOeoYMbQLDIBDnt14fv8Lgg5gE	2024-05-29 14:07:19.755999-04
+jvb1wyg5w0whh0zeoa4bg5kjy82ij1ya	.eJxVy70OwjAMBOB3yYyqxImJy4jEc0S24yoVPwNpJ8S7U6QOMN59dy9XeF1aWbs9y1zdyYE7_HbCerXHF4S7DXscLneeb-fd_g6Ne9vWxIA51ckjgNGYiFRS9NX0qORRxiAEaD4jiWYIFONmFGo0NYbJvT_oCzGG:1s7hzh:XzecI4APHc0j2cd9HnWW3CCw_CupWoLMzXylzhIE_UA	2024-05-30 16:46:29.231146-04
+o3gpkgi9u7xhrlwx4tq28qqf7cbioxvw	.eJxVy70OwjAMBOB3yYyqxImJy4jEc0S24yoVPwNpJ8S7U6QOMN59dy9XeF1aWbs9y1zdyYE7_HbCerXHF4S7DXscLneeb-fd_g6Ne9vWxIA51ckjgNGYiFRS9NX0qORRxiAEaD4jiWYIFONmFGo0NYbJvT_oCzGG:1s7iSE:Di0F74xr9L6ZNodKLx2Yj9_5MDCbmWtedeEgDsDvV_M	2024-05-30 17:15:58.114499-04
+o4q9jegdbiux3msyphtg43qu7fgmpun3	.eJxVizsOAjEMBe-SGq3sfDeUSJwjsmNHWfEpyG6FuDsgbQHlvHnzNIW2tZdt6KMsYo4GzeF3Y6oXvX8F09Bpx-l8o-V62t1f0Gn0z9tlsjJHjC5GzyKtCrQZggdtlRmCekwJI0BywSKCMELUTD67LJbM6w3rmzDY:1s7kUq:0xfcnZkNcagqbV2JBJ0W5PgS38WJuHgvdGos1k5EIWQ	2024-05-30 19:26:48.241533-04
+\.
+
+
+--
+-- Data for Name: spatial_ref_sys; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text) FROM stdin;
+\.
+
+
+--
+-- Name: auth_group_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.auth_group_id_seq', 3, true);
+
+
+--
+-- Name: auth_group_permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.auth_group_permissions_id_seq', 1, false);
+
+
+--
+-- Name: auth_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.auth_permission_id_seq', 68, true);
+
+
+--
+-- Name: base_customuser_groups_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.base_customuser_groups_id_seq', 18, true);
+
+
+--
+-- Name: base_customuser_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.base_customuser_id_seq', 18, true);
+
+
+--
+-- Name: base_customuser_user_permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.base_customuser_user_permissions_id_seq', 1, false);
+
+
+--
+-- Name: base_farmaciamedicamento_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.base_farmaciamedicamento_id_seq', 19, true);
+
+
+--
+-- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.django_admin_log_id_seq', 128, true);
+
+
+--
+-- Name: django_content_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.django_content_type_id_seq', 16, true);
+
+
+--
+-- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.django_migrations_id_seq', 29, true);
+
+
+--
+-- Name: auth_group auth_group_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_group
+    ADD CONSTRAINT auth_group_name_key UNIQUE (name);
+
+
+--
+-- Name: auth_group_permissions auth_group_permissions_group_id_permission_id_0cd325b0_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_group_permissions
+    ADD CONSTRAINT auth_group_permissions_group_id_permission_id_0cd325b0_uniq UNIQUE (group_id, permission_id);
+
+
+--
+-- Name: auth_group_permissions auth_group_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_group_permissions
+    ADD CONSTRAINT auth_group_permissions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: auth_group auth_group_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_group
+    ADD CONSTRAINT auth_group_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: auth_permission auth_permission_content_type_id_codename_01ab375a_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_permission
+    ADD CONSTRAINT auth_permission_content_type_id_codename_01ab375a_uniq UNIQUE (content_type_id, codename);
+
+
+--
+-- Name: auth_permission auth_permission_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_permission
+    ADD CONSTRAINT auth_permission_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: base_customuser_groups base_customuser_groups_customuser_id_group_id_d4e28d0b_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_customuser_groups
+    ADD CONSTRAINT base_customuser_groups_customuser_id_group_id_d4e28d0b_uniq UNIQUE (customuser_id, group_id);
+
+
+--
+-- Name: base_customuser_groups base_customuser_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_customuser_groups
+    ADD CONSTRAINT base_customuser_groups_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: base_customuser base_customuser_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_customuser
+    ADD CONSTRAINT base_customuser_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: base_customuser_user_permissions base_customuser_user_per_customuser_id_permission_90414b11_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_customuser_user_permissions
+    ADD CONSTRAINT base_customuser_user_per_customuser_id_permission_90414b11_uniq UNIQUE (customuser_id, permission_id);
+
+
+--
+-- Name: base_customuser_user_permissions base_customuser_user_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_customuser_user_permissions
+    ADD CONSTRAINT base_customuser_user_permissions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: base_customuser base_customuser_username_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_customuser
+    ADD CONSTRAINT base_customuser_username_key UNIQUE (username);
+
+
+--
+-- Name: base_farmacia base_farmacia_id_farma_06ab42cb_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_farmacia
+    ADD CONSTRAINT base_farmacia_id_farma_06ab42cb_pk PRIMARY KEY (id_farma);
+
+
+--
+-- Name: base_farmaciamedicamento base_farmaciamedicamento_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_farmaciamedicamento
+    ADD CONSTRAINT base_farmaciamedicamento_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: base_farmauser base_farmauser_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_farmauser
+    ADD CONSTRAINT base_farmauser_pkey PRIMARY KEY (customuser_ptr_id);
+
+
+--
+-- Name: base_medicamento base_medicamento_nombre_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_medicamento
+    ADD CONSTRAINT base_medicamento_nombre_key UNIQUE (nombre);
+
+
+--
+-- Name: base_medicamento base_medicamento_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_medicamento
+    ADD CONSTRAINT base_medicamento_pkey PRIMARY KEY (id_medic);
+
+
+--
+-- Name: base_municipio base_municipio_nombre_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_municipio
+    ADD CONSTRAINT base_municipio_nombre_key UNIQUE (nombre);
+
+
+--
+-- Name: base_municipio base_municipio_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_municipio
+    ADD CONSTRAINT base_municipio_pkey PRIMARY KEY (id_munic);
+
+
+--
+-- Name: base_provincia base_provincia_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_provincia
+    ADD CONSTRAINT base_provincia_pkey PRIMARY KEY (id_prov);
+
+
+--
+-- Name: base_restriccionmedicamento base_restriccionmedicamento_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_restriccionmedicamento
+    ADD CONSTRAINT base_restriccionmedicamento_pkey PRIMARY KEY (id_restriccion);
+
+
+--
+-- Name: base_tipofarmacia base_tipofarmacia_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_tipofarmacia
+    ADD CONSTRAINT base_tipofarmacia_pkey PRIMARY KEY (id_tipo_farmacia);
+
+
+--
+-- Name: base_clasificacionmedicamento base_tipomedicamento_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_clasificacionmedicamento
+    ADD CONSTRAINT base_tipomedicamento_pkey PRIMARY KEY (id_clasificacion);
+
+
+--
+-- Name: base_turnofarmacia base_turnofarmacia_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_turnofarmacia
+    ADD CONSTRAINT base_turnofarmacia_pkey PRIMARY KEY (id_turno_farmacia);
+
+
+--
+-- Name: django_admin_log django_admin_log_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.django_admin_log
+    ADD CONSTRAINT django_admin_log_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: django_content_type django_content_type_app_label_model_76bd3d3b_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.django_content_type
+    ADD CONSTRAINT django_content_type_app_label_model_76bd3d3b_uniq UNIQUE (app_label, model);
+
+
+--
+-- Name: django_content_type django_content_type_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.django_content_type
+    ADD CONSTRAINT django_content_type_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: django_migrations django_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.django_migrations
+    ADD CONSTRAINT django_migrations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: django_session django_session_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.django_session
+    ADD CONSTRAINT django_session_pkey PRIMARY KEY (session_key);
+
+
+--
+-- Name: auth_group_name_a6ea08ec_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX auth_group_name_a6ea08ec_like ON public.auth_group USING btree (name varchar_pattern_ops);
+
+
+--
+-- Name: auth_group_permissions_group_id_b120cbf9; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX auth_group_permissions_group_id_b120cbf9 ON public.auth_group_permissions USING btree (group_id);
+
+
+--
+-- Name: auth_group_permissions_permission_id_84c5c92e; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX auth_group_permissions_permission_id_84c5c92e ON public.auth_group_permissions USING btree (permission_id);
+
+
+--
+-- Name: auth_permission_content_type_id_2f476e4b; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX auth_permission_content_type_id_2f476e4b ON public.auth_permission USING btree (content_type_id);
+
+
+--
+-- Name: base_customuser_groups_customuser_id_04d7166b; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_customuser_groups_customuser_id_04d7166b ON public.base_customuser_groups USING btree (customuser_id);
+
+
+--
+-- Name: base_customuser_groups_group_id_d1822349; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_customuser_groups_group_id_d1822349 ON public.base_customuser_groups USING btree (group_id);
+
+
+--
+-- Name: base_customuser_user_permissions_customuser_id_4f46199a; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_customuser_user_permissions_customuser_id_4f46199a ON public.base_customuser_user_permissions USING btree (customuser_id);
+
+
+--
+-- Name: base_customuser_user_permissions_permission_id_e62eddd3; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_customuser_user_permissions_permission_id_e62eddd3 ON public.base_customuser_user_permissions USING btree (permission_id);
+
+
+--
+-- Name: base_customuser_username_e2c38001_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_customuser_username_e2c38001_like ON public.base_customuser USING btree (username varchar_pattern_ops);
+
+
+--
+-- Name: base_farmacia_id_munic_id_3e5918ce; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_farmacia_id_munic_id_3e5918ce ON public.base_farmacia USING btree (id_munic_id);
+
+
+--
+-- Name: base_farmacia_id_tipo_id_4607f30a; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_farmacia_id_tipo_id_4607f30a ON public.base_farmacia USING btree (id_tipo_id);
+
+
+--
+-- Name: base_farmacia_id_turno_id_ee8c4576; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_farmacia_id_turno_id_ee8c4576 ON public.base_farmacia USING btree (id_turno_id);
+
+
+--
+-- Name: base_farmacia_ubicacion_763f3b28_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_farmacia_ubicacion_763f3b28_id ON public.base_farmacia USING gist (ubicacion);
+
+
+--
+-- Name: base_farmaciamedicamento_id_farma_id_732b7923; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_farmaciamedicamento_id_farma_id_732b7923 ON public.base_farmaciamedicamento USING btree (id_farma_id);
+
+
+--
+-- Name: base_farmaciamedicamento_id_medic_id_e4c0853d; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_farmaciamedicamento_id_medic_id_e4c0853d ON public.base_farmaciamedicamento USING btree (id_medic_id);
+
+
+--
+-- Name: base_farmauser_id_farma_id_4eb5dcf3; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_farmauser_id_farma_id_4eb5dcf3 ON public.base_farmauser USING btree (id_farma_id);
+
+
+--
+-- Name: base_medicamento_id_clasificacion_id_7047a2fc; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_medicamento_id_clasificacion_id_7047a2fc ON public.base_medicamento USING btree (id_clasificacion_id);
+
+
+--
+-- Name: base_medicamento_id_restriccion_id_266d8f06; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_medicamento_id_restriccion_id_266d8f06 ON public.base_medicamento USING btree (id_restriccion_id);
+
+
+--
+-- Name: base_medicamento_nombre_fb209e34_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_medicamento_nombre_fb209e34_like ON public.base_medicamento USING btree (nombre varchar_pattern_ops);
+
+
+--
+-- Name: base_municipio_id_prov_id_559f64a6; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_municipio_id_prov_id_559f64a6 ON public.base_municipio USING btree (id_prov_id);
+
+
+--
+-- Name: base_municipio_nombre_9db9b416_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_municipio_nombre_9db9b416_like ON public.base_municipio USING btree (nombre varchar_pattern_ops);
+
+
+--
+-- Name: django_admin_log_content_type_id_c4bce8eb; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX django_admin_log_content_type_id_c4bce8eb ON public.django_admin_log USING btree (content_type_id);
+
+
+--
+-- Name: django_admin_log_user_id_c564eba6; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX django_admin_log_user_id_c564eba6 ON public.django_admin_log USING btree (user_id);
+
+
+--
+-- Name: django_session_expire_date_a5c62663; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX django_session_expire_date_a5c62663 ON public.django_session USING btree (expire_date);
+
+
+--
+-- Name: django_session_session_key_c0390e0f_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX django_session_session_key_c0390e0f_like ON public.django_session USING btree (session_key varchar_pattern_ops);
+
+
+--
+-- Name: auth_group_permissions auth_group_permissio_permission_id_84c5c92e_fk_auth_perm; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_group_permissions
+    ADD CONSTRAINT auth_group_permissio_permission_id_84c5c92e_fk_auth_perm FOREIGN KEY (permission_id) REFERENCES public.auth_permission(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: auth_group_permissions auth_group_permissions_group_id_b120cbf9_fk_auth_group_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_group_permissions
+    ADD CONSTRAINT auth_group_permissions_group_id_b120cbf9_fk_auth_group_id FOREIGN KEY (group_id) REFERENCES public.auth_group(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: auth_permission auth_permission_content_type_id_2f476e4b_fk_django_co; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_permission
+    ADD CONSTRAINT auth_permission_content_type_id_2f476e4b_fk_django_co FOREIGN KEY (content_type_id) REFERENCES public.django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: base_customuser_groups base_customuser_grou_customuser_id_04d7166b_fk_base_cust; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_customuser_groups
+    ADD CONSTRAINT base_customuser_grou_customuser_id_04d7166b_fk_base_cust FOREIGN KEY (customuser_id) REFERENCES public.base_customuser(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: base_customuser_groups base_customuser_groups_group_id_d1822349_fk_auth_group_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_customuser_groups
+    ADD CONSTRAINT base_customuser_groups_group_id_d1822349_fk_auth_group_id FOREIGN KEY (group_id) REFERENCES public.auth_group(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: base_customuser_user_permissions base_customuser_user_customuser_id_4f46199a_fk_base_cust; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_customuser_user_permissions
+    ADD CONSTRAINT base_customuser_user_customuser_id_4f46199a_fk_base_cust FOREIGN KEY (customuser_id) REFERENCES public.base_customuser(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: base_customuser_user_permissions base_customuser_user_permission_id_e62eddd3_fk_auth_perm; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_customuser_user_permissions
+    ADD CONSTRAINT base_customuser_user_permission_id_e62eddd3_fk_auth_perm FOREIGN KEY (permission_id) REFERENCES public.auth_permission(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: base_farmacia base_farmacia_id_munic_id_3e5918ce_fk_base_municipio_id_munic; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_farmacia
+    ADD CONSTRAINT base_farmacia_id_munic_id_3e5918ce_fk_base_municipio_id_munic FOREIGN KEY (id_munic_id) REFERENCES public.base_municipio(id_munic) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: base_farmacia base_farmacia_id_tipo_id_4607f30a_fk_base_tipo; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_farmacia
+    ADD CONSTRAINT base_farmacia_id_tipo_id_4607f30a_fk_base_tipo FOREIGN KEY (id_tipo_id) REFERENCES public.base_tipofarmacia(id_tipo_farmacia) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: base_farmacia base_farmacia_id_turno_id_ee8c4576_fk_base_turn; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_farmacia
+    ADD CONSTRAINT base_farmacia_id_turno_id_ee8c4576_fk_base_turn FOREIGN KEY (id_turno_id) REFERENCES public.base_turnofarmacia(id_turno_farmacia) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: base_farmaciamedicamento base_farmaciamedicam_id_farma_id_732b7923_fk_base_farm; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_farmaciamedicamento
+    ADD CONSTRAINT base_farmaciamedicam_id_farma_id_732b7923_fk_base_farm FOREIGN KEY (id_farma_id) REFERENCES public.base_farmacia(id_farma) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: base_farmaciamedicamento base_farmaciamedicam_id_medic_id_e4c0853d_fk_base_medi; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_farmaciamedicamento
+    ADD CONSTRAINT base_farmaciamedicam_id_medic_id_e4c0853d_fk_base_medi FOREIGN KEY (id_medic_id) REFERENCES public.base_medicamento(id_medic) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: base_farmauser base_farmauser_customuser_ptr_id_62ce4952_fk_base_customuser_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_farmauser
+    ADD CONSTRAINT base_farmauser_customuser_ptr_id_62ce4952_fk_base_customuser_id FOREIGN KEY (customuser_ptr_id) REFERENCES public.base_customuser(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: base_farmauser base_farmauser_id_farma_id_4eb5dcf3_fk_base_farmacia_id_farma; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_farmauser
+    ADD CONSTRAINT base_farmauser_id_farma_id_4eb5dcf3_fk_base_farmacia_id_farma FOREIGN KEY (id_farma_id) REFERENCES public.base_farmacia(id_farma) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: base_medicamento base_medicamento_id_clasificacion_id_7047a2fc_fk_base_clas; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_medicamento
+    ADD CONSTRAINT base_medicamento_id_clasificacion_id_7047a2fc_fk_base_clas FOREIGN KEY (id_clasificacion_id) REFERENCES public.base_clasificacionmedicamento(id_clasificacion) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: base_medicamento base_medicamento_id_restriccion_id_266d8f06_fk_base_rest; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_medicamento
+    ADD CONSTRAINT base_medicamento_id_restriccion_id_266d8f06_fk_base_rest FOREIGN KEY (id_restriccion_id) REFERENCES public.base_restriccionmedicamento(id_restriccion) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: base_municipio base_municipio_id_prov_id_559f64a6_fk_base_provincia_id_prov; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_municipio
+    ADD CONSTRAINT base_municipio_id_prov_id_559f64a6_fk_base_provincia_id_prov FOREIGN KEY (id_prov_id) REFERENCES public.base_provincia(id_prov) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: django_admin_log django_admin_log_content_type_id_c4bce8eb_fk_django_co; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.django_admin_log
+    ADD CONSTRAINT django_admin_log_content_type_id_c4bce8eb_fk_django_co FOREIGN KEY (content_type_id) REFERENCES public.django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: django_admin_log django_admin_log_user_id_c564eba6_fk_base_customuser_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.django_admin_log
+    ADD CONSTRAINT django_admin_log_user_id_c564eba6_fk_base_customuser_id FOREIGN KEY (user_id) REFERENCES public.base_customuser(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- PostgreSQL database dump complete
+--
+

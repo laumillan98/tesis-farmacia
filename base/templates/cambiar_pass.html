@@ -1,22 +1,54 @@
-{% extends "./base.html" %}
-
-{% block title %}Cambiar contraseña{% endblock %}
-
-{% block body %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
 {% load crispy_forms_tags %}
 
-<div class="card mx-auto" style="width: 30rem; margin-top: 20px;">
-    <div class="card-body">
-        <h2 style="margin-left: 50px;">Cambiar contraseña</h2><hr>
-        <p>Por favor introduzca una nueva contraseña</p>
-        <form method="POST">
-            {% csrf_token %}
-            {{ form|crispy }}
-            <button class="btn btn-dark btn-md btn-block" type="submit" 
-            style="margin-bottom: 10px; margin-top: 10px; margin-left: 175px;">Cambiar</button>
-        </form>
-    </div>
-</div>
+<title>Registro de farmacia</title>
 
-{% endblock %}
+    <!-- CSS only -->
+    <!-- Boostrap 5  --> 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="https://unpkg.com/@trevoreyre/autocomplete-js/dist/style.css"/>
+</head>
+
+<body>
+
+    <section class="vh-200 d-flex align-items-center justify-content-center" style="background-color: #d3e2e979;">
+        <div class="container">
+            <div class="card mx-auto" style="width: 30rem; border-radius: 1rem; box-shadow: 0 0 8px rgba(0, 0, 0, 0.122); margin-top: 125px; margin-bottom: 120px;">
+                <div class="card-body">
+                    <h2 style="margin-left: 50px;">Cambiar contraseña</h2><hr>
+                    <p>Por favor introduzca una nueva contraseña</p>
+                    <form method="POST">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <button class="btn btn-dark btn-md btn-block" type="submit" 
+                        style="margin-bottom: 10px; margin-top: 10px; margin-left: 175px;">Cambiar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<!-- Boostrap 5  --> 
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous">
+    </script>
+    
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+    integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"
+    integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>

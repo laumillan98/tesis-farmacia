@@ -2,57 +2,65 @@ $(document).ready(function() {
     let editionSuccessful = false
     var ajaxUrl = $("#miTabla").data("url");
     var table = $("#miTabla").DataTable({
-        ajax: ajaxUrl,
-        columns: [
-            { data: "index" },
-            { data: "first_name" },
-            { data: "last_name" },
-            { data: "username" },
-            { data: "email" },
-            { data: "first_group" },
-            { data: "date_joined"},
-            { data: "last_login"},
-            { data: "is_active" },
-            {
-                data: null,
-                orderable: false,
-                searchable: false,
-                render: function(data, type, row, meta) {
-                    // Verifica si estás en la columna de acciones
-                    if (meta.col === 9) { 
-                        let editButton = `
-                        <button id='editar' class='btn btn-sm btn-secondary' data-id='${row.username}' data-toggle='modal' data-target='#modal-lg'>
-                            <i class="fas fa-pencil-alt"></i>
-                        </button>&nbsp`
-                        let deleteButton = `<button id='softdelete' class='btn btn-sm btn-danger' data-id='${row.username}'>
-                        <i class="fa-solid fa-trash-can"></i>
-                        </button>`
-                        let restoreButton = `<button id='activar' class='btn btn-sm btn-secondary' data-id='${row.username}'>
-                        <i class="fas fa-trash-restore-alt"></i>
-                        </button>`
-                        if(row.is_superuser) {
-                            return editButton;
-                        } else if(row.is_active) {
-                            return editButton + deleteButton;
-                        } else {
-                            return restoreButton;
-                        }
-                    }
-                    // Puedes retornar diferentes contenidos dependiendo de la columna
-                    return data; // Retorna los datos originales para otras columnas
-                }
-            }
-        ],
-        columnDefs: [
-            {
-                targets: 8, // Columna de estado activo
-                orderable: false,
-                searchable: false,
-                render: function(data, type, row) {
-                    return data ? '<i class="fas fa-check" style="color: green"></i>' : '<i class="fas fa-xmark" style="color: red"></i>';
-                }
-            },
-        ]
+      processing: true,
+      serverSide: true,
+      ajax: {
+        'url': ajaxUrl,
+        'type': "GET",
+        "data": function(d) {
+          d.page = (d.start / d.length) + 1;  // Agregar el número de página al request
+        }
+      },
+      columns: [
+          { data: "index" },
+          { data: "first_name" },
+          { data: "last_name" },
+          { data: "username" },
+          { data: "email" },
+          { data: "first_group" },
+          { data: "date_joined"},
+          { data: "last_login"},
+          { data: "is_active" },
+          {
+              data: null,
+              orderable: false,
+              searchable: false,
+              render: function(data, type, row, meta) {
+                  // Verifica si estás en la columna de acciones
+                  if (meta.col === 9) { 
+                      let editButton = `
+                      <button id='editar' class='btn btn-sm btn-success' data-id='${row.username}' data-toggle='modal' data-target='#modal-lg'>
+                          <i class="fas fa-pencil-alt"></i>
+                      </button>&nbsp`
+                      let deleteButton = `<button id='softdelete' class='btn btn-sm btn-danger' data-id='${row.username}'>
+                      <i class="fa-solid fa-trash-can"></i>
+                      </button>`
+                      let restoreButton = `<button id='activar' class='btn btn-sm btn-secondary' data-id='${row.username}'>
+                      <i class="fas fa-trash-restore-alt"></i>
+                      </button>`
+                      if(row.is_superuser) {
+                          return editButton;
+                      } else if(row.is_active) {
+                          return editButton + deleteButton;
+                      } else {
+                          return restoreButton;
+                      }
+                  }
+                  // Puedes retornar diferentes contenidos dependiendo de la columna
+                  return data; // Retorna los datos originales para otras columnas
+              }
+          }
+      ],
+      columnDefs: [
+          {
+              targets: 8, // Columna de estado activo
+              orderable: false,
+              searchable: false,
+              render: function(data, type, row) {
+                  return data ? '<i class="fas fa-check" style="color: green"></i>' : '<i class="fas fa-xmark" style="color: red"></i>';
+              }
+          },
+      ]
     });
 
     // Evento de clic en el botón "Eliminar"
@@ -266,6 +274,7 @@ $(document).ready(function() {
           editionSuccessful = false;
         }
     })
+    
 });
 
 

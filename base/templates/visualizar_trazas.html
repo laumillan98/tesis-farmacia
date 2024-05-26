@@ -2,16 +2,23 @@
 
 {% load static %}
 
+{% block mytitle %}Visualizar Trazas{% endblock %}
+
 {% block mycss %}{% endblock %}
 
 {% block title %}Trazas{% endblock %}
 
 {% block content %}
 
+
 <div class="col-12">
     <div class="card">
         <div class="card-body">
             <div class="table-responsive">
+                <div>
+                    <!-- Botón para abrir el modal -->
+                    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#filtroModal">Exportar Trazas</button>
+                </div>
                 <br>
                 <table id="miTabla" class="table table-bordered table-striped" data-url="{% url 'lista_de_trazas' %}">
                     <thead>
@@ -32,10 +39,115 @@
     </div>
 </div>
 
+
+    <!-- Modal de filtro -->
+    <div class="modal fade" id="filtroModal" tabindex="-1" role="dialog" aria-labelledby="filtroModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="filtroModalLabel">Filtrar Datos para el Reporte PDF</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="filtroForm">
+                        <div class="form-group">
+                            <label for="usuario">Usuario</label>
+                            <input type="text" class="form-control" id="usuario" name="usuario">
+                            <input type="hidden" name="tipo_objeto" value="traza">
+                        </div>
+                        <div class="form-group">
+                            <label for="fecha_inicio">Fecha de Inicio</label>
+                            <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio">
+                        </div>
+                        <div class="form-group">
+                            <label for="fecha_fin">Fecha de Fin</label>
+                            <input type="date" class="form-control" id="fecha_fin" name="fecha_fin">
+                        </div>
+                        <div class="form-group">
+                            <label for="tipo_accion">Tipo de Acción</label>
+                            <select class="form-control" id="tipo_accion" name="tipo_accion">
+                            <option value="">Todos</option>
+                            <option value="1">Adición</option>
+                            <option value="2">Cambio</option>
+                            <option value="3">Eliminación</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="contenido">Objeto</label>
+                            <input type="text" class="form-control" id="contenido" name="contenido" placeholder="Texto en la representación del objeto">
+                        </div>
+                        <div style="align-content: center;">
+                            <button type="button" class="btn btn-primary" id="generarReporteBtn">Generar Reporte</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" style="margin-left: 5px;">Cerrar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 {% endblock %}   
 
 {% block subtitle %}Trazas{% endblock %}
 
 {% block custom_scripts %}
+
+<script>
+    $(document).ready(function() {
+        $('#generarReporteBtn').click(function() {
+            var form = $('#filtroForm');
+            $.ajax({
+                url: '{% url "generar_reporte_pdf" %}',
+                type: 'POST',
+                data: form.serialize(),
+                success: function(response, status, xhr) {
+                    if (xhr.getResponseHeader('content-type') === 'application/json') {
+                        var jsonResponse = JSON.parse(response);
+                        Swal.fire({
+                            title: 'Error',
+                            text: jsonResponse.error,
+                            icon: 'error',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    } else {
+                        var blob = new Blob([response], { type: 'application/pdf' });
+                        var link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        link.download = 'reporte_trazas.pdf';
+                        link.click();
+                        $('#filtroModal').modal('hide');
+
+                        // Show SweetAlert notification
+                        Swal.fire({
+                            title: 'Éxito',
+                            text: 'El reporte se ha generado exitosamente.',
+                            icon: 'success',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    }
+                },
+                error: function(response) {
+                    var jsonResponse = response.responseJSON;
+                    Swal.fire({
+                        title: 'Error',
+                        text: jsonResponse.error,
+                        icon: 'error',
+                        confirmButtonText: 'Aceptar'
+                    });
+                }
+            });
+        });
+        // Configurar el atributo max en los campos de fecha para evitar fechas futuras
+        var today = new Date().toISOString().split('T')[0];
+        $('#fecha_inicio').attr('max', today);
+        $('#fecha_fin').attr('max', today);
+    });
+  </script>
+  
+
 <script src="{% static 'js/lista_de_trazas.js' %}"></script>
+
 {% endblock %}

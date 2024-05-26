@@ -1,114 +1,134 @@
-{% extends "./base.html" %}
+{% extends "./index_farmaceutico.html" %}
 
-{% block title %}Gestión de Medicamentos{% endblock %}
+{% load static %}
 
-{% block body %}
-<div class="row" style="margin-top: 10px;">
-  <div class="col-sm-12 col-md-6 col-lg-4 col-xl-4">
-    <h2>Insertar Medicamento</h2>
-    <div class="card">
-      <div class="card-body">
-        <form action="/registrarMedicamento/" method="POST">{% csrf_token %}
-          <input name="idFarmacia" value="{{farmacia.id}}" hidden>
-          <div class="form-group">
-            <input type="text" id="txtNombre" name="txtNombre" class="form-control" placeholder="Nombre" minlength="5"
-              maxlength="50" required>
-          </div>
-          <div class="form-group">
-            <input type="text" style="margin-top: 10px;" id="txtDescription" name="txtDescription" class="form-control"
-              placeholder="Descripción" minlength="5" maxlength="500" required>
-          </div>
-          <div class="form-group">
-            <input type="number" style="margin-top: 10px" id="numCantidad" name="numCantidad" class="form-control"
-              placeholder="Cantidad máxima por receta/compra" min="1" max="10" required>
-          </div>
-          <div class="form-group">
-            <input type="text" style="margin-top: 10px" id="txtPrecio" name="txtPrecio" class="form-control"
-              placeholder="Precio por unidad" min="1" max="200" required>
-          </div>
-          <div class="form-group" style="margin-top: 10px">
-            <select class="form-select" aria-label="Default select example" name="txtRestriccion">
-              <option value="" selected disabled>Seleccione Restricción</option>
-              {% for tipo in tipo_medicamento %}
-              <option value="{{ tipo.id_tipo_medicamento }}">{{ tipo.nombre }}</option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="form-group" style="margin-top: 10px">
-            <label>Seleccione origen:</label>
-            <div class="form-check" style="margin-top: 5px">
-              <input class="form-check-input" type="radio" name="radioOrigen" id="flexRadioDefault1" value="True">
-              <label class="form-check-label" for="flexRadioDefault1">
-                Natural
-              </label>
+{% block mytitle %}Gestionar Medicamentos{% endblock %}
+
+{% block mycss %}{% endblock %}
+
+{% block title %}Gestionar Medicamentos{% endblock %}
+
+{% block content %}
+
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <a href="/registrar_medicamento" class="btn btn-md btn-secondary">Registrar medicamento</a>
             </div>
-            <div class="form-check" style="margin-top: 5px">
-              <input class="form-check-input" type="radio" name="radioOrigen" id="flexRadioDefault2" value="False">
-              <label class="form-check-label" for="flexRadioDefault2">
-                Fármaco
-              </label>
-            </div>
-          </div>
-          <div class="form-group" style="margin-top: 10px">
-            <button type="submit" class="btn btn-success btn-block text-white">Guardar</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-12 col-md-6 col-lg-8 col-xl-8">
-    <h2>Listado de Medicamentos</h2>
-    <div class="table-responsive py-2">
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Nombre</th>
-            <th>Descripción</th>
-            <th>Cantidad máxima por receta/compra</th>
-            <th>Precio por unidad</th>
-            <th>Origen</th>
-            <th>Restricción</th>
-            <th>Existencias</th>
-            <th colspan="2">Opciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for m in medicamentos %}
-          <tr>
-            <td>{{forloop.counter}}</td>
-            <td>{{m.id_medic.nombre}}</td>
-            <td>{{m.id_medic.description}}</td>
-            <td>{{m.id_medic.cant_max}}</td>
-            <td>{{m.id_medic.precio_unidad}}</td>
-            <td>
-              {% if m.id_medic.origen_natural %}
-              Natural
-              {% else %}
-              Fármaco
-              {% endif %}
-            </td>
-            <td>{{m.id_medic.id_restriccion}}</td>
-            <td>
-              <div class="form-group existenciaData">
-                <input value="{{farmacia.id}}" id="idFarmacia" hidden>
-                <input value="{{m.id_medic.id_medic}}" class="uuid-medicamento" hidden>
-                <div class="input-group mb-3" style="width:120px">
-                  <button class="input-group-text decrementBtn" name="minus">-</button>
-                  <input type="text" class="form-control text-center bg-white input-qty" disabled
-                    value="{{m.existencia}}">
-                  <button class="input-group-text incrementBtn">+</button>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <br>
+                    <table id="miTabla" class="table table-bordered table-striped" data-url="{% url 'lista_de_medicamentos' %}">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nombre</th>
+                                <th>Cantidad máxima</th>
+                                <th>Precio</th>
+                                <th>Origen</th>
+                                <th>Restricción</th>
+                                <th>Clasificación</th>
+                                <th>Descripción</th>
+                                <th>Editar</th>
+                            </tr>
+                        </thead>
+                    </table>
                 </div>
-              </div>
-            </td>
-            <td><a href="editarMedicamento/{{m.id_medic.id_medic}}" class="btn btn-success">Editar</a></td>
-            <td><a href="eliminarMedicamento/{{m.id_medic.id_medic}}" class="btn btn-danger btnEliminacion"
-                style="--bs-btn-padding-x: .5rem;">Eliminar</a></td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
+
+    <!-- /.modal Editar -->
+    <div class="modal fade" id="modal-lg">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h4 class="modal-title">Editar</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <div class="modal-body">
+                    <form id="edicionMedicamentoForm">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="name">Nombre</label>
+                                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre">
+                                <input type="text" class="form-control" id="id" hidden name="id">
+                            </div>
+                            <div class="form-group">
+                                <label for="name">Descripción</label>
+                                <input type="text" class="form-control" id="descriptionEdit" name="description" placeholder="Descripcion">
+                            </div>
+                            <div class="form-group">
+                                <label for="name">Cantidad Máxima</label>
+                                <input type="text" class="form-control" id="cant_max" name="cant_max" placeholder="Cant_max">
+                            </div>
+                            <div class="form-group">
+                                <label for="name">Precio</label>
+                                <input type="text" class="form-control" id="precio_unidad" name="precio_unidad" placeholder="Precio_unidad">
+                            </div>
+                            <div class="form-group">
+                                <label for="name">Origen</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="origen" name="origen">
+                                    <label class="form-check-label" for="origen">Natural</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Restricción</label>
+                                <select class="form-control" id="restriccion_selector" name="id_restriccion">
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Clasificación</label>
+                                <select class="form-control" id="clasificacion_selector" name="id_clasificacion">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Aceptar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.modal Editar-->
+
+
+    <!-- /.modal Mostrar Descripcion-->
+    <div class="modal fade" id="modaldesc-lg">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Descripción</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <p id="descripcionMostrar" class="form-control-plaintext"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.modal Mostrar Descripcion -->
+
+{% endblock %}   
+
+{% block subtitle %}Medicamentos{% endblock %}
+
+{% block custom_scripts %}
+<script src="{% static 'plugins/jquery-validation/jquery.validate.min.js' %}"></script>
+<script src="{% static 'plugins/jquery-validation/additional-methods.min.js' %}"></script>
+<script src="{% static 'js/lista_de_medicamentos.js' %}"></script>
 {% endblock %}

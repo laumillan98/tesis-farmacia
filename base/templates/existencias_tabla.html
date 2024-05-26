@@ -62,7 +62,7 @@
             success: function (response) {
                 $("tbody").empty();
                 $.each(response, function (key, value) {
-                    var count = key;
+                    var count = key + 1;
                     var nombre = value.nombre;
                     var telefono = value.telefono;
                     var existencia = value.existencia;

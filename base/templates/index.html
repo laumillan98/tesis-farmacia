@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AdminLTE 3 | Dashboard</title>
+  <title>{% block mytitle %}{% endblock %}</title>
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -33,6 +33,11 @@
 
 
   <!-- MIOSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS --> 
+  <!-- Mapa Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
   <!-- Font Awesome mio --> 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <!-- DataTables.js mio 
@@ -113,7 +118,7 @@
     </ul>
   </nav>
   <!-- /.navbar -->
-
+  
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
@@ -173,7 +178,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="/visualizar_trazas" class="nav-link {% if request.path == '/trazas/' %}active{% endif %}">
+                <a href="/visualizar_trazas" class="nav-link {% if request.path == '/visualizar_trazas/' %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Trazas</p>
                 </a>
@@ -216,12 +221,21 @@
             </ul>
           </li>
           <li class="nav-item">
-            <a href="pages/widgets.html" class="nav-link">
+            <a href="#" class="nav-link">
               <i class="nav-icon fas fa-chart-pie"></i>
               <p>
                 Reportes
+                <i class="right fas fa-angle-left"></i>
               </p>
             </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="/visualizar_charts" class="nav-link {% if request.path == '/visualizar_charts/' %}active{% endif %}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Charts</p>
+                </a>
+              </li>
+            </ul>
           </li>
           <li class="nav-item menu-close">
             <a href="#" class="nav-link">
@@ -351,6 +365,11 @@
 
 
 <!--MIOSSSSSSSSSSSSSSSSSSSSSSSSS-->
+<!-- Mapa Leaflet -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
 <!-- Backup Base de Datos Alerta --> 
 <script src="{% static 'js/backup_bd.js' %}"></script>
 <script src="{% static 'js/restore_bd.js' %}"></script>

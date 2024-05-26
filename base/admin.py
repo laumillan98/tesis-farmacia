@@ -1,22 +1,20 @@
 from django.contrib import admin
-
-from base.forms import FarmaciaAdminForm
-from .models import CustomUser, TipoFarmacia, TurnoFarmacia, TipoMedicamento, Provincia, Municipio, Medicamento, Farmacia, FarmaUser, FarmaciaMedicamento
-from django.contrib import admin
-from leaflet.admin import LeafletGeoAdmin
+from .models import CustomUser, TipoFarmacia, TurnoFarmacia, RestriccionMedicamento, ClasificacionMedicamento, Provincia, Municipio, Medicamento, Farmacia, FarmaUser, FarmaciaMedicamento
 from django.contrib.gis.geos import Point
+from leaflet.admin import LeafletGeoAdmin
+from .forms import FarmaciaAdminForm
 # Register your models here.
 
 admin.site.register(CustomUser)
 admin.site.register(TipoFarmacia)
 admin.site.register(TurnoFarmacia)
-admin.site.register(TipoMedicamento)
+admin.site.register(RestriccionMedicamento)
+admin.site.register(ClasificacionMedicamento)
 admin.site.register(Provincia)
 admin.site.register(Municipio)
 admin.site.register(Medicamento)
 admin.site.register(FarmaUser)
 admin.site.register(FarmaciaMedicamento)
-
 
 @admin.register(Farmacia)
 class FarmaciaAdmin(LeafletGeoAdmin):

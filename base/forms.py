@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, SetPasswordForm, PasswordResetForm, UserChangeForm
-from .models import CustomUser, FarmaUser, Farmacia, Municipio, Provincia, TipoFarmacia, TurnoFarmacia
+from .models import CustomUser, FarmaUser, Farmacia, Municipio, Provincia, TipoFarmacia, TurnoFarmacia, Medicamento, RestriccionMedicamento, ClasificacionMedicamento
+from .widgets import BooleanCheckbox
 from django.contrib.auth import get_user_model
 from django_recaptcha.fields import ReCaptchaField
 from django_recaptcha.widgets import ReCaptchaV2Checkbox
@@ -199,6 +200,39 @@ class ProvUpdateForm(forms.ModelForm):
         model = Provincia
         fields = ('nombre',)
 
+
+class MedicUpdateForm(forms.ModelForm):
+    nombre = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
+
+    cant_max = forms.IntegerField(required=True, label="Cantidad Máxima")
+    precio_unidad = forms.FloatField(required=True)
+    origen_natural = forms.BooleanField(widget=BooleanCheckbox, required=False, label="Origen")
+    id_restriccion = forms.ModelChoiceField(queryset=RestriccionMedicamento.objects.all(), required=True, label="Restricción")
+    id_clasificacion = forms.ModelChoiceField(queryset=ClasificacionMedicamento.objects.all(), required=True, label="Clasificación")
+
+    class Meta:
+        model = Medicamento
+        fields = ('nombre', 'description', 'cant_max', 'precio_unidad', 'origen_natural', 'id_restriccion', 'id_clasificacion')
+
+
+class RestriccionMedicamentoUpdateForm(forms.ModelForm):
+    nombre = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
+    
+    class Meta:
+        model = RestriccionMedicamento
+        fields = ('nombre',)
+
+
+class ClasificacionMedicamentoUpdateForm(forms.ModelForm):
+    nombre = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
+    
+    class Meta:
+        model = ClasificacionMedicamento
+        fields = ('nombre',)
+
+
+
+
 class FarmaciaAdminForm(forms.ModelForm):
     latitud = forms.FloatField(required=False)
     longitud = forms.FloatField(required=False)
@@ -212,3 +246,4 @@ class FarmaciaAdminForm(forms.ModelForm):
         if self.instance and self.instance.ubicacion:
             self.fields['latitud'].initial = self.instance.ubicacion.y
             self.fields['longitud'].initial = self.instance.ubicacion.x
+

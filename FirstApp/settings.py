@@ -46,7 +46,9 @@ INSTALLED_APPS = [
     'django_recaptcha',
     'dbbackup',
     'django.contrib.gis',
-    'leaflet'
+    'leaflet',
+    'django_filters',
+    'django_tables2',
 ]
 
 AUTH_USER_MODEL = 'base.CustomUser'
@@ -85,17 +87,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'FirstApp.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
-#DATABASES = {
- #   'default': {
-  #      'ENGINE': 'django.db.backends.sqlite3',
-   #     'NAME': BASE_DIR / 'db.sqlite3',
-    #}
-#}
-
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
@@ -132,7 +123,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'es-es'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Havana'
 
 USE_I18N = True
 
@@ -169,9 +160,10 @@ EMAIL_HOST_PASSWORD = 'pooa tvdz yaln xpmz'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
+
 # Backup de la bd 
 DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
-DBBACKUP_STORAGE_OPTIONS = {'location': 'C:/Users/laumi/Downloads/example/FirstApp/backup_bd'}
+DBBACKUP_STORAGE_OPTIONS = {'location': 'C:/Users/ceper/Downloads/Python/tesis-farmacia/backup_bd'}
 
 GDAL_LIBRARY_PATH = r'C:\OSGeo4W\bin\gdal308'
 GEOS_LIBRARY_PATH = r'C:\OSGeo4W\bin\geos_c'
