@@ -885,6 +885,7 @@ def listaDeMedicFarma(request):
                     'id': str(medic.id_medic),
                     'farma': farmaMedic.id_farma.nombre,
                     'nombre': medic.nombre,
+                    'formato': medic.id_formato.nombre,
                     'descripcion': medic.description,
                     'cant_max': cant_max_texto,
                     'precio': f'{medic.precio_unidad} CUP/u',
@@ -916,8 +917,83 @@ def actualizarExistencia(request):
         return JsonResponse({'error': 'Medicamento no encontrado'}, status=404)
     
 
-def listarMedicamentosDisponibles(request):
-     return render(request, "listar_medicamentos_disponibles.html") 
+@login_required
+def gestionarMedicamentosDisponibles(request):
+    # Obtener el usuario actual
+    usuario = request.user
+
+    try:
+        # Obtener el farmaceutico correspondiente al usuario actual
+        farmaceutico = FarmaUser.objects.get(username=usuario.username)
+        # Obtener la farmacia del farmaceutico
+        farmacia = farmaceutico.id_farma
+        # Obtener los medicamentos que ya están en la farmacia del usuario actual
+        medicamentos_en_farmacia = FarmaciaMedicamento.objects.filter(id_farma=farmacia).values_list('id_medic', flat=True)
+        # Filtrar los medicamentos que no están en la farmacia del usuario actual
+        medicamentos_disponibles = Medicamento.objects.exclude(id_medic__in=medicamentos_en_farmacia)
+
+    except FarmaUser.DoesNotExist:
+        medicamentos_disponibles = Medicamento.objects.all()
+
+    # Código para poder seleccionar de las listas siguientes en el filtrado para exportar la tabla
+    restricciones = RestriccionMedicamento.objects.all()
+    clasificaciones = ClasificacionMedicamento.objects.all()
+    formatos = FormatoMedicamento.objects.all()
+
+    context = {
+        'medicamentos_disponibles': medicamentos_disponibles,
+        'restricciones': restricciones,
+        'clasificaciones': clasificaciones,
+        'formatos': formatos
+    }
+
+    return render(request, "gestionar_medicamentos_disponibles.html", context)
+
+
+def listaDeMedicamentosDisponibles(request):
+    usuario = request.user
+    farmaceutico = FarmaUser.objects.get(username=usuario.username)
+    farmacia = farmaceutico.id_farma
+    # Obtén los IDs de los medicamentos que ya están en la farmacia del usuario actual
+    medicamentos_en_farmacia = FarmaciaMedicamento.objects.filter(id_farma=farmacia).values_list('id_medic', flat=True)
+    # Filtra los medicamentos disponibles excluyendo los que ya están en la farmacia del usuario
+    medicamentos = Medicamento.objects.exclude(id_medic__in=medicamentos_en_farmacia)
+
+    paginator = Paginator(medicamentos, request.GET.get('length', 10))  # Cantidad de objetos por página
+    start = int(request.GET.get('start', 0))
+    page_number = start // paginator.per_page + 1  # Calcular el número de página basado en 'start'
+    page_obj = paginator.get_page(page_number)
+
+    medicamentos_list = []
+
+    for index, medic in enumerate(page_obj.object_list):
+        if medic.cant_max == 1:
+            cant_max_texto = f'{medic.cant_max} unidad'
+        else:
+            cant_max_texto = f'{medic.cant_max} unidades'
+        origen_texto = "Natural" if medic.origen_natural else "Fármaco"
+        medic_data = {
+            'index': index + 1,
+            'id': medic.id_medic,
+            'nombre': medic.nombre,
+            'description': medic.description,
+            'cant_max': cant_max_texto,
+            'precio_unidad': f'{medic.precio_unidad} CUP/u',
+            'origen': origen_texto,
+            'restriccion': medic.id_restriccion.nombre if medic.id_restriccion else None,
+            'clasificacion': medic.id_clasificacion.nombre if medic.id_clasificacion else None,
+            'formato': medic.id_formato.nombre if medic.id_formato else None,
+        }
+        medicamentos_list.append(medic_data)
+
+    data = {
+        "draw": int(request.GET.get('draw', 0)),
+        'recordsTotal': paginator.count,
+        'recordsFiltered': paginator.count,
+        'data': medicamentos_list
+    }
+    return JsonResponse(data, safe=False)
+
 
 
 @csrf_exempt
@@ -947,6 +1023,59 @@ def exportarMedicamento(request, uuid):
         except FarmaUser.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Usuario no encontrado'}, status=404)
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
+
+
+# No funciona aunnnnnnnn
+def filtrarMedicamentos(request):
+    nombre = request.GET.get('nombre', '')
+    clasificacion = request.GET.get('clasificacion', '')
+    formato = request.GET.get('formato', '')
+    restriccion = request.GET.get('restriccion', '')
+    origen = request.GET.get('origen', '')
+
+    usuario = request.user
+    farmaceutico = FarmaUser.objects.get(username=usuario.username)
+    farmacia = farmaceutico.id_farma
+
+    medicamentos = Medicamento.objects.exclude(farmaciamedicamento__id_farma=farmacia)
+
+    if nombre:
+        medicamentos = medicamentos.filter(nombre__icontains=nombre)
+    if clasificacion:
+        medicamentos = medicamentos.filter(id_clasificacion__id_clasificacion=clasificacion)
+    if formato:
+        medicamentos = medicamentos.filter(id_formato__id_formato=formato)
+    if restriccion:
+        medicamentos = medicamentos.filter(id_restriccion__id_restriccion=restriccion)
+    if origen:
+        medicamentos = medicamentos.filter(origen_natural=True if origen == 'Natural' else False)
+
+    page = request.GET.get('page', 1)
+    paginator = Paginator(medicamentos, 10)
+    medicamentos_page = paginator.get_page(page)
+
+    medicamentos_list = []
+    for index, medicamento in enumerate(medicamentos_page, start=1):
+        medicamentos_list.append({
+            'index': index,
+            'id': medicamento.id_medic,
+            'nombre': medicamento.nombre,
+            'cant_max': medicamento.cant_max,
+            'precio_unidad': medicamento.precio_unidad,
+            'origen': 'Natural' if medicamento.origen_natural else 'Sintético',
+            'restriccion': medicamento.id_restriccion.nombre if medicamento.id_restriccion else '',
+            'clasificacion': medicamento.id_clasificacion.nombre if medicamento.id_clasificacion else '',
+            'description': medicamento.description,
+        })
+
+    response = {
+        'data': medicamentos_list,
+        'recordsTotal': paginator.count,
+        'recordsFiltered': paginator.count,
+        'draw': request.GET.get('draw', 1),
+    }
+
+    return JsonResponse(response)
 
 
 @login_required(login_url='/acceder')
@@ -998,15 +1127,22 @@ def listaDeMedicamentos(request):
 @usuarios_permitidos(roles_permitidos=['admin']) 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarMedicamento(request):
-    if request.method =='POST':
+    if request.method == 'POST':
         form = MedicUpdateForm(data=request.POST)
         if form.is_valid():
-            medic = form.save(commit=False)
-            medic.id_restriccion = form.cleaned_data['id_restriccion']
-            medic.id_clasificacion = form.cleaned_data['id_clasificacion']
-            medic.id_formato = form.cleaned_data['id_formato']
-            medic.save()
-            return redirect('/gestionar_medicamentos')
+            nombre = form.cleaned_data['nombre']
+            formato = form.cleaned_data['id_formato']
+            
+            # Verificar si ya existe un medicamento con el mismo nombre y formato
+            if Medicamento.objects.filter(nombre=nombre, id_formato=formato).exists():
+                messages.error(request, "Ya existe un medicamento con este nombre y formato.")
+            else:
+                medic = form.save(commit=False)
+                medic.id_restriccion = form.cleaned_data['id_restriccion']
+                medic.id_clasificacion = form.cleaned_data['id_clasificacion']
+                medic.id_formato = form.cleaned_data['id_formato']
+                medic.save()
+                return redirect('/gestionar_medicamentos')
         else:
             for error in list(form.errors.values()):
                 messages.error(request, error)

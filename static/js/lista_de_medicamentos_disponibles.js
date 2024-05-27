@@ -1,5 +1,4 @@
 $(document).ready(function () {
-    let editionSuccessful = false;
     var ajaxUrl = $("#miTabla").data("url");
     var table = $("#miTabla").DataTable({
         processing: true,
@@ -9,11 +8,17 @@ $(document).ready(function () {
           'type': "GET",
           "data": function(d) {
             d.page = (d.start / d.length) + 1;  // Agregar el número de página al request
+            d.nombre = $('#nombre').val();
+            d.clasificacion = $('#clasificacion').val();
+            d.formato = $('#formato').val();
+            d.restriccion = $('#restriccion').val();
+            d.origen = $('#origen').val();
           }
         },
         columns: [
             { data: "index" },
             { data: "nombre" },
+            { data: "formato" },
             { data: "cant_max" },
             { data: "precio_unidad" },
             { data: "origen" },
@@ -73,7 +78,7 @@ $(document).ready(function () {
         exportarMedicamento(idMedic);
     });
 
-    function exportarMedicamento(id) {
+    function exportarMedicamento(id, row) {
         $.ajax({
             url: 'exportarMedicamento/' + id + '/',
             type: 'POST',
@@ -81,6 +86,9 @@ $(document).ready(function () {
             headers: { 'X-CSRFToken': '{{ csrf_token }}' },  // Añadir CSRF token
             success: function(response) {
                 if (response.status === 'success') {
+                    // Eliminar la fila de la tabla sin recargar la página
+                    table.row(row).remove().draw(false);
+
                     Swal.fire({
                         title: 'Exportado',
                         text: 'El medicamento ha sido exportado a tu farmacia con éxito.',
@@ -106,6 +114,14 @@ $(document).ready(function () {
             }
         });
     }
+
+
+    // Evento de clic en el botón "Aplicar Filtro"
+    $('#aplicarFiltroBtn').click(function() {
+        var filtros = $('#filtroForm').serialize();
+        table.ajax.url(ajaxUrl + '?' + filtros).load();
+        $('#filtroModal').modal('hide');
+    });
 
 
 });

@@ -203,7 +203,6 @@ class ProvUpdateForm(forms.ModelForm):
 
 class MedicUpdateForm(forms.ModelForm):
     nombre = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
-
     cant_max = forms.IntegerField(required=True, label="Cantidad Máxima")
     precio_unidad = forms.FloatField(required=True)
     origen_natural = forms.BooleanField(widget=BooleanCheckbox, required=False, label="Origen")

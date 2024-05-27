@@ -6,6 +6,8 @@
 
 {% block mycss %}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.81.1/dist/L.Control.Locate.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css">
 {% endblock %}
 
 {% block title %}Existencias{% endblock %}
@@ -55,7 +57,11 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div id="mapa" style="height: 500px;"></div>
+                    <div id="mapa">
+                        <div id="routeIcon">
+                            <i class="fas fa-route"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -69,5 +75,7 @@
     var buscarMedicamentoUrl = "{% url 'buscar_medicamento' %}";
 </script>
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.81.1/dist/L.Control.Locate.min.js" charset="utf-8"></script>
+<script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
 <script src="{% static 'js/lista_existencias_de_medicamentos.js' %}"></script>
 {% endblock %}

@@ -78,7 +78,7 @@ class Municipio(models.Model):
 class Medicamento(models.Model):
     id_medic = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False)
-    nombre = models.CharField(max_length=50, unique=True)
+    nombre = models.CharField(max_length=50, unique=False)
     description = models.TextField(null=True, blank=True)
     cant_max = models.IntegerField(default=0)
     precio_unidad = models.FloatField(default=0)
