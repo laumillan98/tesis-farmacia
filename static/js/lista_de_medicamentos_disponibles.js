@@ -52,7 +52,7 @@ $(document).ready(function () {
     });
 
 
-    // Evento de clic en el botón "Mostrar"
+    // Evento de clic en el botón "Mostrar Descripcion"
     $('#miTabla').on('click', '#mostrar', function() {
       let idMedic = $(this).data('id');
       cargarDescripcionMedicamento(idMedic);
@@ -116,12 +116,6 @@ $(document).ready(function () {
     }
 
 
-    // Evento de clic en el botón "Aplicar Filtro"
-    $('#aplicarFiltroBtn').click(function() {
-        var filtros = $('#filtroForm').serialize();
-        table.ajax.url(ajaxUrl + '?' + filtros).load();
-        $('#filtroModal').modal('hide');
-    });
 
 
 });

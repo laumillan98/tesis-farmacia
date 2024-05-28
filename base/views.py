@@ -25,6 +25,7 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.cache import cache_control
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
+from easyaudit.models import CRUDEvent, LoginEvent, RequestEvent
 
 from .models import CustomUser, Medicamento, Farmacia, FarmaUser, FarmaciaMedicamento, TipoFarmacia, TurnoFarmacia, Municipio, Provincia, RestriccionMedicamento, ClasificacionMedicamento, FormatoMedicamento
 from .forms import CustomUserCreationForm, FarmaUserCreationForm, UserLoginForm, SetPasswordForm, PasswordResetForm, UserProfileForm, UserUpdateForm, FarmaUserUpdateForm, FarmaUpdateForm, TipoFarmaciaUpdateForm, TurnoFarmaciaUpdateForm, MunicUpdateForm, ProvUpdateForm, MedicUpdateForm, RestriccionMedicamentoUpdateForm, ClasificacionMedicamentoUpdateForm, FormatoMedicamentoUpdateForm
@@ -1025,58 +1026,6 @@ def exportarMedicamento(request, uuid):
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
 
 
-# No funciona aunnnnnnnn
-def filtrarMedicamentos(request):
-    nombre = request.GET.get('nombre', '')
-    clasificacion = request.GET.get('clasificacion', '')
-    formato = request.GET.get('formato', '')
-    restriccion = request.GET.get('restriccion', '')
-    origen = request.GET.get('origen', '')
-
-    usuario = request.user
-    farmaceutico = FarmaUser.objects.get(username=usuario.username)
-    farmacia = farmaceutico.id_farma
-
-    medicamentos = Medicamento.objects.exclude(farmaciamedicamento__id_farma=farmacia)
-
-    if nombre:
-        medicamentos = medicamentos.filter(nombre__icontains=nombre)
-    if clasificacion:
-        medicamentos = medicamentos.filter(id_clasificacion__id_clasificacion=clasificacion)
-    if formato:
-        medicamentos = medicamentos.filter(id_formato__id_formato=formato)
-    if restriccion:
-        medicamentos = medicamentos.filter(id_restriccion__id_restriccion=restriccion)
-    if origen:
-        medicamentos = medicamentos.filter(origen_natural=True if origen == 'Natural' else False)
-
-    page = request.GET.get('page', 1)
-    paginator = Paginator(medicamentos, 10)
-    medicamentos_page = paginator.get_page(page)
-
-    medicamentos_list = []
-    for index, medicamento in enumerate(medicamentos_page, start=1):
-        medicamentos_list.append({
-            'index': index,
-            'id': medicamento.id_medic,
-            'nombre': medicamento.nombre,
-            'cant_max': medicamento.cant_max,
-            'precio_unidad': medicamento.precio_unidad,
-            'origen': 'Natural' if medicamento.origen_natural else 'Sintético',
-            'restriccion': medicamento.id_restriccion.nombre if medicamento.id_restriccion else '',
-            'clasificacion': medicamento.id_clasificacion.nombre if medicamento.id_clasificacion else '',
-            'description': medicamento.description,
-        })
-
-    response = {
-        'data': medicamentos_list,
-        'recordsTotal': paginator.count,
-        'recordsFiltered': paginator.count,
-        'draw': request.GET.get('draw', 1),
-    }
-
-    return JsonResponse(response)
-
 
 @login_required(login_url='/acceder')
 @usuarios_permitidos(roles_permitidos=['admin'])
@@ -1582,6 +1531,39 @@ def visualizarTrazas(request):
 
 
 def listaDeTrazas(request):
+    try:
+        eventos = CRUDEvent.objects.all()  # Obtener todos los eventos de CRUDEvent
+
+        paginator = Paginator(eventos, request.GET.get('length', 10))  # Cantidad de objetos por página
+        start = int(request.GET.get('start', 0))
+        page_number = start // paginator.per_page + 1  # Calcular el número de página basado en 'start'
+        page_obj = paginator.get_page(page_number)
+
+        trazas_list = []
+        for index, traza in enumerate(page_obj.object_list):
+            traza_data = {
+                'index': index + 1,
+                'id': traza.id,
+                'action_time': traza.datetime.strftime('%Y-%m-%d %H:%M:%S'),
+                'user': traza.user.username if traza.user else 'System',
+                'object_repr': traza.object_repr,
+                'action_flag': traza.get_event_type_display(),
+                'change_message': traza.changes if traza.changes else "Sin cambios"
+            }
+            trazas_list.append(traza_data)
+
+        data = {
+            "draw": int(request.GET.get('draw', 0)),
+            'recordsTotal': paginator.count,
+            'recordsFiltered': paginator.count,
+            'data': trazas_list
+        }
+        return JsonResponse(data, safe=False)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+"""def listaDeTrazas(request):
     trazas = LogEntry.objects.all()  # Obtener todas las trazas de LogEntry (acciones registradas por Django)
 
     paginator = Paginator(trazas, request.GET.get('length', 10))  # Cantidad de objetos por página
@@ -1622,7 +1604,7 @@ def listaDeTrazas(request):
         'recordsFiltered': paginator.count,
         'data': trazas_list
     }
-    return JsonResponse(data, safe=False)
+    return JsonResponse(data, safe=False)"""
     
 
 #################################################################################################################################

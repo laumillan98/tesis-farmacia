@@ -66,66 +66,7 @@
     <!-- Fin Modal Mostrar Descripcion -->
 
 
-    <!-- Modal para Filtrar y Exportar Medicamentos -->
-    <div class="modal fade" id="filtroModal" tabindex="-1" role="dialog" aria-labelledby="filtroModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="filtroModalLabel">Filtrar Medicamentos por:</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="filtroForm">
-                        <div class="form-group">
-                            <label for="nombre">Nombre</label>
-                            <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre del Medicamento">
-                        </div>
-                        <div class="form-group">
-                            <label for="clasificacion">Clasificación</label>
-                            <select class="form-control" id="clasificacion" name="clasificacion">
-                                <option value="">Todas las clasificaciones</option>
-                                {% for clasificacion in clasificaciones %}
-                                    <option value="{{ clasificacion.id_clasificacion }}">{{ clasificacion.nombre }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="formato">Formato</label>
-                            <select class="form-control" id="formato" name="formato">
-                                <option value="">Todos los formatos</option>
-                                {% for formato in formatos %}
-                                    <option value="{{ formato.id_formato }}">{{ formato.nombre }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="restriccion">Restricción</label>
-                            <select class="form-control" id="restriccion" name="restriccion">
-                                <option value="">Todas las restricciones</option>
-                                {% for restriccion in restricciones %}
-                                    <option value="{{ restriccion.id_restriccion }}">{{ restriccion.nombre }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="origen">Origen</label>
-                            <select class="form-control" id="origen" name="origen">
-                                <option value="">Todos los orígenes</option>
-                                <option value="Natural">Natural</option>
-                                <option value="Sintético">Fármaco</option>
-                            </select>
-                        </div>
-                        <button type="button" class="btn btn-primary" id="aplicarFiltroBtn">Exportar a Mi Farmacia</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Fin Modal Filtrar y Exportar Medicamentos-->
-
-
+    
 {% endblock %}   
 
 {% block subtitle %}Medicamentos{% endblock %}

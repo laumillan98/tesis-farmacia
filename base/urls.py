@@ -63,7 +63,7 @@ urlpatterns = [
      path('lista_de_medicamentos_disponibles/', views.listaDeMedicamentosDisponibles, name='lista_de_medicamentos_disponibles'),
      path('gestionar_medicamentos_disponibles/obtenerDescripcion/<uuid>/', views.obtenerDescripcion, name ='obtener_descripcion'),
      path('gestionar_medicamentos_disponibles/exportarMedicamento/<uuid>/', views.exportarMedicamento, name='exportar_medicamento'),
-     path('gestionar_medicamentos_disponibles/filtrar/', views.filtrarMedicamentos, name='filtrar_medicamentos'),
+     
      
      
      #Medicamentos
