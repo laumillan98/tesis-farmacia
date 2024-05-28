@@ -1,9 +1,9 @@
 $(document).ready(function() {
     let map;
+    let marker;
     let userMarker; // Variable para guardar el marcador del usuario
     let routingControl;
     var locationControl;
-    const apiKey = 'YOUR_API_KEY'; // Reemplaza con tu clave API de OpenRouteService
 
     $('#buscarMedicamentoBtn').click(function() {
         var nombreMedicamento = $('#nombre_medicamento').val();
@@ -51,6 +51,7 @@ $(document).ready(function() {
                         $('#mapaModal').data('lng', lng);
                         $('#mapaModal').data('name', name);
                         $('#mapaModal').modal('show');
+
                     });
                 } else {
                     Swal.fire({
@@ -72,6 +73,7 @@ $(document).ready(function() {
         });
     });
 
+   
     $('#mapaModal').on('shown.bs.modal', function() {
         const pharmacyLat = $('#mapaModal').data('lat');
         const pharmacyLng = $('#mapaModal').data('lng');
@@ -135,11 +137,9 @@ $(document).ready(function() {
         map.on('locationerror', (e) => {
             alert(e.message);
         });
+
     });
 
-   $('#mapaModal').on('hidden.bs.modal', function() {
-        $('#routeIcon').css('display', 'none');
-    });
 
     $('#routeIcon').click(function() {
         const userLocation = $(this).data('userLocation');
@@ -148,11 +148,13 @@ $(document).ready(function() {
         updateRouting(userLocation, pharmacyLat, pharmacyLng)
     });
 
+
     function clearRouteAndHideDirections() {
         if(routingControl != null) {
             map.removeControl(routingControl);
         }
     }
+
 
     function updateRouting(userLatLng, pharmacyLat, pharmacyLng) {
         if (routingControl) {
@@ -180,51 +182,9 @@ $(document).ready(function() {
         }).addTo(map);
     }
 
-    function getUserLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(showPosition, showError);
-        } else {
-            alert("La geolocalización no es soportada por este navegador.");
-        }
-    }
 
-    function showPosition(position) {
-        const userLat = position.coords.latitude;
-        const userLng = position.coords.longitude;
-        getRoute(userLat, userLng);
-    }
+    $('#mapaModal').on('hidden.bs.modal', function() {
+        $('#routeIcon').css('display', 'none');
+    });
 
-    function showError(error) {
-        alert(`Error al obtener la ubicación: ${error.message}`);
-    }
-
-    function getRoute(userLat, userLng) {
-        const pharmacyLat = $('#mapaModal').data('lat');
-        const pharmacyLng = $('#mapaModal').data('lng');
-        const pharmacyName = $('#mapaModal').data('name');
-
-        const url = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${apiKey}&start=${userLng},${userLat}&end=${pharmacyLng},${pharmacyLat}`;
-
-        $.ajax({
-            url: url,
-            method: 'GET',
-            success: function(response) {
-                const coordinates = response.routes[0].geometry.coordinates;
-                const route = coordinates.map(coord => [coord[1], coord[0]]);
-
-                L.marker([userLat, userLng]).addTo(map).bindPopup('Tu ubicación').openPopup();
-                L.marker([pharmacyLat, pharmacyLng]).addTo(map).bindPopup(pharmacyName).openPopup();
-                L.polyline(route, { color: 'blue' }).addTo(map);
-            },
-            error: function(error) {
-                console.error('Error al obtener la ruta:', error);
-                Swal.fire({
-                    title: 'Error',
-                    text: 'No se pudo encontrar una ruta. Verifica que las coordenadas sean correctas.',
-                    icon: 'error',
-                    confirmButtonText: 'Aceptar'
-                });
-            }
-        });
-    }
 });

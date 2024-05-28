@@ -2,20 +2,23 @@
 
 {% load static %}
 
-{% block mytitle %}Gestionar Medicamentos{% endblock %}
+{% block mytitle %}Lista de Medicamentos{% endblock %}
 
 {% block mycss %}{% endblock %}
 
-{% block title %}Gestionar Medicamentos en Farmacia {{ farmacia_del_farmaceutico }}</p>{% endblock %}
+{% block title %}Lista de Medicamentos{% endblock %}
 
 {% block content %}
 
     <div class="col-12">
         <div class="card">
+            <div class="card-header">
+                <button type="button" class="btn btn-md btn-primary" data-toggle="modal" data-target="#filtroModal">Exportar Grupo</button>
+            </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <br>
-                    <table id="miTabla" class="table table-bordered table-striped" data-url="{% url 'lista_de_medicfarma' %}">
+                    <table id="miTabla" class="table table-bordered table-striped" data-url="{% url 'lista_de_medicamentos_disponibles' %}">
                         <thead>
                             <tr>
                                 <th>#</th>
@@ -27,7 +30,7 @@
                                 <th>Restricción</th>
                                 <th>Clasificación</th>
                                 <th>Descripción</th>
-                                <th>Existencia</th>
+                                <th>Exportar</th>
                             </tr>
                         </thead>
                     </table>
@@ -37,7 +40,7 @@
     </div>
 
 
-     <!-- /.modal Mostrar Descripcion-->
+     <!-- Modal Mostrar Descripcion-->
      <div class="modal fade" id="modaldesc-lg">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -60,15 +63,14 @@
             </div>
         </div>
     </div>
-    <!-- /.modal Mostrar Descripcion -->
+    <!-- Fin Modal Mostrar Descripcion -->
 
 
+    
 {% endblock %}   
 
 {% block subtitle %}Medicamentos{% endblock %}
 
 {% block custom_scripts %}
-<script src="{% static 'plugins/jquery-validation/jquery.validate.min.js' %}"></script>
-<script src="{% static 'plugins/jquery-validation/additional-methods.min.js' %}"></script>
-<script src="{% static 'js/lista_de_medicfarma.js' %}"></script>
+<script src="{% static 'js/lista_de_medicamentos_disponibles.js' %}"></script>
 {% endblock %}

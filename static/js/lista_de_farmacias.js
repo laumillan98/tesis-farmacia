@@ -42,7 +42,6 @@ $(document).ready(function() {
     })
 
     
-
     // Evento de clic en el botón "Editar"
     $('#miTabla').on('click', '#editar', function() {
         let idFarma = $(this).data('id');

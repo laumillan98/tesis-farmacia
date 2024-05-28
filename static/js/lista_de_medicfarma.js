@@ -8,11 +8,24 @@ $(document).ready(function () {
         columns: [
             { data: "index" },
             { data: "nombre" },
+            { data: "formato"},
             { data: "cant_max" },
             { data: "precio" },
             { data: "origen" },
             { data: "restriccion" },
             { data: "clasificacion" },
+            {
+                data: null,
+                orderable: false,
+                searchable: false,
+                render: function (data, type, row, meta) {
+                    let mostrarButton = `
+                    <button id='mostrar' class='btn btn-sm btn-info' data-id='${row.id}' data-toggle='modal' data-target='#modaldesc-lg'>
+                        <i class="fa-solid fa-eye"></i>
+                    </button>`;
+                    return mostrarButton;
+                }
+              },
             {
                 data: "existencia",
                 orderable: false,
@@ -25,6 +38,26 @@ $(document).ready(function () {
             }
         ]
     });
+
+    
+    // Evento de clic en el botón "Mostrar"
+    $('#miTabla').on('click', '#mostrar', function() {
+        let idMedic = $(this).data('id');
+        cargarDescripcionMedicamento(idMedic);
+      });
+  
+      function cargarDescripcionMedicamento(id) {
+        $.ajax({
+            url: 'obtenerDescripcion/' + id + '/',
+            type: 'GET',
+            data: {},
+            success: function(response) {
+                $('#descripcionMostrar').text(response.description);
+                $('#id').val(response.id);
+                $('#modaldesc-lg').modal('show'); 
+            },
+        })
+      }
 
 
     // Manejar clic en el botón de guardar
@@ -74,6 +107,7 @@ $(document).ready(function () {
         });
     });
 
+    
     // Función para obtener el valor de una cookie por su nombre
     function getCookie(name) {
         var cookieValue = null;

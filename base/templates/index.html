@@ -178,15 +178,15 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="/visualizar_trazas" class="nav-link {% if request.path == '/visualizar_trazas/' %}active{% endif %}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Trazas</p>
-                </a>
-              </li>
-              <li class="nav-item">
                 <a href="/gestionar_medicamentos" class="nav-link {% if request.path == '/gestionar_medicamentos/' %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Medicamentos</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/visualizar_trazas" class="nav-link {% if request.path == '/visualizar_trazas/' %}active{% endif %}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Trazas</p>
                 </a>
               </li>
               <li class="nav-item menu-open">
@@ -232,6 +232,12 @@
                     <a href="/gestionar_clasificaciones_de_medicamentos" class="nav-link {% if request.path == '/gestionar_clasificaciones_de_medicamentos/' %}active{% endif %}">
                       <i class="far fa-circle nav-icon"></i>
                       <p>Clasificaciones de Medicamentos</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="/gestionar_formatos_de_medicamentos" class="nav-link {% if request.path == '/gestionar_formatos_de_medicamentos/' %}active{% endif %}">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Formatos de Medicamentos</p>
                     </a>
                   </li>
                 </ul>

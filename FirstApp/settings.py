@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'leaflet',
     'django_filters',
     'django_tables2',
+    'easyaudit',
 ]
 
 AUTH_USER_MODEL = 'base.CustomUser'
@@ -64,7 +65,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'base.middleware.Custom404Middleware'
+    'base.middleware.Custom404Middleware',
+    'easyaudit.middleware.easyaudit.EasyAuditMiddleware',
 ]
 
 ROOT_URLCONF = 'FirstApp.urls'
@@ -176,5 +178,6 @@ LEAFLET_CONFIG = {
 }
 
 
-
-
+EASY_AUDIT_WATCH_MODEL_EVENTS = True
+EASY_AUDIT_WATCH_AUTH_EVENTS = True
+EASY_AUDIT_WATCH_REQUEST_EVENTS = True
