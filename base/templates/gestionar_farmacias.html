@@ -105,7 +105,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="filtroModalLabel">Filtrar Farmacias</h5>
+                    <h5 class="modal-title" id="filtroModalLabel">Filtrar Farmacias por:</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -115,13 +115,13 @@
                         {% csrf_token %}
                         <div class="form-group">
                             <label for="nombre">Nombre</label>
-                            <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre">
+                            <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Todos">
                             <input type="hidden" name="tipo_objeto" value="farmacia">
                         </div>
                         <div class="form-group">
                             <label for="provincia">Provincia</label>
                             <select class="form-control" id="provincia" name="provincia">
-                                <option value="">Seleccione una provincia</option>
+                                <option value="">Todas las provincias</option>
                                 {% for provincia in provincias %}
                                     <option value="{{ provincia.nombre }}">{{ provincia.nombre }}</option>
                                 {% endfor %}
@@ -130,7 +130,7 @@
                         <div class="form-group">
                             <label for="municipio">Municipio</label>
                             <select class="form-control" id="municipio" name="municipio">
-                                <option value="">Seleccione un municipio</option>
+                                <option value="">Todos los municipios</option>
                                 {% for municipio in municipios %}
                                     <option value="{{ municipio.nombre }}">{{ municipio.nombre }}</option>
                                 {% endfor %}
@@ -139,7 +139,7 @@
                         <div class="form-group">
                             <label for="tipo">Tipo</label>
                             <select class="form-control" id="tipo" name="tipo">
-                                <option value="">Seleccione un tipo</option>
+                                <option value="">Todos los tipos</option>
                                 {% for tipo in tipos %}
                                     <option value="{{ tipo.nombre }}">{{ tipo.nombre }}</option>
                                 {% endfor %}
@@ -148,7 +148,7 @@
                         <div class="form-group">
                             <label for="turno">Turno</label>
                             <select class="form-control" id="turno" name="turno">
-                                <option value="">Seleccione un turno</option>
+                                <option value="">Todos los turnos</option>
                                 {% for turno in turnos %}
                                     <option value="{{ turno.nombre }}">{{ turno.nombre }}</option>
                                 {% endfor %}

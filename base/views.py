@@ -47,9 +47,10 @@ from reportlab.lib.pagesizes import A4, landscape
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
 from django.views.decorators.csrf import csrf_exempt
-
+from .pdf_utils import header_footer
 
 # Create your views here.
+
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def inicio(request):
@@ -71,14 +72,14 @@ def farmaceutico(request):
 def backup_database(request):
     try:
         now = datetime.now()
-        date_time = now.strftime("%Y-%m-%d %H:%M:%S")  #Formatear la fecha y hora
+        date_time = now.strftime("%Y-%m-%d %H:%M:%S")  # Formatear la fecha y hora
         call_command('dbbackup')
         with open('backup_log.txt', 'a') as f:
             f.write(f"Backup realizado el {date_time}\n")
         return JsonResponse({'status': 'success'})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)})
-
+    
 
 def restore_database(request):
     try:
@@ -103,7 +104,7 @@ def restore_database(request):
 def salir(request):
     logout(request)
     messages.success(request, f"Su sesión se ha cerrado correctamente")
-    return redirect('/acceder')
+    return redirect('/acceder/')
 
 
 @unauthenticated_user
@@ -123,11 +124,11 @@ def autenticar(request):
                 grupo_admin = Group.objects.get(name='admin')
                 grupo_clientes = Group.objects.get(name='clientes')
                 if grupo_admin in usuario.groups.all():
-                    return redirect('/gestionar_usuarios')
+                    return redirect('/gestionar_usuarios/')
                 elif grupo_clientes in usuario.groups.all():
-                    return redirect('/')
+                    return redirect('/visualizar_existencias_medicamentos/')
                 else:
-                    return redirect('/gestionar_medicfarma')  
+                    return redirect('/gestionar_medicfarma/')  
                      
        # else:
         #    for key, error in list(form.errors.items()):
@@ -385,7 +386,7 @@ def registrarFarmaceutico(request):
             user.save()
             group = Group.objects.get(name='farmaceuticos')
             user.groups.add(group)
-            return redirect('/gestionar_usuarios')
+            return redirect('/gestionar_usuarios/')
 
         else:
             for error in list(form.errors.values()):
@@ -1027,7 +1028,7 @@ def agregarMedicFarma(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['farmaceuticos'])
+@usuarios_permitidos(roles_permitidos=['admin'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def gestionarMedicamentos(request): 
     return render(request, "gestionar_medicamentos.html")
@@ -1071,7 +1072,7 @@ def listaDeMedicamentos(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['farmaceuticos']) #farmaveutico o admin? consultar ya que la lista de medicamentos seria un nomenclador
+@usuarios_permitidos(roles_permitidos=['admin']) 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarMedicamento(request):
     if request.method =='POST':
@@ -1139,7 +1140,7 @@ def editarMedicamento(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['farmaceuticos'])
+@usuarios_permitidos(roles_permitidos=['admin'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def gestionarRestriccionesMedicamentos(request):
     return render(request, "gestionar_restricciones_de_medicamentos.html")
@@ -1160,7 +1161,7 @@ def listaDeRestriccionesDeMedicamentos(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['farmaceuticos'])
+@usuarios_permitidos(roles_permitidos=['admin'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarRestriccionMedicamento(request):
     if request.method =='POST':
@@ -1203,7 +1204,7 @@ def editarRestriccionMedicamento(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['farmaceuticos'])
+@usuarios_permitidos(roles_permitidos=['admin'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def gestionarClasificacionesMedicamentos(request):
     return render(request, "gestionar_clasificaciones_de_medicamentos.html")
@@ -1224,7 +1225,7 @@ def listaDeClasificacionesDeMedicamentos(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['farmaceuticos'])
+@usuarios_permitidos(roles_permitidos=['admin'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarClasificacionMedicamento(request):
     if request.method =='POST':
@@ -1264,9 +1265,48 @@ def editarClasificacionMedicamento(request):
         return JsonResponse({'success': True})
     else:
         return JsonResponse({'success': False, 'errors': form.errors})
+    
+
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['clientes'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def visualizarExistenciasMedicamentos(request):
+    return render(request, "visualizar_existencias_medicamentos.html")
 
 
-#def actualizarCantidad(request):
+def buscarMedicamento(request):
+    if request.method == 'GET':
+        nombre_medicamento = request.GET.get('nombre_medicamento', '')
+
+        if nombre_medicamento:
+            medicamentos = Medicamento.objects.filter(nombre__icontains=nombre_medicamento)
+            resultados = []
+
+            for medicamento in medicamentos:
+                farmacias = FarmaciaMedicamento.objects.filter(id_medic=medicamento, existencia__gt=0)
+                for farmacia in farmacias:
+                    resultados.append({
+                        'nombre_farmacia': farmacia.id_farma.nombre,
+                        'direccion': farmacia.id_farma.direccion,
+                        'telefono': farmacia.id_farma.telefono,
+                        'existencia': farmacia.existencia,
+                        'nombre_municipio': farmacia.id_farma.id_munic.nombre,
+                        'nombre_provincia': farmacia.id_farma.id_munic.id_prov.nombre,
+                        'tipo': farmacia.id_farma.id_tipo.nombre,
+                        'turno': farmacia.id_farma.id_turno.nombre,
+                        'latitud': farmacia.id_farma.ubicacion.y if farmacia.id_farma.ubicacion else None,
+                        'longitud': farmacia.id_farma.ubicacion.x if farmacia.id_farma.ubicacion else None,
+                    })
+            return JsonResponse(resultados, safe=False)
+        else:
+            return JsonResponse({'error': 'Debe ingresar un nombre de medicamento.'}, status=400)
+
+    return JsonResponse({'error': 'Método no permitido.'}, status=405)
+
+
+
+
+"""def actualizarCantidad(request):
     if request.method == 'POST':
         farmacia = request.POST['farmacia']
         medicamento = request.POST['medicamento']
@@ -1276,8 +1316,7 @@ def editarClasificacionMedicamento(request):
         farmacia_medicamento.existencia = cantidad
         farmacia_medicamento.save()
         return JsonResponse({'status': 'Cantidad actualizada'})
-    return redirect('/gestionar/')
-
+    return redirect('/gestionar/')"""
 
 ################################################################################################################################
 #############################################     CLIENTES    ##################################################################
@@ -1299,7 +1338,7 @@ def medicamentosTabla(request):
     return render(request, "medicamentos_tabla.html", {"medic": medic})
 
 
-@login_required(login_url='/acceder')
+"""@login_required(login_url='/acceder')
 @usuarios_permitidos(roles_permitidos=['clientes'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def existenciasTabla(request):
@@ -1338,7 +1377,7 @@ def buscarDisponibilidad(request):
         for dis in disponibilidad:
             payload.append(Disponibilidad(nombre=dis.id_farma.nombre,
                            telefono=dis.id_farma.telefono, existencia=dis.existencia).to_dict())
-    return JsonResponse(payload, safe=False)
+    return JsonResponse(payload, safe=False)"""
 
 ####################################################################################################################
 
@@ -1528,8 +1567,7 @@ def usuariosXGruposChart(request):
 ################################################    MAPA    ##################################################################
 
 
-def map_view(request):
-    return render(request, 'mapa.html')
+
 
 
 ##############################################################################################################################

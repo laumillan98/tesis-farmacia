@@ -1,0 +1,1461 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 16.2
+-- Dumped by pg_dump version 16.2
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+ALTER TABLE ONLY public.django_admin_log DROP CONSTRAINT django_admin_log_user_id_c564eba6_fk_base_customuser_id;
+ALTER TABLE ONLY public.django_admin_log DROP CONSTRAINT django_admin_log_content_type_id_c4bce8eb_fk_django_co;
+ALTER TABLE ONLY public.base_municipio DROP CONSTRAINT base_municipio_id_prov_id_559f64a6_fk_base_provincia_id_prov;
+ALTER TABLE ONLY public.base_medicamento DROP CONSTRAINT base_medicamento_id_restriccion_id_266d8f06_fk_base_rest;
+ALTER TABLE ONLY public.base_medicamento DROP CONSTRAINT base_medicamento_id_clasificacion_id_7047a2fc_fk_base_clas;
+ALTER TABLE ONLY public.base_farmauser DROP CONSTRAINT base_farmauser_id_farma_id_4eb5dcf3_fk_base_farmacia_id_farma;
+ALTER TABLE ONLY public.base_farmauser DROP CONSTRAINT base_farmauser_customuser_ptr_id_62ce4952_fk_base_customuser_id;
+ALTER TABLE ONLY public.base_farmaciamedicamento DROP CONSTRAINT base_farmaciamedicam_id_medic_id_e4c0853d_fk_base_medi;
+ALTER TABLE ONLY public.base_farmaciamedicamento DROP CONSTRAINT base_farmaciamedicam_id_farma_id_732b7923_fk_base_farm;
+ALTER TABLE ONLY public.base_farmacia DROP CONSTRAINT base_farmacia_id_turno_id_ee8c4576_fk_base_turn;
+ALTER TABLE ONLY public.base_farmacia DROP CONSTRAINT base_farmacia_id_tipo_id_4607f30a_fk_base_tipo;
+ALTER TABLE ONLY public.base_farmacia DROP CONSTRAINT base_farmacia_id_munic_id_3e5918ce_fk_base_municipio_id_munic;
+ALTER TABLE ONLY public.base_customuser_user_permissions DROP CONSTRAINT base_customuser_user_permission_id_e62eddd3_fk_auth_perm;
+ALTER TABLE ONLY public.base_customuser_user_permissions DROP CONSTRAINT base_customuser_user_customuser_id_4f46199a_fk_base_cust;
+ALTER TABLE ONLY public.base_customuser_groups DROP CONSTRAINT base_customuser_groups_group_id_d1822349_fk_auth_group_id;
+ALTER TABLE ONLY public.base_customuser_groups DROP CONSTRAINT base_customuser_grou_customuser_id_04d7166b_fk_base_cust;
+ALTER TABLE ONLY public.auth_permission DROP CONSTRAINT auth_permission_content_type_id_2f476e4b_fk_django_co;
+ALTER TABLE ONLY public.auth_group_permissions DROP CONSTRAINT auth_group_permissions_group_id_b120cbf9_fk_auth_group_id;
+ALTER TABLE ONLY public.auth_group_permissions DROP CONSTRAINT auth_group_permissio_permission_id_84c5c92e_fk_auth_perm;
+DROP INDEX public.django_session_session_key_c0390e0f_like;
+DROP INDEX public.django_session_expire_date_a5c62663;
+DROP INDEX public.django_admin_log_user_id_c564eba6;
+DROP INDEX public.django_admin_log_content_type_id_c4bce8eb;
+DROP INDEX public.base_municipio_nombre_9db9b416_like;
+DROP INDEX public.base_municipio_id_prov_id_559f64a6;
+DROP INDEX public.base_medicamento_nombre_fb209e34_like;
+DROP INDEX public.base_medicamento_id_restriccion_id_266d8f06;
+DROP INDEX public.base_medicamento_id_clasificacion_id_7047a2fc;
+DROP INDEX public.base_farmauser_id_farma_id_4eb5dcf3;
+DROP INDEX public.base_farmaciamedicamento_id_medic_id_e4c0853d;
+DROP INDEX public.base_farmaciamedicamento_id_farma_id_732b7923;
+DROP INDEX public.base_farmacia_ubicacion_763f3b28_id;
+DROP INDEX public.base_farmacia_id_turno_id_ee8c4576;
+DROP INDEX public.base_farmacia_id_tipo_id_4607f30a;
+DROP INDEX public.base_farmacia_id_munic_id_3e5918ce;
+DROP INDEX public.base_customuser_username_e2c38001_like;
+DROP INDEX public.base_customuser_user_permissions_permission_id_e62eddd3;
+DROP INDEX public.base_customuser_user_permissions_customuser_id_4f46199a;
+DROP INDEX public.base_customuser_groups_group_id_d1822349;
+DROP INDEX public.base_customuser_groups_customuser_id_04d7166b;
+DROP INDEX public.auth_permission_content_type_id_2f476e4b;
+DROP INDEX public.auth_group_permissions_permission_id_84c5c92e;
+DROP INDEX public.auth_group_permissions_group_id_b120cbf9;
+DROP INDEX public.auth_group_name_a6ea08ec_like;
+ALTER TABLE ONLY public.django_session DROP CONSTRAINT django_session_pkey;
+ALTER TABLE ONLY public.django_migrations DROP CONSTRAINT django_migrations_pkey;
+ALTER TABLE ONLY public.django_content_type DROP CONSTRAINT django_content_type_pkey;
+ALTER TABLE ONLY public.django_content_type DROP CONSTRAINT django_content_type_app_label_model_76bd3d3b_uniq;
+ALTER TABLE ONLY public.django_admin_log DROP CONSTRAINT django_admin_log_pkey;
+ALTER TABLE ONLY public.base_turnofarmacia DROP CONSTRAINT base_turnofarmacia_pkey;
+ALTER TABLE ONLY public.base_clasificacionmedicamento DROP CONSTRAINT base_tipomedicamento_pkey;
+ALTER TABLE ONLY public.base_tipofarmacia DROP CONSTRAINT base_tipofarmacia_pkey;
+ALTER TABLE ONLY public.base_restriccionmedicamento DROP CONSTRAINT base_restriccionmedicamento_pkey;
+ALTER TABLE ONLY public.base_provincia DROP CONSTRAINT base_provincia_pkey;
+ALTER TABLE ONLY public.base_municipio DROP CONSTRAINT base_municipio_pkey;
+ALTER TABLE ONLY public.base_municipio DROP CONSTRAINT base_municipio_nombre_key;
+ALTER TABLE ONLY public.base_medicamento DROP CONSTRAINT base_medicamento_pkey;
+ALTER TABLE ONLY public.base_medicamento DROP CONSTRAINT base_medicamento_nombre_key;
+ALTER TABLE ONLY public.base_farmauser DROP CONSTRAINT base_farmauser_pkey;
+ALTER TABLE ONLY public.base_farmaciamedicamento DROP CONSTRAINT base_farmaciamedicamento_pkey;
+ALTER TABLE ONLY public.base_farmacia DROP CONSTRAINT base_farmacia_id_farma_06ab42cb_pk;
+ALTER TABLE ONLY public.base_customuser DROP CONSTRAINT base_customuser_username_key;
+ALTER TABLE ONLY public.base_customuser_user_permissions DROP CONSTRAINT base_customuser_user_permissions_pkey;
+ALTER TABLE ONLY public.base_customuser_user_permissions DROP CONSTRAINT base_customuser_user_per_customuser_id_permission_90414b11_uniq;
+ALTER TABLE ONLY public.base_customuser DROP CONSTRAINT base_customuser_pkey;
+ALTER TABLE ONLY public.base_customuser_groups DROP CONSTRAINT base_customuser_groups_pkey;
+ALTER TABLE ONLY public.base_customuser_groups DROP CONSTRAINT base_customuser_groups_customuser_id_group_id_d4e28d0b_uniq;
+ALTER TABLE ONLY public.auth_permission DROP CONSTRAINT auth_permission_pkey;
+ALTER TABLE ONLY public.auth_permission DROP CONSTRAINT auth_permission_content_type_id_codename_01ab375a_uniq;
+ALTER TABLE ONLY public.auth_group DROP CONSTRAINT auth_group_pkey;
+ALTER TABLE ONLY public.auth_group_permissions DROP CONSTRAINT auth_group_permissions_pkey;
+ALTER TABLE ONLY public.auth_group_permissions DROP CONSTRAINT auth_group_permissions_group_id_permission_id_0cd325b0_uniq;
+ALTER TABLE ONLY public.auth_group DROP CONSTRAINT auth_group_name_key;
+DROP TABLE public.django_session;
+DROP TABLE public.django_migrations;
+DROP TABLE public.django_content_type;
+DROP TABLE public.django_admin_log;
+DROP TABLE public.base_turnofarmacia;
+DROP TABLE public.base_tipofarmacia;
+DROP TABLE public.base_restriccionmedicamento;
+DROP TABLE public.base_provincia;
+DROP TABLE public.base_municipio;
+DROP TABLE public.base_medicamento;
+DROP TABLE public.base_farmauser;
+DROP TABLE public.base_farmaciamedicamento;
+DROP TABLE public.base_farmacia;
+DROP TABLE public.base_customuser_user_permissions;
+DROP TABLE public.base_customuser_groups;
+DROP TABLE public.base_customuser;
+DROP TABLE public.base_clasificacionmedicamento;
+DROP TABLE public.auth_permission;
+DROP TABLE public.auth_group_permissions;
+DROP TABLE public.auth_group;
+DROP EXTENSION postgis;
+--
+-- Name: postgis; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION postgis; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION postgis IS 'PostGIS geometry and geography spatial types and functions';
+
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: auth_group; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.auth_group (
+    id integer NOT NULL,
+    name character varying(150) NOT NULL
+);
+
+
+ALTER TABLE public.auth_group OWNER TO postgres;
+
+--
+-- Name: auth_group_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.auth_group ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.auth_group_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: auth_group_permissions; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.auth_group_permissions (
+    id bigint NOT NULL,
+    group_id integer NOT NULL,
+    permission_id integer NOT NULL
+);
+
+
+ALTER TABLE public.auth_group_permissions OWNER TO postgres;
+
+--
+-- Name: auth_group_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.auth_group_permissions ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.auth_group_permissions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: auth_permission; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.auth_permission (
+    id integer NOT NULL,
+    name character varying(255) NOT NULL,
+    content_type_id integer NOT NULL,
+    codename character varying(100) NOT NULL
+);
+
+
+ALTER TABLE public.auth_permission OWNER TO postgres;
+
+--
+-- Name: auth_permission_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.auth_permission ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.auth_permission_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: base_clasificacionmedicamento; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.base_clasificacionmedicamento (
+    id_clasificacion uuid NOT NULL,
+    nombre character varying(20) NOT NULL
+);
+
+
+ALTER TABLE public.base_clasificacionmedicamento OWNER TO postgres;
+
+--
+-- Name: base_customuser; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.base_customuser (
+    id bigint NOT NULL,
+    password character varying(128) NOT NULL,
+    last_login timestamp with time zone,
+    is_superuser boolean NOT NULL,
+    username character varying(150) NOT NULL,
+    first_name character varying(150) NOT NULL,
+    last_name character varying(150) NOT NULL,
+    email character varying(254) NOT NULL,
+    is_staff boolean NOT NULL,
+    is_active boolean NOT NULL,
+    date_joined timestamp with time zone NOT NULL,
+    description text NOT NULL
+);
+
+
+ALTER TABLE public.base_customuser OWNER TO postgres;
+
+--
+-- Name: base_customuser_groups; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.base_customuser_groups (
+    id bigint NOT NULL,
+    customuser_id bigint NOT NULL,
+    group_id integer NOT NULL
+);
+
+
+ALTER TABLE public.base_customuser_groups OWNER TO postgres;
+
+--
+-- Name: base_customuser_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.base_customuser_groups ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.base_customuser_groups_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: base_customuser_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.base_customuser ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.base_customuser_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: base_customuser_user_permissions; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.base_customuser_user_permissions (
+    id bigint NOT NULL,
+    customuser_id bigint NOT NULL,
+    permission_id integer NOT NULL
+);
+
+
+ALTER TABLE public.base_customuser_user_permissions OWNER TO postgres;
+
+--
+-- Name: base_customuser_user_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.base_customuser_user_permissions ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.base_customuser_user_permissions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: base_farmacia; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.base_farmacia (
+    id_farma uuid NOT NULL,
+    nombre character varying(100) NOT NULL,
+    direccion character varying(200) NOT NULL,
+    telefono integer,
+    id_munic_id uuid NOT NULL,
+    id_tipo_id uuid NOT NULL,
+    id_turno_id uuid,
+    ubicacion public.geography(Point,4326)
+);
+
+
+ALTER TABLE public.base_farmacia OWNER TO postgres;
+
+--
+-- Name: base_farmaciamedicamento; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.base_farmaciamedicamento (
+    id bigint NOT NULL,
+    existencia integer NOT NULL,
+    id_farma_id uuid,
+    id_medic_id uuid
+);
+
+
+ALTER TABLE public.base_farmaciamedicamento OWNER TO postgres;
+
+--
+-- Name: base_farmaciamedicamento_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.base_farmaciamedicamento ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.base_farmaciamedicamento_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: base_farmauser; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.base_farmauser (
+    customuser_ptr_id bigint NOT NULL,
+    id_farma_id uuid
+);
+
+
+ALTER TABLE public.base_farmauser OWNER TO postgres;
+
+--
+-- Name: base_medicamento; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.base_medicamento (
+    id_medic uuid NOT NULL,
+    nombre character varying(50) NOT NULL,
+    description text,
+    cant_max integer NOT NULL,
+    precio_unidad double precision NOT NULL,
+    origen_natural boolean NOT NULL,
+    id_clasificacion_id uuid,
+    id_restriccion_id uuid
+);
+
+
+ALTER TABLE public.base_medicamento OWNER TO postgres;
+
+--
+-- Name: base_municipio; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.base_municipio (
+    id_munic uuid NOT NULL,
+    nombre character varying(25) NOT NULL,
+    id_prov_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.base_municipio OWNER TO postgres;
+
+--
+-- Name: base_provincia; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.base_provincia (
+    id_prov uuid NOT NULL,
+    nombre character varying(20) NOT NULL
+);
+
+
+ALTER TABLE public.base_provincia OWNER TO postgres;
+
+--
+-- Name: base_restriccionmedicamento; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.base_restriccionmedicamento (
+    id_restriccion uuid NOT NULL,
+    nombre character varying(20) NOT NULL
+);
+
+
+ALTER TABLE public.base_restriccionmedicamento OWNER TO postgres;
+
+--
+-- Name: base_tipofarmacia; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.base_tipofarmacia (
+    id_tipo_farmacia uuid NOT NULL,
+    nombre character varying(20) NOT NULL
+);
+
+
+ALTER TABLE public.base_tipofarmacia OWNER TO postgres;
+
+--
+-- Name: base_turnofarmacia; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.base_turnofarmacia (
+    id_turno_farmacia uuid NOT NULL,
+    nombre character varying(20) NOT NULL
+);
+
+
+ALTER TABLE public.base_turnofarmacia OWNER TO postgres;
+
+--
+-- Name: django_admin_log; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.django_admin_log (
+    id integer NOT NULL,
+    action_time timestamp with time zone NOT NULL,
+    object_id text,
+    object_repr character varying(200) NOT NULL,
+    action_flag smallint NOT NULL,
+    change_message text NOT NULL,
+    content_type_id integer,
+    user_id bigint NOT NULL,
+    CONSTRAINT django_admin_log_action_flag_check CHECK ((action_flag >= 0))
+);
+
+
+ALTER TABLE public.django_admin_log OWNER TO postgres;
+
+--
+-- Name: django_admin_log_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.django_admin_log ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.django_admin_log_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: django_content_type; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.django_content_type (
+    id integer NOT NULL,
+    app_label character varying(100) NOT NULL,
+    model character varying(100) NOT NULL
+);
+
+
+ALTER TABLE public.django_content_type OWNER TO postgres;
+
+--
+-- Name: django_content_type_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.django_content_type ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.django_content_type_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: django_migrations; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.django_migrations (
+    id bigint NOT NULL,
+    app character varying(255) NOT NULL,
+    name character varying(255) NOT NULL,
+    applied timestamp with time zone NOT NULL
+);
+
+
+ALTER TABLE public.django_migrations OWNER TO postgres;
+
+--
+-- Name: django_migrations_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.django_migrations ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.django_migrations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: django_session; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.django_session (
+    session_key character varying(40) NOT NULL,
+    session_data text NOT NULL,
+    expire_date timestamp with time zone NOT NULL
+);
+
+
+ALTER TABLE public.django_session OWNER TO postgres;
+
+--
+-- Data for Name: auth_group; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.auth_group (id, name) FROM stdin;
+\.
+
+
+--
+-- Data for Name: auth_group_permissions; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.auth_group_permissions (id, group_id, permission_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: auth_permission; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
+1	Can add log entry	1	add_logentry
+2	Can change log entry	1	change_logentry
+3	Can delete log entry	1	delete_logentry
+4	Can view log entry	1	view_logentry
+5	Can add permission	2	add_permission
+6	Can change permission	2	change_permission
+7	Can delete permission	2	delete_permission
+8	Can view permission	2	view_permission
+9	Can add group	3	add_group
+10	Can change group	3	change_group
+11	Can delete group	3	delete_group
+12	Can view group	3	view_group
+13	Can add content type	4	add_contenttype
+14	Can change content type	4	change_contenttype
+15	Can delete content type	4	delete_contenttype
+16	Can view content type	4	view_contenttype
+17	Can add session	5	add_session
+18	Can change session	5	change_session
+19	Can delete session	5	delete_session
+20	Can view session	5	view_session
+21	Can add user	6	add_customuser
+22	Can change user	6	change_customuser
+23	Can delete user	6	delete_customuser
+24	Can view user	6	view_customuser
+25	Can add farmacia	7	add_farmacia
+26	Can change farmacia	7	change_farmacia
+27	Can delete farmacia	7	delete_farmacia
+28	Can view farmacia	7	view_farmacia
+29	Can add medicamento	8	add_medicamento
+30	Can change medicamento	8	change_medicamento
+31	Can delete medicamento	8	delete_medicamento
+32	Can view medicamento	8	view_medicamento
+33	Can add municipio	9	add_municipio
+34	Can change municipio	9	change_municipio
+35	Can delete municipio	9	delete_municipio
+36	Can view municipio	9	view_municipio
+37	Can add provincia	10	add_provincia
+38	Can change provincia	10	change_provincia
+39	Can delete provincia	10	delete_provincia
+40	Can view provincia	10	view_provincia
+41	Can add tipo farmacia	11	add_tipofarmacia
+42	Can change tipo farmacia	11	change_tipofarmacia
+43	Can delete tipo farmacia	11	delete_tipofarmacia
+44	Can view tipo farmacia	11	view_tipofarmacia
+45	Can add turno farmacia	12	add_turnofarmacia
+46	Can change turno farmacia	12	change_turnofarmacia
+47	Can delete turno farmacia	12	delete_turnofarmacia
+48	Can view turno farmacia	12	view_turnofarmacia
+49	Can add Farmaceutico	13	add_farmauser
+50	Can change Farmaceutico	13	change_farmauser
+51	Can delete Farmaceutico	13	delete_farmauser
+52	Can view Farmaceutico	13	view_farmauser
+53	Can add farmacia medicamento	14	add_farmaciamedicamento
+54	Can change farmacia medicamento	14	change_farmaciamedicamento
+55	Can delete farmacia medicamento	14	delete_farmaciamedicamento
+56	Can view farmacia medicamento	14	view_farmaciamedicamento
+57	Can add restriccion medicamento	15	add_restriccionmedicamento
+58	Can change restriccion medicamento	15	change_restriccionmedicamento
+59	Can delete restriccion medicamento	15	delete_restriccionmedicamento
+60	Can view restriccion medicamento	15	view_restriccionmedicamento
+61	Can add clasificacion medicamento	16	add_clasificacionmedicamento
+62	Can change clasificacion medicamento	16	change_clasificacionmedicamento
+63	Can delete clasificacion medicamento	16	delete_clasificacionmedicamento
+64	Can view clasificacion medicamento	16	view_clasificacionmedicamento
+\.
+
+
+--
+-- Data for Name: base_clasificacionmedicamento; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.base_clasificacionmedicamento (id_clasificacion, nombre) FROM stdin;
+\.
+
+
+--
+-- Data for Name: base_customuser; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.base_customuser (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined, description) FROM stdin;
+\.
+
+
+--
+-- Data for Name: base_customuser_groups; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.base_customuser_groups (id, customuser_id, group_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: base_customuser_user_permissions; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.base_customuser_user_permissions (id, customuser_id, permission_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: base_farmacia; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.base_farmacia (id_farma, nombre, direccion, telefono, id_munic_id, id_tipo_id, id_turno_id, ubicacion) FROM stdin;
+\.
+
+
+--
+-- Data for Name: base_farmaciamedicamento; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.base_farmaciamedicamento (id, existencia, id_farma_id, id_medic_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: base_farmauser; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.base_farmauser (customuser_ptr_id, id_farma_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: base_medicamento; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.base_medicamento (id_medic, nombre, description, cant_max, precio_unidad, origen_natural, id_clasificacion_id, id_restriccion_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: base_municipio; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.base_municipio (id_munic, nombre, id_prov_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: base_provincia; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.base_provincia (id_prov, nombre) FROM stdin;
+\.
+
+
+--
+-- Data for Name: base_restriccionmedicamento; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.base_restriccionmedicamento (id_restriccion, nombre) FROM stdin;
+\.
+
+
+--
+-- Data for Name: base_tipofarmacia; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.base_tipofarmacia (id_tipo_farmacia, nombre) FROM stdin;
+\.
+
+
+--
+-- Data for Name: base_turnofarmacia; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.base_turnofarmacia (id_turno_farmacia, nombre) FROM stdin;
+\.
+
+
+--
+-- Data for Name: django_admin_log; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.django_admin_log (id, action_time, object_id, object_repr, action_flag, change_message, content_type_id, user_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: django_content_type; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.django_content_type (id, app_label, model) FROM stdin;
+1	admin	logentry
+2	auth	permission
+3	auth	group
+4	contenttypes	contenttype
+5	sessions	session
+6	base	customuser
+7	base	farmacia
+8	base	medicamento
+9	base	municipio
+10	base	provincia
+11	base	tipofarmacia
+12	base	turnofarmacia
+13	base	farmauser
+14	base	farmaciamedicamento
+15	base	restriccionmedicamento
+16	base	clasificacionmedicamento
+\.
+
+
+--
+-- Data for Name: django_migrations; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.django_migrations (id, app, name, applied) FROM stdin;
+1	contenttypes	0001_initial	2024-05-22 22:18:57.896358-04
+2	contenttypes	0002_remove_content_type_name	2024-05-22 22:18:57.904332-04
+3	auth	0001_initial	2024-05-22 22:18:57.957283-04
+4	auth	0002_alter_permission_name_max_length	2024-05-22 22:18:57.962105-04
+5	auth	0003_alter_user_email_max_length	2024-05-22 22:18:57.965599-04
+6	auth	0004_alter_user_username_opts	2024-05-22 22:18:57.969234-04
+7	auth	0005_alter_user_last_login_null	2024-05-22 22:18:57.974387-04
+8	auth	0006_require_contenttypes_0002	2024-05-22 22:18:57.975494-04
+9	auth	0007_alter_validators_add_error_messages	2024-05-22 22:18:57.979941-04
+10	auth	0008_alter_user_username_max_length	2024-05-22 22:18:57.983681-04
+11	auth	0009_alter_user_last_name_max_length	2024-05-22 22:18:57.986882-04
+12	auth	0010_alter_group_name_max_length	2024-05-22 22:18:57.992392-04
+13	auth	0011_update_proxy_permissions	2024-05-22 22:18:57.999697-04
+14	auth	0012_alter_user_first_name_max_length	2024-05-22 22:18:58.002844-04
+15	base	0001_initial	2024-05-22 22:18:58.13247-04
+16	admin	0001_initial	2024-05-22 22:18:58.152763-04
+17	admin	0002_logentry_remove_auto_add	2024-05-22 22:18:58.158744-04
+18	admin	0003_logentry_add_action_flag_choices	2024-05-22 22:18:58.164904-04
+19	base	0002_rename_uid_farmacia_id_farma_remove_farmauser_test_and_more	2024-05-22 22:18:58.210378-04
+20	base	0003_remove_farmauser_farma_farmauser_prueba	2024-05-22 22:18:58.231267-04
+21	base	0004_remove_farmacia_id_alter_farmacia_id_farma	2024-05-22 22:18:58.244762-04
+22	base	0005_remove_farmauser_prueba_farmauser_id_farma	2024-05-22 22:18:58.259775-04
+23	base	0006_alter_farmauser_id_farma	2024-05-22 22:18:58.266097-04
+24	base	0007_remove_farmaciamedicamento_id_farmacia_and_more	2024-05-22 22:18:58.278973-04
+25	base	0008_farmaciamedicamento_id_farma_and_more	2024-05-22 22:18:58.298402-04
+26	base	0009_restriccionmedicamento_and_more	2024-05-22 22:18:58.329831-04
+27	base	0010_medicamento_id_clasificacion_and_more	2024-05-22 22:18:58.349306-04
+28	base	0011_remove_farmacia_is_active_farmacia_ubicacion	2024-05-22 22:18:58.360698-04
+29	sessions	0001_initial	2024-05-22 22:18:58.375425-04
+\.
+
+
+--
+-- Data for Name: django_session; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.django_session (session_key, session_data, expire_date) FROM stdin;
+\.
+
+
+--
+-- Data for Name: spatial_ref_sys; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text) FROM stdin;
+\.
+
+
+--
+-- Name: auth_group_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.auth_group_id_seq', 24, true);
+
+
+--
+-- Name: auth_group_permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.auth_group_permissions_id_seq', 1, false);
+
+
+--
+-- Name: auth_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.auth_permission_id_seq', 64, true);
+
+
+--
+-- Name: base_customuser_groups_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.base_customuser_groups_id_seq', 24, true);
+
+
+--
+-- Name: base_customuser_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.base_customuser_id_seq', 36, true);
+
+
+--
+-- Name: base_customuser_user_permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.base_customuser_user_permissions_id_seq', 1, false);
+
+
+--
+-- Name: base_farmaciamedicamento_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.base_farmaciamedicamento_id_seq', 12, true);
+
+
+--
+-- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.django_admin_log_id_seq', 1, false);
+
+
+--
+-- Name: django_content_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.django_content_type_id_seq', 16, true);
+
+
+--
+-- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.django_migrations_id_seq', 29, true);
+
+
+--
+-- Name: auth_group auth_group_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_group
+    ADD CONSTRAINT auth_group_name_key UNIQUE (name);
+
+
+--
+-- Name: auth_group_permissions auth_group_permissions_group_id_permission_id_0cd325b0_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_group_permissions
+    ADD CONSTRAINT auth_group_permissions_group_id_permission_id_0cd325b0_uniq UNIQUE (group_id, permission_id);
+
+
+--
+-- Name: auth_group_permissions auth_group_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_group_permissions
+    ADD CONSTRAINT auth_group_permissions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: auth_group auth_group_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_group
+    ADD CONSTRAINT auth_group_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: auth_permission auth_permission_content_type_id_codename_01ab375a_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_permission
+    ADD CONSTRAINT auth_permission_content_type_id_codename_01ab375a_uniq UNIQUE (content_type_id, codename);
+
+
+--
+-- Name: auth_permission auth_permission_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_permission
+    ADD CONSTRAINT auth_permission_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: base_customuser_groups base_customuser_groups_customuser_id_group_id_d4e28d0b_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_customuser_groups
+    ADD CONSTRAINT base_customuser_groups_customuser_id_group_id_d4e28d0b_uniq UNIQUE (customuser_id, group_id);
+
+
+--
+-- Name: base_customuser_groups base_customuser_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_customuser_groups
+    ADD CONSTRAINT base_customuser_groups_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: base_customuser base_customuser_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_customuser
+    ADD CONSTRAINT base_customuser_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: base_customuser_user_permissions base_customuser_user_per_customuser_id_permission_90414b11_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_customuser_user_permissions
+    ADD CONSTRAINT base_customuser_user_per_customuser_id_permission_90414b11_uniq UNIQUE (customuser_id, permission_id);
+
+
+--
+-- Name: base_customuser_user_permissions base_customuser_user_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_customuser_user_permissions
+    ADD CONSTRAINT base_customuser_user_permissions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: base_customuser base_customuser_username_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_customuser
+    ADD CONSTRAINT base_customuser_username_key UNIQUE (username);
+
+
+--
+-- Name: base_farmacia base_farmacia_id_farma_06ab42cb_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_farmacia
+    ADD CONSTRAINT base_farmacia_id_farma_06ab42cb_pk PRIMARY KEY (id_farma);
+
+
+--
+-- Name: base_farmaciamedicamento base_farmaciamedicamento_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_farmaciamedicamento
+    ADD CONSTRAINT base_farmaciamedicamento_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: base_farmauser base_farmauser_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_farmauser
+    ADD CONSTRAINT base_farmauser_pkey PRIMARY KEY (customuser_ptr_id);
+
+
+--
+-- Name: base_medicamento base_medicamento_nombre_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_medicamento
+    ADD CONSTRAINT base_medicamento_nombre_key UNIQUE (nombre);
+
+
+--
+-- Name: base_medicamento base_medicamento_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_medicamento
+    ADD CONSTRAINT base_medicamento_pkey PRIMARY KEY (id_medic);
+
+
+--
+-- Name: base_municipio base_municipio_nombre_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_municipio
+    ADD CONSTRAINT base_municipio_nombre_key UNIQUE (nombre);
+
+
+--
+-- Name: base_municipio base_municipio_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_municipio
+    ADD CONSTRAINT base_municipio_pkey PRIMARY KEY (id_munic);
+
+
+--
+-- Name: base_provincia base_provincia_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_provincia
+    ADD CONSTRAINT base_provincia_pkey PRIMARY KEY (id_prov);
+
+
+--
+-- Name: base_restriccionmedicamento base_restriccionmedicamento_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_restriccionmedicamento
+    ADD CONSTRAINT base_restriccionmedicamento_pkey PRIMARY KEY (id_restriccion);
+
+
+--
+-- Name: base_tipofarmacia base_tipofarmacia_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_tipofarmacia
+    ADD CONSTRAINT base_tipofarmacia_pkey PRIMARY KEY (id_tipo_farmacia);
+
+
+--
+-- Name: base_clasificacionmedicamento base_tipomedicamento_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_clasificacionmedicamento
+    ADD CONSTRAINT base_tipomedicamento_pkey PRIMARY KEY (id_clasificacion);
+
+
+--
+-- Name: base_turnofarmacia base_turnofarmacia_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_turnofarmacia
+    ADD CONSTRAINT base_turnofarmacia_pkey PRIMARY KEY (id_turno_farmacia);
+
+
+--
+-- Name: django_admin_log django_admin_log_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.django_admin_log
+    ADD CONSTRAINT django_admin_log_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: django_content_type django_content_type_app_label_model_76bd3d3b_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.django_content_type
+    ADD CONSTRAINT django_content_type_app_label_model_76bd3d3b_uniq UNIQUE (app_label, model);
+
+
+--
+-- Name: django_content_type django_content_type_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.django_content_type
+    ADD CONSTRAINT django_content_type_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: django_migrations django_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.django_migrations
+    ADD CONSTRAINT django_migrations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: django_session django_session_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.django_session
+    ADD CONSTRAINT django_session_pkey PRIMARY KEY (session_key);
+
+
+--
+-- Name: auth_group_name_a6ea08ec_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX auth_group_name_a6ea08ec_like ON public.auth_group USING btree (name varchar_pattern_ops);
+
+
+--
+-- Name: auth_group_permissions_group_id_b120cbf9; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX auth_group_permissions_group_id_b120cbf9 ON public.auth_group_permissions USING btree (group_id);
+
+
+--
+-- Name: auth_group_permissions_permission_id_84c5c92e; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX auth_group_permissions_permission_id_84c5c92e ON public.auth_group_permissions USING btree (permission_id);
+
+
+--
+-- Name: auth_permission_content_type_id_2f476e4b; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX auth_permission_content_type_id_2f476e4b ON public.auth_permission USING btree (content_type_id);
+
+
+--
+-- Name: base_customuser_groups_customuser_id_04d7166b; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_customuser_groups_customuser_id_04d7166b ON public.base_customuser_groups USING btree (customuser_id);
+
+
+--
+-- Name: base_customuser_groups_group_id_d1822349; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_customuser_groups_group_id_d1822349 ON public.base_customuser_groups USING btree (group_id);
+
+
+--
+-- Name: base_customuser_user_permissions_customuser_id_4f46199a; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_customuser_user_permissions_customuser_id_4f46199a ON public.base_customuser_user_permissions USING btree (customuser_id);
+
+
+--
+-- Name: base_customuser_user_permissions_permission_id_e62eddd3; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_customuser_user_permissions_permission_id_e62eddd3 ON public.base_customuser_user_permissions USING btree (permission_id);
+
+
+--
+-- Name: base_customuser_username_e2c38001_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_customuser_username_e2c38001_like ON public.base_customuser USING btree (username varchar_pattern_ops);
+
+
+--
+-- Name: base_farmacia_id_munic_id_3e5918ce; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_farmacia_id_munic_id_3e5918ce ON public.base_farmacia USING btree (id_munic_id);
+
+
+--
+-- Name: base_farmacia_id_tipo_id_4607f30a; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_farmacia_id_tipo_id_4607f30a ON public.base_farmacia USING btree (id_tipo_id);
+
+
+--
+-- Name: base_farmacia_id_turno_id_ee8c4576; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_farmacia_id_turno_id_ee8c4576 ON public.base_farmacia USING btree (id_turno_id);
+
+
+--
+-- Name: base_farmacia_ubicacion_763f3b28_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_farmacia_ubicacion_763f3b28_id ON public.base_farmacia USING gist (ubicacion);
+
+
+--
+-- Name: base_farmaciamedicamento_id_farma_id_732b7923; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_farmaciamedicamento_id_farma_id_732b7923 ON public.base_farmaciamedicamento USING btree (id_farma_id);
+
+
+--
+-- Name: base_farmaciamedicamento_id_medic_id_e4c0853d; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_farmaciamedicamento_id_medic_id_e4c0853d ON public.base_farmaciamedicamento USING btree (id_medic_id);
+
+
+--
+-- Name: base_farmauser_id_farma_id_4eb5dcf3; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_farmauser_id_farma_id_4eb5dcf3 ON public.base_farmauser USING btree (id_farma_id);
+
+
+--
+-- Name: base_medicamento_id_clasificacion_id_7047a2fc; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_medicamento_id_clasificacion_id_7047a2fc ON public.base_medicamento USING btree (id_clasificacion_id);
+
+
+--
+-- Name: base_medicamento_id_restriccion_id_266d8f06; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_medicamento_id_restriccion_id_266d8f06 ON public.base_medicamento USING btree (id_restriccion_id);
+
+
+--
+-- Name: base_medicamento_nombre_fb209e34_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_medicamento_nombre_fb209e34_like ON public.base_medicamento USING btree (nombre varchar_pattern_ops);
+
+
+--
+-- Name: base_municipio_id_prov_id_559f64a6; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_municipio_id_prov_id_559f64a6 ON public.base_municipio USING btree (id_prov_id);
+
+
+--
+-- Name: base_municipio_nombre_9db9b416_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX base_municipio_nombre_9db9b416_like ON public.base_municipio USING btree (nombre varchar_pattern_ops);
+
+
+--
+-- Name: django_admin_log_content_type_id_c4bce8eb; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX django_admin_log_content_type_id_c4bce8eb ON public.django_admin_log USING btree (content_type_id);
+
+
+--
+-- Name: django_admin_log_user_id_c564eba6; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX django_admin_log_user_id_c564eba6 ON public.django_admin_log USING btree (user_id);
+
+
+--
+-- Name: django_session_expire_date_a5c62663; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX django_session_expire_date_a5c62663 ON public.django_session USING btree (expire_date);
+
+
+--
+-- Name: django_session_session_key_c0390e0f_like; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX django_session_session_key_c0390e0f_like ON public.django_session USING btree (session_key varchar_pattern_ops);
+
+
+--
+-- Name: auth_group_permissions auth_group_permissio_permission_id_84c5c92e_fk_auth_perm; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_group_permissions
+    ADD CONSTRAINT auth_group_permissio_permission_id_84c5c92e_fk_auth_perm FOREIGN KEY (permission_id) REFERENCES public.auth_permission(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: auth_group_permissions auth_group_permissions_group_id_b120cbf9_fk_auth_group_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_group_permissions
+    ADD CONSTRAINT auth_group_permissions_group_id_b120cbf9_fk_auth_group_id FOREIGN KEY (group_id) REFERENCES public.auth_group(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: auth_permission auth_permission_content_type_id_2f476e4b_fk_django_co; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.auth_permission
+    ADD CONSTRAINT auth_permission_content_type_id_2f476e4b_fk_django_co FOREIGN KEY (content_type_id) REFERENCES public.django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: base_customuser_groups base_customuser_grou_customuser_id_04d7166b_fk_base_cust; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_customuser_groups
+    ADD CONSTRAINT base_customuser_grou_customuser_id_04d7166b_fk_base_cust FOREIGN KEY (customuser_id) REFERENCES public.base_customuser(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: base_customuser_groups base_customuser_groups_group_id_d1822349_fk_auth_group_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_customuser_groups
+    ADD CONSTRAINT base_customuser_groups_group_id_d1822349_fk_auth_group_id FOREIGN KEY (group_id) REFERENCES public.auth_group(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: base_customuser_user_permissions base_customuser_user_customuser_id_4f46199a_fk_base_cust; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_customuser_user_permissions
+    ADD CONSTRAINT base_customuser_user_customuser_id_4f46199a_fk_base_cust FOREIGN KEY (customuser_id) REFERENCES public.base_customuser(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: base_customuser_user_permissions base_customuser_user_permission_id_e62eddd3_fk_auth_perm; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_customuser_user_permissions
+    ADD CONSTRAINT base_customuser_user_permission_id_e62eddd3_fk_auth_perm FOREIGN KEY (permission_id) REFERENCES public.auth_permission(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: base_farmacia base_farmacia_id_munic_id_3e5918ce_fk_base_municipio_id_munic; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_farmacia
+    ADD CONSTRAINT base_farmacia_id_munic_id_3e5918ce_fk_base_municipio_id_munic FOREIGN KEY (id_munic_id) REFERENCES public.base_municipio(id_munic) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: base_farmacia base_farmacia_id_tipo_id_4607f30a_fk_base_tipo; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_farmacia
+    ADD CONSTRAINT base_farmacia_id_tipo_id_4607f30a_fk_base_tipo FOREIGN KEY (id_tipo_id) REFERENCES public.base_tipofarmacia(id_tipo_farmacia) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: base_farmacia base_farmacia_id_turno_id_ee8c4576_fk_base_turn; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_farmacia
+    ADD CONSTRAINT base_farmacia_id_turno_id_ee8c4576_fk_base_turn FOREIGN KEY (id_turno_id) REFERENCES public.base_turnofarmacia(id_turno_farmacia) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: base_farmaciamedicamento base_farmaciamedicam_id_farma_id_732b7923_fk_base_farm; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_farmaciamedicamento
+    ADD CONSTRAINT base_farmaciamedicam_id_farma_id_732b7923_fk_base_farm FOREIGN KEY (id_farma_id) REFERENCES public.base_farmacia(id_farma) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: base_farmaciamedicamento base_farmaciamedicam_id_medic_id_e4c0853d_fk_base_medi; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_farmaciamedicamento
+    ADD CONSTRAINT base_farmaciamedicam_id_medic_id_e4c0853d_fk_base_medi FOREIGN KEY (id_medic_id) REFERENCES public.base_medicamento(id_medic) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: base_farmauser base_farmauser_customuser_ptr_id_62ce4952_fk_base_customuser_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_farmauser
+    ADD CONSTRAINT base_farmauser_customuser_ptr_id_62ce4952_fk_base_customuser_id FOREIGN KEY (customuser_ptr_id) REFERENCES public.base_customuser(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: base_farmauser base_farmauser_id_farma_id_4eb5dcf3_fk_base_farmacia_id_farma; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_farmauser
+    ADD CONSTRAINT base_farmauser_id_farma_id_4eb5dcf3_fk_base_farmacia_id_farma FOREIGN KEY (id_farma_id) REFERENCES public.base_farmacia(id_farma) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: base_medicamento base_medicamento_id_clasificacion_id_7047a2fc_fk_base_clas; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_medicamento
+    ADD CONSTRAINT base_medicamento_id_clasificacion_id_7047a2fc_fk_base_clas FOREIGN KEY (id_clasificacion_id) REFERENCES public.base_clasificacionmedicamento(id_clasificacion) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: base_medicamento base_medicamento_id_restriccion_id_266d8f06_fk_base_rest; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_medicamento
+    ADD CONSTRAINT base_medicamento_id_restriccion_id_266d8f06_fk_base_rest FOREIGN KEY (id_restriccion_id) REFERENCES public.base_restriccionmedicamento(id_restriccion) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: base_municipio base_municipio_id_prov_id_559f64a6_fk_base_provincia_id_prov; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.base_municipio
+    ADD CONSTRAINT base_municipio_id_prov_id_559f64a6_fk_base_provincia_id_prov FOREIGN KEY (id_prov_id) REFERENCES public.base_provincia(id_prov) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: django_admin_log django_admin_log_content_type_id_c4bce8eb_fk_django_co; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.django_admin_log
+    ADD CONSTRAINT django_admin_log_content_type_id_c4bce8eb_fk_django_co FOREIGN KEY (content_type_id) REFERENCES public.django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: django_admin_log django_admin_log_user_id_c564eba6_fk_base_customuser_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.django_admin_log
+    ADD CONSTRAINT django_admin_log_user_id_c564eba6_fk_base_customuser_id FOREIGN KEY (user_id) REFERENCES public.base_customuser(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
