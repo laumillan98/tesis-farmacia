@@ -1611,7 +1611,7 @@ def usuariosXGruposChart(request):
 ################################################    REPORTES    ##################################################################
 
 
-"""
+
 def generate_user_report(request, objetos):
     username = request.POST.get('username')
     fecha_inicio = request.POST.get('fecha_inicio')
@@ -1983,4 +1983,4 @@ def generar_reporte_pdf(request):
         buffer.seek(0)
         return FileResponse(buffer, as_attachment=True, filename=filename)
 
-    return JsonResponse({'error': 'Método no permitido'}, status=405)
+    return JsonResponse({'error': 'Método no permitido'}, status=405)"""
