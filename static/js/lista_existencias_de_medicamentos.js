@@ -101,7 +101,7 @@ $(document).ready(function() {
                 setView: false // No ajustar la vista
             }
         }).addTo(map);
-        L.marker([pharmacyLat, pharmacyLng], {draggable: false}).addTo(map).bindPopup(pharmacyName).openPopup();
+        L.marker([pharmacyLat, pharmacyLng], {draggable: false}).addTo(map).bindPopup("Farmacia" + pharmacyName).openPopup();
         // Agregar un callback para cuando se encuentra la ubicación del usuario
         map.on('locationfound', function(e) {
             const userLatLng = e.latlng;

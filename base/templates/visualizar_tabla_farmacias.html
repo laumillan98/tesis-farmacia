@@ -1,0 +1,81 @@
+{% extends "./index_cliente.html" %}
+
+{% load static %}
+
+{% block mytitle %}Farmacias{% endblock %}
+
+{% block mycss %}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+{% endblock %}
+
+{% block title %}Farmacias{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Buscar por Municipio</h1>
+        <form id="buscarFarmaciaForm">
+            <div class="form-group">
+                <label for="nombre_municipio">Nombre del Municipio:</label>
+                <input type="text" class="form-control" id="nombre_municipio" name="nombre_municipio">
+            </div>
+            <button type="button" class="btn btn-success" id="buscarFarmaciaBtn">Buscar</button>
+            <div>
+                <button type="button" class="btn btn-info mt-3" id="verMapaBtn" style="display: none;"><i class="fa-solid fa-map-location-dot"></i> &nbsp; Ubicación Farmacias</button>
+            </div>
+        </form>
+
+        <div class="table-responsive mt-4">
+            <table class="table table-bordered table-striped" id="resultadosTabla">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre de la Farmacia</th>
+                        <th>Dirección</th>
+                        <th>Teléfono</th>
+                        <th>Provincia</th>
+                        <th>Municipio</th>
+                        <th>Tipo</th>
+                        <th>Turno</th>
+                        <th>Mapa</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Los resultados de la búsqueda se agregarán aquí -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <!-- Modal para el mapa -->
+    <div class="modal fade" id="mapaModal" tabindex="-1" role="dialog" aria-labelledby="mapaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mapaModalLabel">Ubicación</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="mapa">
+                        <div id="routeIcon">
+                            <i class="fas fa-route"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block subtitle %}Farmacias{% endblock %}
+
+{% block custom_scripts %}
+<script>
+    var buscarFarmaciaUrl = "{% url 'buscar_farmacia' %}";
+</script>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="{% static 'js/lista_tabla_de_farmacias.js' %}"></script>
+{% endblock %}
