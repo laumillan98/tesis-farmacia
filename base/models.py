@@ -86,6 +86,8 @@ class Medicamento(models.Model):
     id_restriccion = models.ForeignKey(RestriccionMedicamento, on_delete=models.RESTRICT, null=True, blank=True, to_field='id_restriccion')
     id_clasificacion = models.ForeignKey(ClasificacionMedicamento, on_delete=models.RESTRICT, null=True, blank=True, to_field='id_clasificacion')
     id_formato = models.ForeignKey(FormatoMedicamento, on_delete=models.RESTRICT, null=True, blank=True, to_field='id_formato')
+    fecha_expiracion = models.DateField(null=True, blank=True)
+    reacciones = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='reacciones_con')
     
     def __str__(self):
         return self.nombre      

@@ -252,3 +252,14 @@ class FarmaciaAdminForm(forms.ModelForm):
         if self.instance and self.instance.ubicacion:
             self.fields['latitud'].initial = self.instance.ubicacion.y
             self.fields['longitud'].initial = self.instance.ubicacion.x
+
+
+class MedicamentoAdminForm(forms.ModelForm):
+    class Meta:
+        model = Medicamento
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super(MedicamentoAdminForm, self).__init__(*args, **kwargs)
+        if self.instance.pk:
+            self.fields['reacciones'].queryset = Medicamento.objects.exclude(pk=self.instance.pk)
