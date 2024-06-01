@@ -109,7 +109,7 @@ class UserLoginForm(AuthenticationForm):
 
     username = forms.CharField(widget=forms.TextInput(
         attrs={'class': 'form-control'}),
-        label="Nombre de usuario o Correo")
+        label="Nombre de usuario")
 
     password = forms.CharField(widget=forms.PasswordInput(
         attrs={'class': 'form-control'}),
@@ -205,7 +205,7 @@ class MedicUpdateForm(forms.ModelForm):
     nombre = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
     cant_max = forms.IntegerField(required=True, label="Cantidad Máxima")
     precio_unidad = forms.FloatField(required=True)
-    origen_natural = forms.BooleanField(widget=BooleanCheckbox, required=False, label="Origen")
+    origen_natural = forms.BooleanField(widget=BooleanCheckbox, required=False, label="Origen Natural")
     id_restriccion = forms.ModelChoiceField(queryset=RestriccionMedicamento.objects.all(), required=True, label="Restricción")
     id_clasificacion = forms.ModelChoiceField(queryset=ClasificacionMedicamento.objects.all(), required=True, label="Clasificación")
     id_formato = forms.ModelChoiceField(queryset=FormatoMedicamento.objects.all(), required=True, label="Formato")
@@ -254,7 +254,7 @@ class FarmaciaAdminForm(forms.ModelForm):
             self.fields['longitud'].initial = self.instance.ubicacion.x
 
 
-class MedicamentoAdminForm(forms.ModelForm):
+"""class MedicamentoAdminForm(forms.ModelForm):
     class Meta:
         model = Medicamento
         fields = '__all__'
@@ -262,4 +262,4 @@ class MedicamentoAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(MedicamentoAdminForm, self).__init__(*args, **kwargs)
         if self.instance.pk:
-            self.fields['reacciones'].queryset = Medicamento.objects.exclude(pk=self.instance.pk)
+            self.fields['reacciones'].queryset = Medicamento.objects.exclude(pk=self.instance.pk)"""

@@ -862,11 +862,15 @@ def editarProvincia(request):
 @usuarios_permitidos(roles_permitidos=['farmaceuticos'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def gestionarMedicFarma(request): 
-    #Codigo para poder seleccionar de las listas siguientes en el filtrado para exportar la tabla
+    # Obtener nombre de la Farmacia del farmaceutico actual
+    farmaceutico = FarmaUser.objects.get(username=request.user.username)
+    farmacia_del_farmaceutico = farmaceutico.id_farma.nombre
+    # Codigo para poder seleccionar de las listas siguientes en el filtrado para exportar la tabla
     formatos = FormatoMedicamento.objects.all()
     restricciones = RestriccionMedicamento.objects.all()
     clasificaciones = ClasificacionMedicamento.objects.all()
     context = {
+        'farmacia_del_farmaceutico': farmacia_del_farmaceutico,
         'formatos': formatos,
         'restricciones': restricciones,
         'clasificaciones': clasificaciones
@@ -902,6 +906,7 @@ def listaDeMedicFarma(request):
                     'origen': origen_texto,
                     'restriccion': medic.id_restriccion.nombre if medic.id_restriccion else None,
                     'clasificacion': medic.id_clasificacion.nombre if medic.id_clasificacion else None,
+                    'fecha_expiracion': farmaMedic.fecha_expiracion.strftime('%Y-%m-%d') if farmaMedic.fecha_expiracion else 'No especificada',
                     'existencia': farmaMedic.existencia,
                 }
                 medicamentos_list.append(medic_data)
@@ -912,6 +917,26 @@ def listaDeMedicFarma(request):
             return JsonResponse({'error': 'Usuario farmacéutico no encontrado'}, status=404)
     
     return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
+
+
+@csrf_exempt
+def actualizarFechaExpiracion(request):
+    if request.method == 'POST':
+        try:
+            id_medic = request.POST.get('id_medic')
+            fecha_expiracion = request.POST.get('fecha_expiracion')
+
+            farmaceutico = FarmaUser.objects.get(username=request.user.username)
+            farmacia = farmaceutico.id_farma
+
+            farmacia_medicamento = FarmaciaMedicamento.objects.get(id_medic=id_medic, id_farma=farmacia)
+            farmacia_medicamento.fecha_expiracion = fecha_expiracion
+            farmacia_medicamento.save()
+
+            return JsonResponse({'status': 'success'}, status=200)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
 
 
 @require_POST
@@ -930,20 +955,16 @@ def actualizarExistencia(request):
 @login_required
 def gestionarMedicamentosDisponibles(request):
     # Obtener el usuario actual
-    usuario = request.user
-
-    try:
-        # Obtener el farmaceutico correspondiente al usuario actual
-        farmaceutico = FarmaUser.objects.get(username=usuario.username)
-        # Obtener la farmacia del farmaceutico
-        farmacia = farmaceutico.id_farma
-        # Obtener los medicamentos que ya están en la farmacia del usuario actual
-        medicamentos_en_farmacia = FarmaciaMedicamento.objects.filter(id_farma=farmacia).values_list('id_medic', flat=True)
-        # Filtrar los medicamentos que no están en la farmacia del usuario actual
-        medicamentos_disponibles = Medicamento.objects.exclude(id_medic__in=medicamentos_en_farmacia)
-
-    except FarmaUser.DoesNotExist:
-        medicamentos_disponibles = Medicamento.objects.all()
+    #usuario = request.user
+# esta parte del try y el except es para hacer la exportacion por grupo en medicicamentos disponibles a medic farma
+    #try:
+    #    farmaceutico = FarmaUser.objects.get(username=usuario.username)
+     #   farmacia = farmaceutico.id_farma
+      #  medicamentos_en_farmacia = FarmaciaMedicamento.objects.filter(id_farma=farmacia).values_list('id_medic', flat=True)
+       # medicamentos_disponibles = Medicamento.objects.exclude(id_medic__in=medicamentos_en_farmacia) # Filtrar los medicamentos que no están en la farmacia del usuario actual
+   
+   # except FarmaUser.DoesNotExist:
+      #  medicamentos_disponibles = Medicamento.objects.all()
 
     # Código para poder seleccionar de las listas siguientes en el filtrado para exportar la tabla
     restricciones = RestriccionMedicamento.objects.all()
@@ -951,7 +972,7 @@ def gestionarMedicamentosDisponibles(request):
     formatos = FormatoMedicamento.objects.all()
 
     context = {
-        'medicamentos_disponibles': medicamentos_disponibles,
+      #  'medicamentos_disponibles': medicamentos_disponibles,
         'restricciones': restricciones,
         'clasificaciones': clasificaciones,
         'formatos': formatos
@@ -1023,7 +1044,8 @@ def exportarMedicamento(request, uuid):
                 FarmaciaMedicamento.objects.create(
                     id_medic=medicamento,
                     id_farma=farmacia,
-                    existencia=0  # Ajusta este valor según lo necesario
+                    fecha_expiracion=None,
+                    existencia=0  
                 )
                 return JsonResponse({'status': 'success'}, status=200)
             else:

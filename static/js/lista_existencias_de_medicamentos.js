@@ -42,6 +42,15 @@ $(document).ready(function() {
                         `);
                     });
 
+                
+                    // Mostrar alerta con Toastr sobre las reacciones del primer medicamento
+                    toastr.warning(`Reacciones: ${medicamentos[0].reacciones}`, 'Información de Reacciones', {
+                        closeButton: true,
+                        progressBar: true,
+                        positionClass: 'toast-top-right'
+                    });
+                    
+
                     $('.ver-mapa-btn').click(function() {
                         var lat = $(this).data('lat');
                         var lng = $(this).data('lng');
@@ -51,8 +60,9 @@ $(document).ready(function() {
                         $('#mapaModal').data('lng', lng);
                         $('#mapaModal').data('name', name);
                         $('#mapaModal').modal('show');
-
                     });
+
+
                 } else {
                     Swal.fire({
                         title: 'No encontrado',

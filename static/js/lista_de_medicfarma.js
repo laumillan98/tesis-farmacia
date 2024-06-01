@@ -8,12 +8,31 @@ $(document).ready(function () {
         columns: [
             { data: "index" },
             { data: "nombre" },
-            { data: "formato"},
-            { data: "cant_max" },
+            { data: "formato" },
+            //{ data: "cant_max" },
             { data: "precio" },
             { data: "origen" },
             { data: "restriccion" },
             { data: "clasificacion" },
+            {
+                data: "fecha_expiracion",
+                orderable: false,
+                searchable: false,
+                render: function(data, type, row) {
+                    return '<input style="width: 125px; display: inline;" type="date" class="form-control fecha-editable" value="' + data + '" data-id="' + row.id + '" />' +
+                           '<button class="btn btn-sm btn-success btn-guardar-fecha" style="margin-left: 5px;" data-id="' + row.id + '"><i class="fa-solid fa-calendar-days"></i></button>';
+                }
+            },
+            {
+                data: "existencia",
+                orderable: false,
+                searchable: false,
+                render: function(data, type, row) {
+                    // Renderizar un input editable para existencia con validación para no aceptar valores menores a 0
+                    return '<input type="number" class="form-control existencia-editable" style="width: 60px; display: inline;" min="0" value="' + data + '" data-id="' + row.id + '" />' +
+                           '<button class="btn btn-sm btn-success btn-guardar" style="margin-left: 5px;" data-id="' + row.id + '">Guardar</button>';
+                }
+            },
             {
                 data: null,
                 orderable: false,
@@ -25,22 +44,57 @@ $(document).ready(function () {
                     </button>`;
                     return mostrarButton;
                 }
-              },
-            {
-                data: "existencia",
-                orderable: false,
-                searchable: false,
-                render: function(data, type, row) {
-                    // Renderizar un input editable para existencia con validación para no aceptar valores menores a 0
-                    return '<input type="number" class="form-control existencia-editable" style="width: 60px; display: inline;" min="0" value="' + data + '" data-id="' + row.id + '" />' +
-                           '<button class="btn btn-sm btn-success btn-guardar" style="margin-left: 5px;" data-id="' + row.id + '">Guardar</button>';
-                }
             }
         ]
     });
 
+
+    // Manejar clic en el botón de guardar fecha de expiración
+    $('#miTabla').on('click', '.btn-guardar-fecha', function() {
+        var id_medic = $(this).data('id');
+        var fechaInput = $(this).closest('td').find('.fecha-editable');
+        var fecha_expiracion = fechaInput.val();
+
+        // Validar que la fecha de expiración sea futura
+        var today = new Date().toISOString().split('T')[0];
+        if (fecha_expiracion <= today) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Fecha inválida',
+                text: 'La fecha de expiración debe ser una fecha futura.'
+            });
+            return; // Detener la ejecución si la fecha es inválida
+        }
+
+        // Realizar una solicitud AJAX para actualizar la fecha de expiración
+        $.ajax({
+            url: '/actualizar_fecha_expiracion/',
+            method: 'POST',
+            headers: { 'X-CSRFToken': getCookie('csrftoken') },
+            data: { 'id_medic': id_medic, 'fecha_expiracion': fecha_expiracion },
+            success: function(response) {
+                console.log('Fecha de expiración actualizada correctamente');
+                table.ajax.reload();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Fecha de expiración actualizada',
+                    text: 'La fecha de expiración se ha actualizado correctamente.'
+                });
+            },
+            error: function(error) {
+                console.error('Error al actualizar fecha de expiración');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Ocurrió un error al actualizar la fecha de expiración.'
+                });
+            }
+        });
+    });
+
+
     
-    // Evento de clic en el botón "Mostrar"
+    // Evento de clic en el botón "Mostrar" Descripcion
     $('#miTabla').on('click', '#mostrar', function() {
         let idMedic = $(this).data('id');
         cargarDescripcionMedicamento(idMedic);
@@ -60,7 +114,7 @@ $(document).ready(function () {
       }
 
 
-    // Manejar clic en el botón de guardar
+    // Manejar clic en el botón de guardar existencia
     $('#miTabla').on('click', '.btn-guardar', function() {
         var id_medic = $(this).data('id');
         var existenciaInput = $(this).closest('td').find('.existencia-editable');
@@ -75,7 +129,6 @@ $(document).ready(function () {
             });
             return; // Detener la ejecución si el valor es inválido
         }
-
 
         // Realizar una solicitud AJAX para actualizar la existencia
         $.ajax({

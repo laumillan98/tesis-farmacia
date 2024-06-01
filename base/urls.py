@@ -58,6 +58,7 @@ urlpatterns = [
      path('gestionar_medicfarma/', views.gestionarMedicFarma),
      path('lista_de_medicfarma/', views.listaDeMedicFarma, name='lista_de_medicfarma'),
      path('gestionar_medicfarma/obtenerDescripcion/<uuid>/', views.obtenerDescripcion, name ='obtener_descripcion'),
+     path('actualizar_fecha_expiracion/', views.actualizarFechaExpiracion, name='actualizar_fecha_expiracion'),
      path('actualizar_existencia/', views.actualizarExistencia, name='actualizar_existencia'),
      path('gestionar_medicamentos_disponibles/', views.gestionarMedicamentosDisponibles, name = 'gestionar_medicamentos_disponibles'),
      path('lista_de_medicamentos_disponibles/', views.listaDeMedicamentosDisponibles, name='lista_de_medicamentos_disponibles'),
