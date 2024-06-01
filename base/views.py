@@ -1558,7 +1558,9 @@ def listaDeTrazas(request):
                 'user': traza.user.username if traza.user else 'System',
                 'object_repr': traza.object_repr,
                 'action_flag': traza.get_event_type_display(),
-                'change_message': traza.changes if traza.changes else "Sin cambios"
+                'change_message': traza.object_json_repr if hasattr(traza, 'object_json_repr') else "Sin cambios",
+                'remote_addr': traza.remote_addr if hasattr(traza, 'remote_addr') else "No disponible",
+                'additional_data': traza.additional_data if hasattr(traza, 'additional_data') else "No disponible",
             }
             trazas_list.append(traza_data)
 
@@ -1570,6 +1572,7 @@ def listaDeTrazas(request):
         }
         return JsonResponse(data, safe=False)
     except Exception as e:
+        print(e)
         return JsonResponse({'error': str(e)}, status=500)
 
 
@@ -1692,6 +1695,9 @@ def usuariosXGruposChart(request):
 ##############################################################################################################################
 ################################################    REPORTES    ##################################################################
 
+@csrf_exempt
+def generar_reporte_pdf_error(request):
+     return JsonResponse({'error': 'Tipo de objeto no válido'}, status=404)
 
 @csrf_exempt
 def generar_reporte_pdf(request):

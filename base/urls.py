@@ -114,7 +114,7 @@ urlpatterns = [
      path('usuarios_xgrupos_chart/', views.usuariosXGruposChart, name='usuarios_xgrupos_chart'),
     
      # Reportes
-     path('generar_reporte/', views.generar_reporte_pdf, name='generar_reporte_pdf'),
+     path('generar_reporte/', views.generar_reporte_pdf_error, name='generar_reporte_pdf'),
      path('lote_farmacias/', views.generar_lote_farmacias, name='generar_lote_farmacias'),
      path('borrar_lote_farmacias/', views.borrar_lote_farmacias, name='borrar_lote_farmacias'),
 ]
