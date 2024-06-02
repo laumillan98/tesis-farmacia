@@ -1,5 +1,6 @@
 $(document).ready(function() {
     let editionSuccessful = false
+    let registroSuccessful = false
     var ajaxUrl = $('#miTabla').data('url');
     var table = $('#miTabla').DataTable({
         ajax: ajaxUrl,
@@ -28,13 +29,13 @@ $(document).ready(function() {
     });
 
 
-     // Evento de clic en el botón "Editar"
-     $('#miTabla').on('click', '#editar', function() {
-        let idProv = $(this).data('id');
-        cargarInformacionTurnoFarmacia(idProv);
-     });
+    // Evento de clic en el botón "Editar"
+    $('#miTabla').on('click', '#editar', function() {
+        let idTurn = $(this).data('id');
+        cargarInformacionTurnoFarmacia(idTurn);
+    });
 
-     function cargarInformacionTurnoFarmacia(id) {
+    function cargarInformacionTurnoFarmacia(id) {
         $.ajax({
             url: 'obtenerTurnoFarmacia/' + id + '/',
             type: 'GET',
@@ -116,5 +117,6 @@ $(document).ready(function() {
           editionSuccessful = false;
         }
     })
+
 
 });

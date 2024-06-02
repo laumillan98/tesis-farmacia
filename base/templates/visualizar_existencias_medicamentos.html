@@ -30,15 +30,11 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Nombre de la Farmacia</th>
-                        <th>Dirección</th>
-                        <th>Teléfono</th>
-                        <th>Provincia</th>
-                        <th>Municipio</th>
-                        <th>Tipo</th>
-                        <th>Turno</th>
+                        <th>Medicamento</th>
+                        <th>Farmacia</th>
                         <th>Existencia</th>
                         <th>Mapa</th>
+                        <th>Reacciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -63,6 +59,25 @@
                         <div id="routeIcon">
                             <i class="fas fa-route"></i>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para las reacciones -->
+    <div class="modal fade" id="reacModal" tabindex="-1" role="dialog" aria-labelledby="mapaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mapaModalLabel">Reacciones</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="mapa">
+                        <p id="reacciones-id"></p>
                     </div>
                 </div>
             </div>

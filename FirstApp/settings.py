@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 import os
 from pathlib import Path
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -181,6 +182,20 @@ LEAFLET_CONFIG = {
 }
 
 
+
+# Biblioteca EasyAudit para las Trazas
 EASY_AUDIT_WATCH_MODEL_EVENTS = True
-EASY_AUDIT_WATCH_AUTH_EVENTS = True
-EASY_AUDIT_WATCH_REQUEST_EVENTS = True
+EASY_AUDIT_WATCH_AUTH_EVENTS = False
+EASY_AUDIT_WATCH_REQUEST_EVENTS = False
+
+DJANGO_EASY_AUDIT_WATCH_AUTH_EVENTS = False
+DJANGO_EASY_AUDIT_WATCH_REQUEST_EVENTS = False
+
+
+# Alerta de TAREAEXISTENCIA
+CELERY_BEAT_SCHEDULE = {
+    'check-condition-every-10-minutes': {
+        'task': 'FirstApp.tasks.check_stock_for_pills',
+        'schedule': crontab(minute='*/2'),
+    },
+}

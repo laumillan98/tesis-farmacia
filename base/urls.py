@@ -20,6 +20,7 @@ urlpatterns = [
      path('gestionar_usuarios/', views.gestionarUsuarios),
      path('lista_de_usuarios/', views.listaDeUsuarios, name='lista_de_usuarios'),
      path('registrar_farmaceutico/', views.registrarFarmaceutico,  name='registrar_farmaceutico'),
+     path('registrar_especialista/', views.registrarEspecialista,  name='registrar_especialista'),
      path('gestionar_usuarios/eliminarUsuario/<username>/', views.eliminarUsuario, name='eliminar_usuario'),
      path('gestionar_usuarios/activarUsuario/<username>/', views.activarUsuario, name ='activar_usuario'),
      path('gestionar_usuarios/obtenerUsuario/<username>/', views.obtenerUsuario, name ='obtener_usuario'),
@@ -107,5 +108,7 @@ urlpatterns = [
      path('usuarios_xgrupos_chart/', views.usuariosXGruposChart, name='usuarios_xgrupos_chart'),
      # Reportes
      path('generar_reporte_pdf/', views.generar_reporte_pdf, name='generar_reporte_pdf'),
-
+     # Alertas
+     path('crear_notificacion/', views.crearTareaNotificacion, name='crear_notificacion'),
 ]
+

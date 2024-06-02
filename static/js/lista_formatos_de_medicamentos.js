@@ -30,8 +30,8 @@ $(document).ready(function() {
 
      // Evento de clic en el botón "Editar"
      $('#miTabla').on('click', '#editar', function() {
-        let idProv = $(this).data('id');
-        cargarInformacionFormatoMedicamento(idProv);
+        let idForm = $(this).data('id');
+        cargarInformacionFormatoMedicamento(idForm);
      });
 
      function cargarInformacionFormatoMedicamento(id) {

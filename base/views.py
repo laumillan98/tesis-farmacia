@@ -25,9 +25,12 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.cache import cache_control
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
+from django.utils.timezone import localtime
+from django.contrib.contenttypes.models import ContentType
+
 from easyaudit.models import CRUDEvent, LoginEvent, RequestEvent
 
-from .models import CustomUser, Medicamento, Farmacia, FarmaUser, FarmaciaMedicamento, TipoFarmacia, TurnoFarmacia, Municipio, Provincia, RestriccionMedicamento, ClasificacionMedicamento, FormatoMedicamento
+from .models import CustomUser, Medicamento, Farmacia, FarmaUser, FarmaciaMedicamento, TipoFarmacia, TurnoFarmacia, Municipio, Provincia, RestriccionMedicamento, ClasificacionMedicamento, FormatoMedicamento, TareaExistencia
 from .forms import CustomUserCreationForm, FarmaUserCreationForm, UserLoginForm, SetPasswordForm, PasswordResetForm, UserProfileForm, UserUpdateForm, FarmaUserUpdateForm, FarmaUpdateForm, TipoFarmaciaUpdateForm, TurnoFarmaciaUpdateForm, MunicUpdateForm, ProvUpdateForm, MedicUpdateForm, RestriccionMedicamentoUpdateForm, ClasificacionMedicamentoUpdateForm, FormatoMedicamentoUpdateForm
 from .decorators import usuarios_permitidos, unauthenticated_user
 from .tokens import account_activation_token
@@ -104,8 +107,10 @@ def salir(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def autenticar(request):
     if request.method == "POST":
+        print("entrooooo 1")
         form = UserLoginForm(request=request, data=request.POST)
         if form.is_valid():
+            print("entrooooo 2")
             user = authenticate(
                 username=form.cleaned_data["username"],
                 password=form.cleaned_data["password"],
@@ -114,14 +119,19 @@ def autenticar(request):
                 login(request, user)
                 messages.success(request, f"Hola <b>{user.username}</b>! Usted se ha autenticado satisfactoriamente.")
                 usuario = request.user
+                print("entrooooo 3")
                 grupo_admin = Group.objects.get(name='admin')
                 grupo_clientes = Group.objects.get(name='clientes')
+                grupo_farmaceuticos = Group.objects.get(name='farmacéuticos')
+                grupo_especialista = Group.objects.get(name='especialista')
                 if grupo_admin in usuario.groups.all():
                     return redirect('/gestionar_usuarios/')
                 elif grupo_clientes in usuario.groups.all():
                     return redirect('/visualizar_existencias_medicamentos/')
-                else:
-                    return redirect('/gestionar_medicfarma/')  
+                elif grupo_farmaceuticos in usuario.groups.all():
+                    return redirect('/gestionar_medicfarma/')
+                elif grupo_especialista in usuario.groups.all():
+                    return redirect('/gestionar_farmacias/')  
                      
        # else:
         #    for key, error in list(form.errors.items()):
@@ -377,7 +387,7 @@ def registrarFarmaceutico(request):
             user = form.save()
             user.is_active=True
             user.save()
-            group = Group.objects.get(name='farmaceuticos')
+            group = Group.objects.get(name='farmacéuticos')
             user.groups.add(group)
             return redirect('/gestionar_usuarios/')
 
@@ -395,9 +405,38 @@ def registrarFarmaceutico(request):
         )
 
 
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['admin'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def registrarEspecialista(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(data=request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user = form.save()
+            user.is_active=True
+            user.save()
+            group = Group.objects.get(name='especialista')
+            user.groups.add(group)
+            return redirect('/gestionar_usuarios/')
+
+        else:
+            for error in list(form.errors.values()):
+                messages.error(request, error)
+
+    else:
+        form = CustomUserCreationForm()
+
+    return render(
+        request=request,
+        template_name="registrar_especialista.html",
+        context={"form": form}
+        )
+
+
 def eliminarUsuario(request, username): 
     user = CustomUser.objects.get(username = username)   
-    grupo_farmaceutico = Group.objects.get(name='farmaceuticos')
+    grupo_farmaceutico = Group.objects.get(name='farmacéuticos')
     user.is_active = False
     user.save()
 
@@ -418,7 +457,7 @@ def activarUsuario(request, username):
 
 def obtenerUsuario(request, username):
     user = CustomUser.objects.get(username = username) 
-    grupo_farmaceuticos = Group.objects.get(name='farmaceuticos')
+    grupo_farmaceuticos = Group.objects.get(name='farmacéuticos')
     if grupo_farmaceuticos in user.groups.all():
         farma = Farmacia.objects.all()
         farmaUser = FarmaUser.objects.get(username = username) 
@@ -447,7 +486,7 @@ def obtenerUsuario(request, username):
 @require_POST
 def editarUsuario(request):
     user = CustomUser.objects.get(username=request.POST.get('username'))
-    grupo_farmaceuticos = Group.objects.get(name='farmaceuticos')
+    grupo_farmaceuticos = Group.objects.get(name='farmacéuticos')
     if grupo_farmaceuticos in user.groups.all():
         farmaUser = FarmaUser.objects.get(username=request.POST.get('username'))
         formFarma = FarmaUserUpdateForm(request.POST, instance=farmaUser)
@@ -466,7 +505,7 @@ def editarUsuario(request):
         
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['admin'])
+@usuarios_permitidos(roles_permitidos=['especialista'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def gestionarFarmacias(request):
     #Codigo para poder seleccionar de las listas siguientes en el filtrado para exportar la tabla
@@ -537,7 +576,7 @@ def listaDeFarmacias(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['admin'])
+@usuarios_permitidos(roles_permitidos=['especialista'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarFarmacia(request):
     if request.method =='POST':
@@ -594,7 +633,7 @@ def editarFarmacia(request):
     
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['admin'])
+@usuarios_permitidos(roles_permitidos=['especialista'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def gestionarTiposFarmacias(request):
     return render(request, "gestionar_tipos_de_farmacias.html")
@@ -615,7 +654,7 @@ def listaDeTiposDeFarmacias(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['admin'])
+@usuarios_permitidos(roles_permitidos=['especialista'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarTipoFarmacia(request):
     if request.method =='POST':
@@ -658,7 +697,7 @@ def editarTipoFarmacia(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['admin'])
+@usuarios_permitidos(roles_permitidos=['especialista'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def gestionarTurnosFarmacias(request):
     return render(request, "gestionar_turnos_de_farmacias.html")
@@ -679,7 +718,7 @@ def listaDeTurnosDeFarmacias(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['admin'])
+@usuarios_permitidos(roles_permitidos=['especialista'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarTurnoFarmacia(request):
     if request.method =='POST':
@@ -722,7 +761,7 @@ def editarTurnoFarmacia(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['admin'])
+@usuarios_permitidos(roles_permitidos=['especialista'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def gestionarMunicipios(request):
     return render(request, "gestionar_municipios.html")
@@ -744,7 +783,7 @@ def listaDeMunicipios(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['admin'])
+@usuarios_permitidos(roles_permitidos=['especialista'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarMunicipio(request):
     if request.method =='POST':
@@ -791,7 +830,7 @@ def editarMunicipio(request):
     
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['admin'])
+@usuarios_permitidos(roles_permitidos=['especialista'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def gestionarProvincias(request):
     return render(request, "gestionar_provincias.html")
@@ -812,7 +851,7 @@ def listaDeProvincias(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['admin'])
+@usuarios_permitidos(roles_permitidos=['especialista'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarProvincia(request):
     if request.method =='POST':
@@ -859,7 +898,7 @@ def editarProvincia(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['farmaceuticos'])
+@usuarios_permitidos(roles_permitidos=['farmacéuticos'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def gestionarMedicFarma(request): 
     # Obtener nombre de la Farmacia del farmaceutico actual
@@ -952,7 +991,9 @@ def actualizarExistencia(request):
         return JsonResponse({'error': 'Medicamento no encontrado'}, status=404)
     
 
-@login_required
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['farmacéuticos'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def gestionarMedicamentosDisponibles(request):
     # Obtener el usuario actual
     #usuario = request.user
@@ -1026,7 +1067,6 @@ def listaDeMedicamentosDisponibles(request):
     return JsonResponse(data, safe=False)
 
 
-
 @csrf_exempt
 def exportarMedicamento(request, uuid):
     if request.method == 'POST':
@@ -1059,7 +1099,7 @@ def exportarMedicamento(request, uuid):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['admin'])
+@usuarios_permitidos(roles_permitidos=['especialista'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def gestionarMedicamentos(request): 
     #Codigo para poder seleccionar de las listas siguientes en el filtrado para exportar la tabla
@@ -1113,7 +1153,7 @@ def listaDeMedicamentos(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['admin']) 
+@usuarios_permitidos(roles_permitidos=['especialista']) 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarMedicamento(request):
     if request.method == 'POST':
@@ -1177,11 +1217,9 @@ def obtenerMedicamento(request, uuid):
 @login_required(login_url='/acceder')
 @require_POST
 def editarMedicamento(request):
-    print('entro aquiiiii 1')
     medic = Medicamento.objects.get(id_medic=request.POST.get('id'))
     form = MedicUpdateForm(request.POST, instance=medic)
     if form.is_valid():
-        print('entro aquiiiii 2')
         medic = form.save(commit=False)
         medic.origen_natural = bool(request.POST.get('origen', False))
         medic.save()
@@ -1192,7 +1230,7 @@ def editarMedicamento(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['admin'])
+@usuarios_permitidos(roles_permitidos=['especialista'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def gestionarRestriccionesMedicamentos(request):
     return render(request, "gestionar_restricciones_de_medicamentos.html")
@@ -1213,7 +1251,7 @@ def listaDeRestriccionesDeMedicamentos(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['admin'])
+@usuarios_permitidos(roles_permitidos=['especialista'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarRestriccionMedicamento(request):
     if request.method =='POST':
@@ -1256,7 +1294,7 @@ def editarRestriccionMedicamento(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['admin'])
+@usuarios_permitidos(roles_permitidos=['especialista'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def gestionarClasificacionesMedicamentos(request):
     return render(request, "gestionar_clasificaciones_de_medicamentos.html")
@@ -1277,7 +1315,7 @@ def listaDeClasificacionesDeMedicamentos(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['admin'])
+@usuarios_permitidos(roles_permitidos=['especialista'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarClasificacionMedicamento(request):
     if request.method =='POST':
@@ -1320,7 +1358,7 @@ def editarClasificacionMedicamento(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['admin'])
+@usuarios_permitidos(roles_permitidos=['especialista'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def gestionarFormatosMedicamentos(request):
     return render(request, "gestionar_formatos_de_medicamentos.html")
@@ -1341,7 +1379,7 @@ def listaDeFormatosDeMedicamentos(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['admin'])
+@usuarios_permitidos(roles_permitidos=['especialista'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def registrarFormatoMedicamento(request):
     if request.method =='POST':
@@ -1401,12 +1439,17 @@ def buscarMedicamento(request):
 
         if nombre_medicamento:
             medicamentos = Medicamento.objects.filter(nombre__icontains=nombre_medicamento)
+            has_interactions = any(medicamento.reacciones for medicamento in medicamentos)
             resultados = []
 
             for medicamento in medicamentos:
                 farmacias = FarmaciaMedicamento.objects.filter(id_medic=medicamento, existencia__gt=0)
+                has_task = TareaExistencia.objects.filter(id_medic=medicamento, id_user=request.user)
                 for farmacia in farmacias:
                     resultados.append({
+                        'id_medic': medicamento.id_medic,
+                        'medicamento': medicamento.nombre,
+                        'reacciones': medicamento.reacciones,
                         'nombre_farmacia': farmacia.id_farma.nombre,
                         'direccion': farmacia.id_farma.direccion,
                         'telefono': farmacia.id_farma.telefono,
@@ -1417,8 +1460,9 @@ def buscarMedicamento(request):
                         'turno': farmacia.id_farma.id_turno.nombre,
                         'latitud': farmacia.id_farma.ubicacion.y if farmacia.id_farma.ubicacion else None,
                         'longitud': farmacia.id_farma.ubicacion.x if farmacia.id_farma.ubicacion else None,
+                        'notificacion_activa': has_task.count() > 0
                     })
-            return JsonResponse(resultados, safe=False)
+            return JsonResponse({ 'has_interactions': has_interactions, 'result': resultados}, safe=False)
         else:
             return JsonResponse({'error': 'Debe ingresar un nombre de medicamento.'}, status=400)
 
@@ -1536,7 +1580,7 @@ def listaDeTrazas(request):
             traza_data = {
                 'index': index + 1,
                 'id': traza.id,
-                'action_time': traza.datetime.strftime('%Y-%m-%d %H:%M:%S'),
+                'action_time': localtime(traza.datetime).strftime('%Y-%m-%d %H:%M:%S'),
                 'user': traza.user.username if traza.user else 'System',
                 'content_type': str(traza.content_type),
                 'object_repr': traza.object_repr,
@@ -1617,7 +1661,7 @@ def usuariosXGruposChart(request):
     group_counts = CustomUser.objects.values('groups').annotate(count=Count('id'))
 
     # Definir los nombres de los grupos y los contadores
-    labels = ['clientes', 'farmaceuticos', 'admin']
+    labels = ['clientes', 'farmacéuticos', 'admin']
     counts = [0, 0, 0]  # Inicializar contadores para cada grupo
 
     # Asignar los recuentos reales a los contadores correspondientes
@@ -1638,13 +1682,6 @@ def usuariosXGruposChart(request):
     }
 
     return JsonResponse(context)
-
-
-##############################################################################################################################
-################################################    MAPA    ##################################################################
-
-
-
 
 
 ##############################################################################################################################
@@ -1940,3 +1977,20 @@ def generar_reporte_pdf(request):
 
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 
+
+##############################################################################################################################
+################################################    ALERTAS    ##################################################################
+
+
+def crearTareaNotificacion(request):
+    if request.method == 'GET':
+        id_medic = request.GET.get('id_medic')
+        medicamento = Medicamento.objects.get(id_medic=id_medic)
+        tarea = TareaExistencia(id_medic=medicamento, id_user=request.user)
+        try:
+            tarea.save()
+            return JsonResponse({'task': 'creada'}, status=200)
+        except Exception as e:
+            print(e)
+            return JsonResponse({'error': 'Invalid request'}, status=400)
+    return JsonResponse({'error': 'Invalid request'}, status=400)

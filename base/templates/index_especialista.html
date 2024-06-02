@@ -33,11 +33,13 @@
 
 
   <!-- MIOSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS --> 
-  <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+  <!-- Mapa Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
   <!-- Font Awesome mio --> 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
   <!-- DataTables.js mio 
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css"/>-->
   {% block mycss %}{% endblock %}
@@ -100,7 +102,7 @@
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
           <span class="dropdown-item dropdown-header">Configuración</span>
           <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
+          <a href="{%url 'perfil_de_usuario' user.username %}" class="dropdown-item">
             <i class="fas fa-user mr-2"></i> Mi Perfil
           </a>
           <div class="dropdown-divider"></div>
@@ -122,7 +124,7 @@
     <!-- Brand Logo -->
     <a href="https://salud.msp.gob.cu/tag/infomed/" class="brand-link">
       <img src="{% static 'dist/img/InfomedLogo.png' %}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">Cliente</span>
+      <span class="brand-text font-weight-light">Especialista</span>
     </a>
 
     <!-- Sidebar -->
@@ -133,7 +135,7 @@
           <img src="{% static 'dist/img/avatar2.png' %}" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
-          <a href="#" class="d-block">{{user.first_name}}</a>
+          <a href="{%url 'perfil_de_usuario' user.username %}" class="d-block">{{user.first_name}}</a>
         </div>
       </div>
 
@@ -158,27 +160,91 @@
             <a href="#" class="nav-link">
               <i class="nav-icon fa-solid fa-pen-to-square"></i>
               <p>
-                Menu
+                Gestionar
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="/visualizar_existencias_medicamentos" class="nav-link {% if request.path == '/visualizar_existencias_medicamentos/' %}active{% endif %}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>¿Dónde hay?</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="/visualizar_tabla_farmacias" class="nav-link {% if request.path == '/visualizar_tabla_farmacias/' %}active{% endif %}">
+                <a href="/gestionar_farmacias" class="nav-link {% if request.path == '/gestionar_farmacias/' %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Farmacias</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="/visualizar_tabla_medicamentos" class="nav-link {% if request.path == '/visualizar_tabla_medicamentos/' %}active{% endif %}">
+                <a href="/gestionar_medicamentos" class="nav-link {% if request.path == '/gestionar_medicamentos/' %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Medicamentos</p>
+                </a>
+              </li>
+              <li class="nav-item menu-open">
+                <a href="#" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>
+                    Nomencladores
+                    <i class="right fas fa-angle-left"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="/gestionar_municipios" class="nav-link {% if request.path == '/gestionar_municipios/' %}active{% endif %}">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Municipios</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="/gestionar_provincias" class="nav-link {% if request.path == '/gestionar_provincias/' %}active{% endif %}">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Provincias</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="/gestionar_tipos_de_farmacias" class="nav-link {% if request.path == '/gestionar_tipos_de_farmacias/' %}active{% endif %}">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Tipos de Farmacia</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="/gestionar_turnos_de_farmacias" class="nav-link {% if request.path == '/gestionar_turnos_de_farmacias/' %}active{% endif %}">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Turnos de Farmacia</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="/gestionar_restricciones_de_medicamentos" class="nav-link {% if request.path == '/gestionar_restricciones_de_medicamentos/' %}active{% endif %}">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Restricciones de Medicamentos</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="/gestionar_clasificaciones_de_medicamentos" class="nav-link {% if request.path == '/gestionar_clasificaciones_de_medicamentos/' %}active{% endif %}">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Clasificaciones de Medicamentos</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="/gestionar_formatos_de_medicamentos" class="nav-link {% if request.path == '/gestionar_formatos_de_medicamentos/' %}active{% endif %}">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Formatos de Medicamentos</p>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-chart-pie"></i>
+              <p>
+                Gráficos
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="/visualizar_charts" class="nav-link {% if request.path == '/visualizar_charts/' %}active{% endif %}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Charts</p>
                 </a>
               </li>
             </ul>
@@ -288,14 +354,18 @@
 
 
 <!--MIOSSSSSSSSSSSSSSSSSSSSSSSSS-->
+<!-- Mapa Leaflet -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
 <!-- Sweet Alert  --> 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
 <!-- DataTables.js  
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>-->
 {% block custom_scripts %}{% endblock %}
 </body>
 </html>
+
 

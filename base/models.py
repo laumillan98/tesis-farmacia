@@ -137,3 +137,11 @@ class FarmaciaMedicamento(models.Model):
 
     def __str__(self):
         return self.nombre"""
+
+
+class TareaExistencia(models.Model):
+    id_user = models.ForeignKey(CustomUser, on_delete=models.RESTRICT, null=True, blank=True)
+    id_medic = models.ForeignKey(Medicamento, on_delete=models.RESTRICT, null=True, blank=True, to_field='id_medic')
+
+    def __str__(self):
+        return self.id_user.first_name + ' ' + self.id_medic.nombre + 'task'
