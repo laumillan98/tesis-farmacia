@@ -107,10 +107,8 @@ def salir(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def autenticar(request):
     if request.method == "POST":
-        print("entrooooo 1")
         form = UserLoginForm(request=request, data=request.POST)
         if form.is_valid():
-            print("entrooooo 2")
             user = authenticate(
                 username=form.cleaned_data["username"],
                 password=form.cleaned_data["password"],
@@ -119,7 +117,6 @@ def autenticar(request):
                 login(request, user)
                 messages.success(request, f"Hola <b>{user.username}</b>! Usted se ha autenticado satisfactoriamente.")
                 usuario = request.user
-                print("entrooooo 3")
                 grupo_admin = Group.objects.get(name='admin')
                 grupo_clientes = Group.objects.get(name='clientes')
                 grupo_farmaceuticos = Group.objects.get(name='farmacéuticos')
@@ -654,26 +651,17 @@ def listaDeTiposDeFarmacias(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['especialista'])
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@require_POST
 def registrarTipoFarmacia(request):
-    if request.method =='POST':
+    if request.method == 'POST':
         form = TipoFarmaciaUpdateForm(data=request.POST)
         if form.is_valid():
             tipo = form.save(commit=False)
             tipo.save()
-            return redirect('/gestionar_tipos_de_farmacias')
+            return JsonResponse({'success': True})
         else:
-            for error in list(form.errors.values()):
-                messages.error(request, error)
-    else:
-        form = TipoFarmaciaUpdateForm()
-    
-    return render(
-        request=request,
-        template_name="registrar_tipo_de_farmacia.html",
-        context={"form": form}
-    )
+            return JsonResponse({'success': False, 'errors': form.errors})
+    return JsonResponse({'success': False, 'errors': 'Invalid request method'})
 
 
 def obtenerTipoFarmacia(request, uuid):
@@ -718,26 +706,17 @@ def listaDeTurnosDeFarmacias(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['especialista'])
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@require_POST
 def registrarTurnoFarmacia(request):
-    if request.method =='POST':
+    if request.method == 'POST':
         form = TurnoFarmaciaUpdateForm(data=request.POST)
         if form.is_valid():
             turno = form.save(commit=False)
             turno.save()
-            return redirect('/gestionar_turnos_de_farmacias')
+            return JsonResponse({'success': True})
         else:
-            for error in list(form.errors.values()):
-                messages.error(request, error)
-    else:
-        form = TurnoFarmaciaUpdateForm()
-    
-    return render(
-        request=request,
-        template_name="registrar_turno_de_farmacia.html",
-        context={"form": form}
-    )
+            return JsonResponse({'success': False, 'errors': form.errors})
+    return JsonResponse({'success': False, 'errors': 'Invalid request method'})
 
 
 def obtenerTurnoFarmacia(request, uuid):
@@ -783,27 +762,23 @@ def listaDeMunicipios(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['especialista'])
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@require_POST
 def registrarMunicipio(request):
-    if request.method =='POST':
+    if request.method == 'POST':
         form = MunicUpdateForm(data=request.POST)
         if form.is_valid():
             munic = form.save(commit=False)
-            munic.id_prov = form.cleaned_data['id_prov']
             munic.save()
-            return redirect('/gestionar_municipios')
+            return JsonResponse({'success': True})
         else:
-            for error in list(form.errors.values()):
-                messages.error(request, error)
-    else:
-        form = MunicUpdateForm()
-    
-    return render(
-        request=request,
-        template_name="registrar_municipio.html",
-        context={"form": form}
-    )
+            return JsonResponse({'success': False, 'errors': form.errors})
+    return JsonResponse({'success': False, 'errors': 'Invalid request method'})
+
+
+def obtenerProvMunicipio(request):
+    provincias = Provincia.objects.all()
+    data = [{'id_prov': prov.id_prov, 'nombre': prov.nombre} for prov in provincias]
+    return JsonResponse({'provincias': data})
 
 
 def obtenerMunicipio(request, uuid):
@@ -851,26 +826,17 @@ def listaDeProvincias(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['especialista'])
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@require_POST
 def registrarProvincia(request):
-    if request.method =='POST':
+    if request.method == 'POST':
         form = ProvUpdateForm(data=request.POST)
         if form.is_valid():
             prov = form.save(commit=False)
             prov.save()
-            return redirect('/gestionar_provincias')
+            return JsonResponse({'success': True})
         else:
-            for error in list(form.errors.values()):
-                messages.error(request, error)
-    else:
-        form = ProvUpdateForm()
-    
-    return render(
-        request=request,
-        template_name="registrar_provincia.html",
-        context={"form": form}
-    )
+            return JsonResponse({'success': False, 'errors': form.errors})
+    return JsonResponse({'success': False, 'errors': 'Invalid request method'})
 
 
 def obtenerProvincia(request, uuid):
@@ -1251,26 +1217,17 @@ def listaDeRestriccionesDeMedicamentos(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['especialista'])
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@require_POST
 def registrarRestriccionMedicamento(request):
-    if request.method =='POST':
+    if request.method == 'POST':
         form = RestriccionMedicamentoUpdateForm(data=request.POST)
         if form.is_valid():
-            restriccion = form.save(commit=False)
-            restriccion.save()
-            return redirect('/gestionar_restricciones_de_medicamentos')
+            rest = form.save(commit=False)
+            rest.save()
+            return JsonResponse({'success': True})
         else:
-            for error in list(form.errors.values()):
-                messages.error(request, error)
-    else:
-        form = RestriccionMedicamentoUpdateForm()
-    
-    return render(
-        request=request,
-        template_name="registrar_restriccion_de_medicamento.html",
-        context={"form": form}
-    )
+            return JsonResponse({'success': False, 'errors': form.errors})
+    return JsonResponse({'success': False, 'errors': 'Invalid request method'})
 
 
 def obtenerRestriccionMedicamento(request, uuid):
@@ -1315,26 +1272,17 @@ def listaDeClasificacionesDeMedicamentos(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['especialista'])
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@require_POST
 def registrarClasificacionMedicamento(request):
-    if request.method =='POST':
+    if request.method == 'POST':
         form = ClasificacionMedicamentoUpdateForm(data=request.POST)
         if form.is_valid():
-            clasificacion = form.save(commit=False)
-            clasificacion.save()
-            return redirect('/gestionar_clasificaciones_de_medicamentos')
+            clasif = form.save(commit=False)
+            clasif.save()
+            return JsonResponse({'success': True})
         else:
-            for error in list(form.errors.values()):
-                messages.error(request, error)
-    else:
-        form = ClasificacionMedicamentoUpdateForm()
-    
-    return render(
-        request=request,
-        template_name="registrar_clasificacion_de_medicamento.html",
-        context={"form": form}
-    )
+            return JsonResponse({'success': False, 'errors': form.errors})
+    return JsonResponse({'success': False, 'errors': 'Invalid request method'})
 
 
 def obtenerClasificacionMedicamento(request, uuid):
@@ -1379,26 +1327,17 @@ def listaDeFormatosDeMedicamentos(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['especialista'])
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@require_POST
 def registrarFormatoMedicamento(request):
-    if request.method =='POST':
+    if request.method == 'POST':
         form = FormatoMedicamentoUpdateForm(data=request.POST)
         if form.is_valid():
             formato = form.save(commit=False)
             formato.save()
-            return redirect('/gestionar_formatos_de_medicamentos')
+            return JsonResponse({'success': True})
         else:
-            for error in list(form.errors.values()):
-                messages.error(request, error)
-    else:
-        form = FormatoMedicamentoUpdateForm()
-    
-    return render(
-        request=request,
-        template_name="registrar_formato_de_medicamento.html",
-        context={"form": form}
-    )
+            return JsonResponse({'success': False, 'errors': form.errors})
+    return JsonResponse({'success': False, 'errors': 'Invalid request method'})
 
 
 def obtenerFormatoMedicamento(request, uuid):
@@ -1435,11 +1374,10 @@ def visualizarExistenciasMedicamentos(request):
 
 def buscarMedicamento(request):
     if request.method == 'GET':
-        nombre_medicamento = request.GET.get('nombre_medicamento', '')
+        id_medicamento = request.GET.get('id_medicamento', '')
 
-        if nombre_medicamento:
-            medicamentos = Medicamento.objects.filter(nombre__icontains=nombre_medicamento)
-            has_interactions = any(medicamento.reacciones for medicamento in medicamentos)
+        if id_medicamento:
+            medicamentos = Medicamento.objects.filter(id_medic=id_medicamento)
             resultados = []
 
             for medicamento in medicamentos:
@@ -1462,7 +1400,7 @@ def buscarMedicamento(request):
                         'longitud': farmacia.id_farma.ubicacion.x if farmacia.id_farma.ubicacion else None,
                         'notificacion_activa': has_task.count() > 0
                     })
-            return JsonResponse({ 'has_interactions': has_interactions, 'result': resultados}, safe=False)
+            return JsonResponse({'result': resultados}, safe=False)
         else:
             return JsonResponse({'error': 'Debe ingresar un nombre de medicamento.'}, status=400)
 
@@ -1516,6 +1454,7 @@ def buscarInfoMedicamento(request):
 
         if nombre_medicamento:
             medicamentos = Medicamento.objects.filter(nombre__icontains=nombre_medicamento)
+            has_interactions = any(medicamento.reacciones for medicamento in medicamentos)
             resultados = []
 
             for medicamento in medicamentos:
@@ -1528,6 +1467,7 @@ def buscarInfoMedicamento(request):
                     'id': medicamento.id_medic,
                     'nombre': medicamento.nombre,
                     'description': medicamento.description,
+                    'reacciones': medicamento.reacciones,
                     'cant_max': cant_max_texto,
                     'precio_unidad': f'{medicamento.precio_unidad} CUP/u',
                     'origen': origen_texto,
@@ -1535,11 +1475,12 @@ def buscarInfoMedicamento(request):
                     'clasificacion': medicamento.id_clasificacion.nombre if medicamento.id_clasificacion else None,
                     'formato': medicamento.id_formato.nombre if medicamento.id_formato else None,
                 })
-            return JsonResponse(resultados, safe=False)
+            return JsonResponse({'has_interactions': has_interactions, 'result': resultados}, safe=False)
         else:
             return JsonResponse({'error': 'Debe ingresar un nombre de medicamento.'}, status=400)
 
     return JsonResponse({'error': 'Método no permitido.'}, status=405)
+
 
 
 ##############################################################################################################################
@@ -1984,8 +1925,8 @@ def generar_reporte_pdf(request):
 
 def crearTareaNotificacion(request):
     if request.method == 'GET':
-        id_medic = request.GET.get('id_medic')
-        medicamento = Medicamento.objects.get(id_medic=id_medic)
+        id_medicamento = request.GET.get('medicamento')
+        medicamento = Medicamento.objects.get(id_medic=id_medicamento)
         tarea = TareaExistencia(id_medic=medicamento, id_user=request.user)
         try:
             tarea.save()

@@ -1,11 +1,11 @@
 $(document).ready(function() {
-    let editionSuccessful = false
+    let editionSuccessful = false;
+    let registroSuccessful = false;
     var ajaxUrl = $('#miTabla').data('url');
     var table = $('#miTabla').DataTable({
         ajax: ajaxUrl,
         columns: [
             { data: "index" },
-            { data: "id" },
             { data: "nombre" },
             {
                 data: null,
@@ -13,7 +13,7 @@ $(document).ready(function() {
                 searchable: false,
                 render: function(data, type, row, meta) {
                     // Verifica si estás en la columna de acciones
-                    if (meta.col === 3) { 
+                    if (meta.col === 2) { 
                         let editButton = `
                         <button id='editar' class='btn btn-sm btn-success' data-id='${row.id}' data-toggle='modal' data-target='#modal-lg'>
                             <i class="fas fa-pencil-alt"></i>
@@ -52,23 +52,23 @@ $(document).ready(function() {
     
         // Enviar los datos al servidor usando AJAX
         $.ajax({
-          url: "editarTipoFarmacia/",
-          type: "POST",
-          data: formData,
-          headers: { "X-CSRFToken": $("input[name=csrfmiddlewaretoken]").val() }, // Incluir el token CSRF
-          success: function (response) {
-            $("#modal-lg").modal("hide")
-    
-            // Mostrar alerta de éxito
-            if (response.success === true) {
-              editionSuccessful = true
-              // Refrescar DataTables
-              $("#miTabla").DataTable().ajax.reload()
-            }
-          },
-          error: function (error) {
-            alert("Ocurrió un error al editar el tipo de farmacia")
-          },
+            url: "editarTipoFarmacia/",
+            type: "POST",
+            data: formData,
+            headers: { "X-CSRFToken": $("input[name=csrfmiddlewaretoken]").val() }, // Incluir el token CSRF
+            success: function (response) {
+                $("#modal-lg").modal("hide")
+        
+                // Mostrar alerta de éxito
+                if (response.success === true) {
+                editionSuccessful = true
+                // Refrescar DataTables
+                $("#miTabla").DataTable().ajax.reload()
+                }
+            },
+            error: function (error) {
+                alert("Ocurrió un error al editar el tipo de farmacia")
+            },
         })
     }
 
@@ -116,5 +116,98 @@ $(document).ready(function() {
           editionSuccessful = false;
         }
     })
+
+
+    // Funcion para registrar un nuevo Tipo de Farmacia
+    function registrarTipoFarmacia(form) {
+        var formData = $(form).serialize();
+        $.ajax({
+            url: "registrarTipoFarmacia/",
+            type: "POST",
+            data: formData,
+            headers: { "X-CSRFToken": $("input[name=csrfmiddlewaretoken]").val() },
+            success: function(response) {
+                $("#modal-registrar-tipo").modal("hide");
+                if (response.success === true) {
+                    registroSuccessful = true;
+                    $("#miTabla").DataTable().ajax.reload();
+                } else {
+                    if (response.errors && response.errors.nombre) {
+                        Swal.fire({
+                            title: 'Error',
+                            text: response.errors.nombre[0],
+                            icon: 'error'
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Ocurrió un error al registrar el tipo de farmacia.',
+                            icon: 'error'
+                        });
+                    }
+                }
+            },
+            error: function() {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Ocurrió un error al registrar el tipo de farmacia.',
+                    icon: 'error'
+                });
+            },
+        });
+    }
+
+    $("#registroTipoFarmaciaForm").validate({
+        rules: {
+            nombre: {
+                required: true,
+                minlength: 3,
+                maxlength: 20,
+                pattern: /^[A-Za-záéíóúÁÉÍÓÚüÜ\s]+$/
+            },
+        },
+        messages: {
+            nombre: {
+                required: "Este campo es obligatorio.",
+                minlength: "Por favor, introduce al menos 3 caracteres.",
+                maxlength: "No puede contener más de 20 caracteres.",
+                pattern: "No puede contener números ni símbolos."
+            },
+        },
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.form-group').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        },
+        submitHandler: function (form) {
+            registrarTipoFarmacia(form);
+            return false;
+        },
+    });
+
+    $("#modal-registrar-tipo").on("hidden.bs.modal", function () {
+        if (registroSuccessful) {
+            Swal.fire({
+                title: 'Éxito',
+                text: 'El tipo de farmacia fue registrado correctamente.',
+                icon: 'success'
+            });
+            registroSuccessful = false;
+        }
+        // Limpiar el formulario del modal de registro
+        $('#registroTipoFarmaciaForm')[0].reset();
+        $('#registroTipoFarmaciaForm').find('.is-invalid').removeClass('is-invalid');
+        $('#registroTipoFarmaciaForm').find('.invalid-feedback').remove();
+    });
+
+    $('#registrarTipoFarmaciaButton').on('click', function() {
+        $('#modal-registrar-tipo').modal('show');
+    });
 
 });

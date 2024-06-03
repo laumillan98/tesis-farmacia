@@ -34,25 +34,26 @@ urlpatterns = [
           # Tipo Farmacia
      path('gestionar_tipos_de_farmacias/', views.gestionarTiposFarmacias),
      path('lista_tipos_de_farmacias/', views.listaDeTiposDeFarmacias, name='lista_tipos_de_farmacias'),
-     path('registrar_tipo_de_farmacia/', views.registrarTipoFarmacia),
+     path('gestionar_tipos_de_farmacias/registrarTipoFarmacia/', views.registrarTipoFarmacia, name='registrar_tipo_de_farmacia'),
      path('gestionar_tipos_de_farmacias/obtenerTipoFarmacia/<uuid>/', views.obtenerTipoFarmacia, name ='obtener_tipo_de_farmacia'),
      path('gestionar_tipos_de_farmacias/editarTipoFarmacia/', views.editarTipoFarmacia, name ='editar_tipo_de_farmacia'),
-          #Tuno Farmacia
+          #Turno Farmacia
      path('gestionar_turnos_de_farmacias/', views.gestionarTurnosFarmacias),
      path('lista_turnos_de_farmacias/', views.listaDeTurnosDeFarmacias, name='lista_turnos_de_farmacias'),
-     path('registrar_turno_de_farmacia/', views.registrarTurnoFarmacia),
+     path('gestionar_turnos_de_farmacias/registrarTurnoFarmacia/', views.registrarTurnoFarmacia, name='registrar_turno_de_farmacia'),
      path('gestionar_turnos_de_farmacias/obtenerTurnoFarmacia/<uuid>/', views.obtenerTurnoFarmacia, name ='obtener_turno_de_farmacia'),
      path('gestionar_turnos_de_farmacias/editarTurnoFarmacia/', views.editarTurnoFarmacia, name ='editar_turno_de_farmacia'),
      # Municipios
      path('gestionar_municipios/', views.gestionarMunicipios),
      path('lista_de_municipios/', views.listaDeMunicipios, name='lista_de_municipios'),
-     path('registrar_municipio/', views.registrarMunicipio),
+     path('gestionar_municipios/registrarMunicipio/', views.registrarMunicipio, name='registrar_municipio'),
+     path('gestionar_municipios/obtenerProvMunicipio/', views.obtenerProvMunicipio, name ='obtener_provmunicipio'),
      path('gestionar_municipios/obtenerMunicipio/<uuid>/', views.obtenerMunicipio, name ='obtener_municipio'),
      path('gestionar_municipios/editarMunicipio/', views.editarMunicipio, name ='editar_municipio'),
      # Provincias
      path('gestionar_provincias/', views.gestionarProvincias),
      path('lista_de_provincias/', views.listaDeProvincias, name='lista_de_provincias'),
-     path('registrar_provincia/', views.registrarProvincia),
+     path('gestionar_provincias/registrarProvincia/', views.registrarProvincia, name='registrar_provincia'),
      path('gestionar_provincias/obtenerProvincia/<uuid>/', views.obtenerProvincia, name ='obtener_provincia'),
      path('gestionar_provincias/editarProvincia/', views.editarProvincia, name ='editar_provincia'),
      # Farmacia Medicamento
@@ -75,19 +76,19 @@ urlpatterns = [
           # Restriccion Medicamento
      path('gestionar_restricciones_de_medicamentos/', views.gestionarRestriccionesMedicamentos),
      path('lista_restricciones_de_medicamentos/', views.listaDeRestriccionesDeMedicamentos, name='lista_restricciones_de_medicamentos'),
-     path('registrar_restriccion_de_medicamento/', views.registrarRestriccionMedicamento),
+     path('gestionar_restricciones_de_medicamentos/registrarRestriccionMedicamento/', views.registrarRestriccionMedicamento, name='registrar_restriccion_de_medicamento'),
      path('gestionar_restricciones_de_medicamentos/obtenerRestriccionMedicamento/<uuid>/', views.obtenerRestriccionMedicamento, name ='obtener_restriccion_de_medicamento'),
      path('gestionar_restricciones_de_medicamentos/editarRestriccionMedicamento/', views.editarRestriccionMedicamento, name ='editar_restriccion_de_medicamento'),
           # Clasificacion Medicamento
      path('gestionar_clasificaciones_de_medicamentos/', views.gestionarClasificacionesMedicamentos),
      path('lista_clasificaciones_de_medicamentos/', views.listaDeClasificacionesDeMedicamentos, name='lista_clasificaciones_de_medicamentos'),
-     path('registrar_clasificacion_de_medicamento/', views.registrarClasificacionMedicamento),
+     path('gestionar_clasificaciones_de_medicamentos/registrarClasificacionMedicamento/', views.registrarClasificacionMedicamento, name='registrar_clasificacion_de_medicamento'),
      path('gestionar_clasificaciones_de_medicamentos/obtenerClasificacionMedicamento/<uuid>/', views.obtenerClasificacionMedicamento, name ='obtener_clasificacion_de_medicamento'),
      path('gestionar_clasificaciones_de_medicamentos/editarClasificacionMedicamento/', views.editarClasificacionMedicamento, name ='editar_clasificacion_de_medicamento'),
           # Formato Medicamento
      path('gestionar_formatos_de_medicamentos/', views.gestionarFormatosMedicamentos),
      path('lista_formatos_de_medicamentos/', views.listaDeFormatosDeMedicamentos, name='lista_formatos_de_medicamentos'),
-     path('registrar_formato_de_medicamento/', views.registrarFormatoMedicamento),
+     path('gestionar_formatos_de_medicamentos/registrarFormatoMedicamento/', views.registrarFormatoMedicamento, name='registrar_formato_de_medicamento'),
      path('gestionar_formatos_de_medicamentos/obtenerFormatoMedicamento/<uuid>/', views.obtenerFormatoMedicamento, name ='obtener_formato_de_medicamento'),
      path('gestionar_formatos_de_medicamentos/editarFormatoMedicamento/', views.editarFormatoMedicamento, name ='editar_formato_de_medicamento'),
      # Buscar Existencias de Medicamentos 

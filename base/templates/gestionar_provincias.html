@@ -13,7 +13,7 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <a href="/registrar_provincia" class="btn btn-md btn-secondary">Registrar provincia</a>
+                <button id="registrarProvinciaButton" class="btn btn-md btn-success"><i class="fa-solid fa-plus"></i> Registrar Nueva Provincia</button>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -22,7 +22,6 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>id</th>
                                 <th>Provincia</th>
                                 <th>Opciones</th>
                             </tr>
@@ -54,18 +53,44 @@
                                 <input type="text" class="form-control" id="id" hidden name="id">
                             </div>
                         </div>
-                        <!-- /.card-body -->
                         <div class="card-footer">
                             <button type="submit" class="btn btn-primary">Aceptar</button>
                         </div>
                     </form>
                 </div>
             </div>
-            <!-- /.modal-content -->
         </div>
-        <!-- /.modal-dialog -->
     </div>
     <!-- /.modal -->
+
+
+    <!-- Modal para registrar provincia -->
+    <div class="modal fade" id="modal-registrar-provincia">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Registrar Provincia</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="registroProvinciaForm">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="nuevaProvincia">Nombre:</label>
+                                <input type="text" class="form-control" id="nuevaProvincia" name="nombre" placeholder="Provincia" required>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Registrar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
     
 
 {% endblock %}   

@@ -158,9 +158,9 @@ DEFAULT_CHARSET = 'utf-8'
 # Emailing settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_FROM = 'testtesisfarma@gmail.com'
-EMAIL_HOST_USER = 'testtesisfarma@gmail.com'
-EMAIL_HOST_PASSWORD = 'pooa tvdz yaln xpmz'
+EMAIL_FROM = 'laumillan98@gmail.com'
+EMAIL_HOST_USER = 'laumillan98@gmail.com'
+EMAIL_HOST_PASSWORD = 'zfwe gnaq lqtr uxnh'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 

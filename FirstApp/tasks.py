@@ -33,10 +33,27 @@ def check_stock_for_pills():
 def notificar_existencias():
     print("notificar_existencias")
     tareas = TareaExistencia.objects.all()
-    existencias = FarmaciaMedicamento.objects.all()
+    farma_medicamentos = FarmaciaMedicamento.objects.all()
     for tarea in tareas:
-        existencia = existencias.get(id_medic=tarea.id_medic).existencia
-        print(f'${tarea.id_medic.nombre} - ${existencia}')
-        if existencia is not None and existencia > 0:
-            # Enviar el correo aqui
+        filtered = farma_medicamentos.filter(id_medic=tarea.id_medic, existencia__gt=0)
+        result = []
+        for item in filtered:
+            print(f'{tarea.id_medic.nombre} - {item.existencia} - {item.id_farma.nombre}')
+            result.append({
+                'medicamento': tarea.id_medic.nombre,
+                'existencias': 'Altas' if item.existencia > 10 else 'Bajas',
+                'farmacia': item.id_farma.nombre,
+                'municipio': item.id_farma.id_munic.nombre,
+            })
+            # el listado result tiene todas las farmacias donde existe ese medicamento con existencia, 
+        if len(result) > 0:
+            print(result)
+            print(result[0]['medicamento'])
+            mail_subject = "Restauración de existencia de " + result[0]['medicamento']
+            message = render_to_string("existencia_medicamento.html", {
+                'user': tarea.id_user.username,
+                'result': result
+            })
+            email_message = EmailMessage(mail_subject, message, to=[tarea.id_user.email])
+            email_message.send()
             tarea.delete()

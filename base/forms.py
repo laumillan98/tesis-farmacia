@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
 from django.core.validators import RegexValidator
+from django.core.exceptions import ValidationError
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -176,6 +177,12 @@ class TipoFarmaciaUpdateForm(forms.ModelForm):
         model = TipoFarmacia
         fields = ('nombre',)
 
+    def clean_nombre(self):
+        nombre = self.cleaned_data.get('nombre')
+        if TipoFarmacia.objects.filter(nombre=nombre).exists():
+            raise ValidationError('Este nombre ya existe.')
+        return nombre
+
 
 class TurnoFarmaciaUpdateForm(forms.ModelForm):
     nombre = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido.')], label="Nombre", required=True)
@@ -183,6 +190,12 @@ class TurnoFarmaciaUpdateForm(forms.ModelForm):
     class Meta:
         model = TurnoFarmacia
         fields = ('nombre',)
+
+    def clean_nombre(self):
+        nombre = self.cleaned_data.get('nombre')
+        if TurnoFarmacia.objects.filter(nombre=nombre).exists():
+            raise ValidationError('Este nombre ya existe.')
+        return nombre
 
 
 class MunicUpdateForm(forms.ModelForm):
@@ -192,6 +205,12 @@ class MunicUpdateForm(forms.ModelForm):
         model = Municipio
         fields = ('nombre', 'id_prov')
 
+    def clean_nombre(self):
+        nombre = self.cleaned_data.get('nombre')
+        if Municipio.objects.filter(nombre=nombre).exists():
+            raise ValidationError('Este nombre ya existe.')
+        return nombre
+
 
 class ProvUpdateForm(forms.ModelForm):
     nombre = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
@@ -199,6 +218,12 @@ class ProvUpdateForm(forms.ModelForm):
     class Meta:
         model = Provincia
         fields = ('nombre',)
+
+    def clean_nombre(self):
+        nombre = self.cleaned_data.get('nombre')
+        if Provincia.objects.filter(nombre=nombre).exists():
+            raise ValidationError('Este nombre ya existe.')
+        return nombre
 
 
 class MedicUpdateForm(forms.ModelForm):
@@ -222,6 +247,12 @@ class RestriccionMedicamentoUpdateForm(forms.ModelForm):
         model = RestriccionMedicamento
         fields = ('nombre',)
 
+    def clean_nombre(self):
+        nombre = self.cleaned_data.get('nombre')
+        if RestriccionMedicamento.objects.filter(nombre=nombre).exists():
+            raise ValidationError('Este nombre ya existe.')
+        return nombre
+
 
 class ClasificacionMedicamentoUpdateForm(forms.ModelForm):
     nombre = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
@@ -230,6 +261,12 @@ class ClasificacionMedicamentoUpdateForm(forms.ModelForm):
         model = ClasificacionMedicamento
         fields = ('nombre',)
 
+    def clean_nombre(self):
+        nombre = self.cleaned_data.get('nombre')
+        if ClasificacionMedicamento.objects.filter(nombre=nombre).exists():
+            raise ValidationError('Este nombre ya existe.')
+        return nombre
+
 
 class FormatoMedicamentoUpdateForm(forms.ModelForm):
     nombre = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
@@ -237,6 +274,12 @@ class FormatoMedicamentoUpdateForm(forms.ModelForm):
     class Meta:
         model = FormatoMedicamento
         fields = ('nombre',)
+
+    def clean_nombre(self):
+        nombre = self.cleaned_data.get('nombre')
+        if FormatoMedicamento.objects.filter(nombre=nombre).exists():
+            raise ValidationError('Este nombre ya existe.')
+        return nombre
 
 
 class FarmaciaAdminForm(forms.ModelForm):

@@ -5,7 +5,6 @@ $(document).ready(function() {
         "ajax": ajaxUrl,
         "columns": [
             { data: "index" },
-            { data: "id" },
             { data: "nombre" },
             {
                 data: null,
@@ -13,7 +12,7 @@ $(document).ready(function() {
                 searchable: false,
                 render: function(data, type, row, meta) {
                     // Verifica si estás en la columna de acciones
-                    if (meta.col === 3) { 
+                    if (meta.col === 2) { 
                         let editButton = `
                         <button id='editar' class='btn btn-sm btn-success' data-id='${row.id}' data-toggle='modal' data-target='#modal-lg'>
                             <i class="fas fa-pencil-alt"></i>
@@ -116,5 +115,98 @@ $(document).ready(function() {
           editionSuccessful = false;
         }
     })
+
+
+    // Funcion para registrar Provincia
+    function registrarProvincia(form) {
+        var formData = $(form).serialize();
+        $.ajax({
+            url: "registrarProvincia/",
+            type: "POST",
+            data: formData,
+            headers: { "X-CSRFToken": $("input[name=csrfmiddlewaretoken]").val() },
+            success: function(response) {
+                $("#modal-registrar-provincia").modal("hide");
+                if (response.success === true) {
+                    registroSuccessful = true;
+                    $("#miTabla").DataTable().ajax.reload();
+                } else {
+                    if (response.errors && response.errors.nombre) {
+                        Swal.fire({
+                            title: 'Error',
+                            text: response.errors.nombre[0],
+                            icon: 'error'
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Ocurrió un error al registrar la provincia.',
+                            icon: 'error'
+                        });
+                    }
+                }
+            },
+            error: function() {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Ocurrió un error al registrar la provincia.',
+                    icon: 'error'
+                });
+            },
+        });
+    }
+
+    $("#registroProvinciaForm").validate({
+        rules: {
+            nombre: {
+                required: true,
+                minlength: 3,
+                maxlength: 20,
+                pattern: /^[A-Za-záéíóúÁÉÍÓÚüÜ\s]+$/
+            },
+        },
+        messages: {
+            nombre: {
+                required: "Este campo es obligatorio.",
+                minlength: "Por favor, introduce al menos 3 caracteres.",
+                maxlength: "No puede contener más de 20 caracteres.",
+                pattern: "No puede contener números ni símbolos."
+            },
+        },
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.form-group').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        },
+        submitHandler: function (form) {
+            registrarProvincia(form);
+            return false;
+        },
+    });
+
+    $("#modal-registrar-provincia").on("hidden.bs.modal", function () {
+        if (registroSuccessful) {
+            Swal.fire({
+                title: 'Éxito',
+                text: 'La provincia fue registrada correctamente.',
+                icon: 'success'
+            });
+            registroSuccessful = false;
+        }
+        // Limpiar el formulario del modal de registro
+        $('#registroProvinciaForm')[0].reset();
+        $('#registroProvinciaForm').find('.is-invalid').removeClass('is-invalid');
+        $('#registroProvinciaForm').find('.invalid-feedback').remove();
+    });
+
+    $('#registrarProvinciaButton').on('click', function() {
+        $('#modal-registrar-provincia').modal('show');
+    });
 
 });
