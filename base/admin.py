@@ -31,9 +31,3 @@ class FarmaciaAdmin(LeafletGeoAdmin):
         super(FarmaciaAdmin, self).save_model(request, obj, form, change)
 
 
-"""@admin.register(Medicamento)
-class MedicamentoAdmin(admin.ModelAdmin):
-    form = MedicamentoAdminForm
-    list_display = ['nombre', 'cant_max', 'precio_unidad', 'origen_natural']
-    search_fields = ['nombre']
-    filter_horizontal = ('reacciones',)"""

@@ -332,8 +332,48 @@ def gestionarUsuarios(request):
     return render(request, "gestionar_usuarios.html")
 
 
+def filterUsers(users, search_value):
+    if search_value:
+        return users.filter(
+            Q(first_name__icontains=search_value) |
+            Q(last_name__icontains=search_value) |
+            Q(username__icontains=search_value) |
+            Q(email__icontains=search_value) |
+            Q(groups__name__icontains=search_value) |
+            Q(date_joined__icontains=search_value) |
+            Q(last_login__icontains=search_value)
+        )
+    return users
+
+
+def orderUsers(users, order_column_index, order_direction):
+    order_column_mapping = {
+        '1': 'first_name',
+        '2': 'last_name',
+        '3': 'username',
+        '4': 'email',
+        '5': 'groups__name',  
+        '6': 'date_joined',
+        '7': 'last_login',
+    }
+    if order_column_index in order_column_mapping:
+        order_column = order_column_mapping[order_column_index]
+        if order_direction == 'desc':
+            order_column = '-' + order_column
+        users = users.order_by(order_column)
+    
+    return users
+
+
 def listaDeUsuarios(request):
     users = CustomUser.objects.all()
+
+    order_column_index = request.GET.get("order[0][column]", "")
+    order_direction = request.GET.get("order[0][dir]", "")
+    search_value = request.GET.get("search[value]", "")
+
+    users = filterUsers(users, search_value)
+    users = orderUsers(users, order_column_index, order_direction)
 
     paginator = Paginator(users, request.GET.get('length', 10))  # Cantidad de objetos por página
     start = int(request.GET.get('start', 0))
@@ -604,22 +644,48 @@ def gestionarFarmacias(request):
     return render(request, "gestionar_farmacias.html", context)
 
 
+def filterFarmas(farmacias, search_value):
+    if search_value:
+        return farmacias.filter(
+            Q(nombre__icontains=search_value) |
+            Q(id_munic__id_prov__nombre__icontains=search_value) |
+            Q(id_munic__nombre__icontains=search_value) |
+            Q(direccion__icontains=search_value) |
+            Q(telefono__icontains=search_value) |
+            Q(id_turno__nombre__icontains=search_value) |
+            Q(id_tipo__nombre__icontains=search_value)
+        )
+    return farmacias
+
+
+def orderFarmas(farmacias, order_column_index, order_direction):
+    order_column_mapping = {
+        '1': 'nombre',
+        '2': 'id_munic__id_prov__nombre',
+        '3': 'id_munic__nombre',
+        '4': 'direccion',
+        '5': 'telefono',
+        '6': 'id_tipo__nombre',
+        '7': 'id_turno__nombre',
+    }
+    if order_column_index in order_column_mapping:
+        order_column = order_column_mapping[order_column_index]
+        if order_direction == 'desc':
+            order_column = '-' + order_column
+        farmacias = farmacias.order_by(order_column)
+    return farmacias
+
+
 def listaDeFarmacias(request):
     farmacias = Farmacia.objects.all()
    
-    order_column = request.GET.get("order[0][column]", "")
-    order = request.GET.get("order[0][dir]", "")
+    order_column_index = request.GET.get("order[0][column]", "")
+    order_direction = request.GET.get("order[0][dir]", "")
     search_value = request.GET.get("search[value]", "")
 
-    if search_value:
-        farmacias = farmacias.filter(nombre__icontains=search_value)
-
-    if order_column == '1':
-        if order == 'desc':
-            farmacias = farmacias.order_by('-nombre')
-        else:
-            farmacias = farmacias.order_by('nombre')
-    
+    farmacias = filterFarmas(farmacias, search_value)
+    farmacias = orderFarmas(farmacias, order_column_index, order_direction)
+   
     paginator = Paginator(farmacias, request.GET.get('length', 10))  # Cantidad de objetos por página
     start = int(request.GET.get('start', 0))
     page_number = start // paginator.per_page + 1  # Calcular el número de página basado en 'start'
@@ -644,7 +710,9 @@ def listaDeFarmacias(request):
             'telefono': farma.telefono,
             'tipo': farma.id_tipo.nombre,
             'turno': farma.id_turno.nombre,
-            'usuario_asignado': nombre_usuario_asignado
+            'usuario_asignado': nombre_usuario_asignado,
+            'latitud': farma.ubicacion.y if farma.ubicacion else None,
+            'longitud': farma.ubicacion.x if farma.ubicacion else None,
         }
         farmacias_list.append(farma_data)
 
@@ -1073,6 +1141,46 @@ def gestionarMedicamentosDisponibles(request):
     return render(request, "gestionar_medicamentos_disponibles.html", context)
 
 
+def filterMedics(medicamentos, search_value):
+    if search_value:
+        search_value_lower = search_value.lower()
+
+        origen_natural_search = None
+        if search_value_lower == 'natural':
+            origen_natural_search = True
+        elif search_value_lower == 'fármaco' or search_value_lower == 'farmaco':
+            origen_natural_search = False
+
+        medicamentos = medicamentos.filter(
+            Q(nombre__icontains=search_value) |
+            Q(id_formato__nombre__icontains=search_value) |
+            Q(cant_max__icontains=search_value) |
+            Q(precio_unidad__icontains=search_value) |
+            Q(id_restriccion__nombre__icontains=search_value) |
+            Q(id_clasificacion__nombre__icontains=search_value) |
+            Q(origen_natural=origen_natural_search)
+        )
+    return medicamentos
+
+
+def orderMedics(medicamentos, order_column_index, order_direction):
+    order_column_mapping = {
+        '1': 'nombre',
+        '2': 'id_formato__nombre',
+        '3': 'cant_max',
+        '4': 'precio_unidad',
+        '5': 'origen_natural',
+        '6': 'id_restriccion__nombre',
+        '7': 'id_clasificacion__nombre',
+    }
+    if order_column_index in order_column_mapping:
+        order_column = order_column_mapping[order_column_index]
+        if order_direction == 'desc':
+            order_column = '-' + order_column
+        medicamentos = medicamentos.order_by(order_column)
+    return medicamentos
+
+
 def listaDeMedicamentosDisponibles(request):
     usuario = request.user
     farmaceutico = FarmaUser.objects.get(username=usuario.username)
@@ -1081,6 +1189,13 @@ def listaDeMedicamentosDisponibles(request):
     medicamentos_en_farmacia = FarmaciaMedicamento.objects.filter(id_farma=farmacia).values_list('id_medic', flat=True)
     # Filtra los medicamentos disponibles excluyendo los que ya están en la farmacia del usuario
     medicamentos = Medicamento.objects.exclude(id_medic__in=medicamentos_en_farmacia)
+
+    order_column_index = request.GET.get("order[0][column]", "")
+    order_direction = request.GET.get("order[0][dir]", "")
+    search_value = request.GET.get("search[value]", "")
+
+    medicamentos = filterMedics(medicamentos, search_value)
+    medicamentos = orderMedics(medicamentos, order_column_index, order_direction)
 
     paginator = Paginator(medicamentos, request.GET.get('length', 10))  # Cantidad de objetos por página
     start = int(request.GET.get('start', 0))
@@ -1167,6 +1282,13 @@ def gestionarMedicamentos(request):
 
 def listaDeMedicamentos(request):
     medicamentos = Medicamento.objects.all()
+
+    order_column_index = request.GET.get("order[0][column]", "")
+    order_direction = request.GET.get("order[0][dir]", "")
+    search_value = request.GET.get("search[value]", "")
+
+    medicamentos = filterMedics(medicamentos, search_value)
+    medicamentos = orderMedics(medicamentos, order_column_index, order_direction)
 
     paginator = Paginator(medicamentos, request.GET.get('length', 10))  # Cantidad de objetos por página
     start = int(request.GET.get('start', 0))
@@ -1882,21 +2004,9 @@ def generate_traza_sistema_report(request, objetos):
         return None  # Return None if no objects are found
 
     data = [
-        ['#', 'Fecha y Hora', 'Usuario', 'Tipo de Objeto', 'Objeto', 'Acción', 'Detalles']
+        ['#', 'Fecha y Hora', 'Usuario', 'Tipo de Objeto', 'Objeto', 'Acción']
     ]
     for index, objeto in enumerate(objetos):
-        # Procesar change_message
-        try:
-            change_message = json.loads(objeto.change_message)
-            if isinstance(change_message, list):
-                change_message = ", ".join([str(msg) for msg in change_message])
-            elif isinstance(change_message, dict):
-                change_message = ", ".join([f"{k}: {v}" for k, v in change_message.items()])
-            else:
-                change_message = str(change_message)
-        except json.JSONDecodeError:
-            change_message = objeto.change_message
-            
         data.append([
             index + 1,
             objeto.action_time.strftime('%Y-%m-%d %H:%M:%S'),
@@ -1904,7 +2014,6 @@ def generate_traza_sistema_report(request, objetos):
             str(objeto.content_type) if objeto.content_type else 'N/A',
             objeto.object_repr,
             {ADDITION: 'Adición', CHANGE: 'Cambio', DELETION: 'Eliminación'}.get(objeto.action_flag, ''),
-            change_message,
         ])
     return data
 

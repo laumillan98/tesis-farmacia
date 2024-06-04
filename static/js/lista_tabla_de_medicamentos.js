@@ -48,7 +48,7 @@ $.getScript("/static/js/datatables.spanish.js", function() {
 
                     if (response.result.length > 0) {
                         if (response.has_interactions) {
-                            toastr.error('Los resultados de busqueda muetran medicamentos con reacciones, presione sobre el icono ⚠️ para visualizarlas');
+                            toastr.error('Los resultados de búsqueda muestran medicamentos con reacciones, presione sobre el ícono ⚠️ para visualizarlas');
                         }    
                         $.each(response.result, function(index, medicamento) {
                             tablaMedicamento.row.add([

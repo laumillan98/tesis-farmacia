@@ -35,7 +35,6 @@ $.getScript("/static/js/datatables.spanish.js", function() {
                               </button>&nbsp`
                           return editButton 
                       }
-                      // Puedes retornar diferentes contenidos dependiendo de la columna
                       return data; // Retorna los datos originales para otras columnas
                   },
               },
