@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.gis.db import models as gis_models
 import uuid
+
 # Create your models here.
 
 class CustomUser(AbstractUser):
@@ -96,7 +97,7 @@ class Farmacia(models.Model):
     id_farma = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     nombre = models.CharField(max_length=100, unique=True)
     direccion = models.CharField(max_length=200)
-    telefono = models.IntegerField(null=True, blank=True) 
+    telefono = models.IntegerField(null=True, blank=True, unique=True) 
     id_turno = models.ForeignKey(TurnoFarmacia, on_delete=models.RESTRICT, null=True)
     id_tipo = models.ForeignKey(TipoFarmacia, on_delete=models.RESTRICT)
     id_munic = models.ForeignKey(Municipio, on_delete=models.RESTRICT)

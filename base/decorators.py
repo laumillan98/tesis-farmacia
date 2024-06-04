@@ -1,5 +1,6 @@
 from django.http import HttpResponse
-from django.shortcuts import redirect  
+from django.shortcuts import redirect 
+from django.http import Http404 
 
 
 def unauthenticated_user(function=None, redirect_url='/acceder'):
@@ -29,6 +30,6 @@ def usuarios_permitidos(roles_permitidos=[]):
             if group in roles_permitidos:
                 return view_func(request, *args, **kwargs)
             else:
-                return HttpResponse('No estás autorizado a acceder en esta página')
+                raise Http404("Página no encontrada")
         return wrapper_func
     return decorators

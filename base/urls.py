@@ -10,7 +10,7 @@ urlpatterns = [
      path('restore_database/', views.restore_database, name='restore_database'),
      path('salir/', views.salir),
      path('acceder/', views.autenticar, name='acceder'),
-     path('activate/<username>/<token>', views.activate, name='activate'),
+     path('activate/<uidb64>/<token>', views.activate, name='activate'),
      path('registrar/', views.registrar),
      path("cambiarPass", views.cambiarPass, name="cambiarPass"),
      path("solicitar_restablecer_pass", views.restablecerPass, name="solicitar_restablecer_pass"),
@@ -21,6 +21,7 @@ urlpatterns = [
      path('lista_de_usuarios/', views.listaDeUsuarios, name='lista_de_usuarios'),
      path('registrar_farmaceutico/', views.registrarFarmaceutico,  name='registrar_farmaceutico'),
      path('registrar_especialista/', views.registrarEspecialista,  name='registrar_especialista'),
+     path('registrar_administrador/', views.registrarAdministrador,  name='registrar_administrador'),
      path('gestionar_usuarios/eliminarUsuario/<username>/', views.eliminarUsuario, name='eliminar_usuario'),
      path('gestionar_usuarios/activarUsuario/<username>/', views.activarUsuario, name ='activar_usuario'),
      path('gestionar_usuarios/obtenerUsuario/<username>/', views.obtenerUsuario, name ='obtener_usuario'),
@@ -91,19 +92,20 @@ urlpatterns = [
      path('gestionar_formatos_de_medicamentos/registrarFormatoMedicamento/', views.registrarFormatoMedicamento, name='registrar_formato_de_medicamento'),
      path('gestionar_formatos_de_medicamentos/obtenerFormatoMedicamento/<uuid>/', views.obtenerFormatoMedicamento, name ='obtener_formato_de_medicamento'),
      path('gestionar_formatos_de_medicamentos/editarFormatoMedicamento/', views.editarFormatoMedicamento, name ='editar_formato_de_medicamento'),
+     # Buscar Informacion de Medicamentos
+     path('visualizar_tabla_medicamentos/', views.visualizarTablaMedicamentos),
+     path('buscar_infoMedicamento/', views.buscarInfoMedicamento, name='buscar_infoMedicamento'),
+      path('visualizar_tabla_medicamentos/obtenerDescripcion/<uuid>/', views.obtenerDescripcion, name ='obtener_descripcion'),
      # Buscar Existencias de Medicamentos 
-     path('visualizar_existencias_medicamentos/', views.visualizarExistenciasMedicamentos),
      path('buscar_medicamento/', views.buscarMedicamento, name='buscar_medicamento'),
      # Buscar Farmacias por Municipio
      path('visualizar_tabla_farmacias/', views.visualizarTablaFarmacias),
      path('buscar_farmacia/', views.buscarFarmacia, name='buscar_farmacia'),
-     # Buscar Informacion de Medicamentos
-     path('visualizar_tabla_medicamentos/', views.visualizarTablaMedicamentos),
-     path('buscar_infoMedicamento/', views.buscarInfoMedicamento, name='buscar_infoMedicamento'),
-     path('visualizar_tabla_medicamentos/obtenerDescripcion/<uuid>/', views.obtenerDescripcion, name ='obtener_descripcion'),
      # Trazas
-     path('visualizar_trazas/', views.visualizarTrazas),
-     path('lista_de_trazas/', views.listaDeTrazas, name='lista_de_trazas'),
+     path('visualizar_trazas_crud/', views.visualizarTrazasCrud),
+     path('lista_de_trazas_crud/', views.listaDeTrazasCrud, name='lista_de_trazas_crud'),
+     path('visualizar_trazas_sistema/', views.visualizarTrazasSistema),
+     path('lista_de_trazas_sistema/', views.listaDeTrazasSistema, name='lista_de_trazas_sistema'),
      # Graficos
      path('visualizar_charts/', views.visualizarCharts),
      path('usuarios_xgrupos_chart/', views.usuariosXGruposChart, name='usuarios_xgrupos_chart'),

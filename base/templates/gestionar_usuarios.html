@@ -13,9 +13,14 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <a href="/registrar_farmaceutico" class="btn btn-md btn-secondary">Registrar farmacéutico</a>
-                <a href="/registrar_especialista" class="btn btn-md btn-secondary">Registrar especialista</a>
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#filtroModal" style="margin-left: 10px;">Exportar Usuarios</button>
+                <div>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#filtroModal">Exportar Usuarios</button><br>
+                </div>
+                <div style="margin-top: 10px;">
+                    <a href="/registrar_farmaceutico" class="btn btn-md btn-success mr-2"><i class="fa-solid fa-plus"></i> Farmacéutico</a>
+                    <a href="/registrar_especialista" class="btn btn-md btn-success mr-2"><i class="fa-solid fa-plus"></i> Especialista</a>
+                    <a href="/registrar_administrador" class="btn btn-md btn-success"><i class="fa-solid fa-plus"></i> Administrador</a>
+                </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -117,7 +122,8 @@
                           <select class="form-control" id="rol" name="rol">
                               <option value="">Todos</option>
                               <option value="admin">Administrador</option>
-                              <option value="farmaceuticos">Farmacéuticos</option>
+                              <option value="especialista">Especialista</option> 
+                              <option value="farmacéuticos">Farmacéuticos</option>
                               <option value="clientes">Clientes</option> 
                           </select>
                       </div>
