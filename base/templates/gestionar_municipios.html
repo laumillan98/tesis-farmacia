@@ -1,5 +1,5 @@
 
-{% extends "./index.html" %}
+{% extends "./index_especialista.html" %}
 
 {% load static %}
 
@@ -14,7 +14,7 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <a href="/registrar_municipio" class="btn btn-md btn-secondary">Registrar municipio</a>
+                <button id="registrarMunicipioButton" class="btn btn-md btn-success"><i class="fa-solid fa-plus"></i> Registrar Nuevo Municipio</button>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -23,7 +23,6 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Id</th>
                                 <th>Municipio</th>
                                 <th>Provincia a la que pertenece </th>
                                 <th>Opciones</th>
@@ -61,18 +60,49 @@
                                 </select>
                             </div>
                         </div>
-                        <!-- /.card-body -->
                         <div class="card-footer">
                             <button type="submit" class="btn btn-primary">Aceptar</button>
                         </div>
                     </form>
                 </div>
             </div>
-            <!-- /.modal-content -->
         </div>
-        <!-- /.modal-dialog -->
     </div>
     <!-- /.modal -->
+
+
+    <!-- Modal para registrar municipio -->
+    <div class="modal fade" id="modal-registrar-municipio">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Registrar Municipio</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="registroMunicipioForm">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="nuevoMunicipio">Nombre:</label>
+                                <input type="text" class="form-control" id="nuevoMunicipio" name="nombre" placeholder="Municipio" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="provinciaRegistro">Provincia:</label>
+                                <select class="form-control" id="provinciaRegistro" name="id_prov" required>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Registrar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}   
 

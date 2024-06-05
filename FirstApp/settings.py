@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from celery.schedules import crontab
 import os
 from pathlib import Path
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -187,6 +188,8 @@ LEAFLET_CONFIG = {
 }
 
 
+
+# Biblioteca EasyAudit para las Trazas
 EASY_AUDIT_WATCH_MODEL_EVENTS = True
 EASY_AUDIT_WATCH_AUTH_EVENTS = True
 EASY_AUDIT_WATCH_REQUEST_EVENTS = True

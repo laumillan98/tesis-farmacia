@@ -1,10 +1,12 @@
-{% extends "./index.html" %}
+{% extends "./index_especialista.html" %}
 
 {% load static %}
 
 {% block mytitle %}Gestionar Farmacias{% endblock %}
 
-{% block mycss %}{% endblock %}
+{% block mycss %}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+{% endblock %}
 
 {% block title %}Gestionar Farmacias{% endblock %}
 
@@ -13,7 +15,7 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <a href="/registrar_farmacia" class="btn btn-md btn-secondary">Registrar Farmacia</a>
+                <a href="/registrar_farmacia" class="btn btn-md btn-success"><i class="fa-solid fa-plus"></i> Registrar Nueva Farmacia</a>
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#filtroModal" style="margin-left: 10px;">Exportar Farmacias</button>
             </div>
             <div class="card-body">
@@ -43,7 +45,7 @@
         </div>
     </div>
 
-    <!-- /.modal -->
+    <!-- /.modal editar -->
     <div class="modal fade" id="modal-lg">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -93,11 +95,34 @@
                     </form>
                 </div>
             </div>
-            <!-- /.modal-content -->
         </div>
-        <!-- /.modal-dialog -->
     </div>
     <!-- /.modal -->
+
+
+    <!-- Map Modal -->
+    <div class="modal fade" id="mapModal" tabindex="-1" role="dialog" aria-labelledby="mapModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mapModalLabel">Ubicación de la Farmacia</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="mapa" style="height: 400px;"></div>
+                    <input type="hidden" id="latitud">
+                    <input type="hidden" id="longitud">
+                    <input type="hidden" id="farmacia_id">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="guardarUbicacionBtn">Guardar Ubicación</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
     <!-- Filtro Modal -->
@@ -218,8 +243,7 @@
         });
     });
 </script>
-
-
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 <script src="{% static 'plugins/jquery-validation/jquery.validate.min.js' %}"></script>
 <script src="{% static 'plugins/jquery-validation/additional-methods.min.js' %}"></script>
 <script src="{% static 'js/lista_de_farmacias.js' %}"></script>

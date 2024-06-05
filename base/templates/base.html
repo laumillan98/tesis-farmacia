@@ -38,18 +38,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" style="margin-left: 20px;" aria-current="page" href="/">Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" style="margin-left: 10px;" href="/farmacias_tabla">Farmacias</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" style="margin-left: 10px;" href="/medicamentos_tabla">Medicamentos</a>
-                    </li> 
-                    <li class="nav-item">
-                        <a class="nav-link" style="margin-left: 10px;" href="/existencias_tabla">¿Dónde hay?</a>
-                    </li> 
+                    
                     
                     {% if request.user.is_authenticated %}
                     <li class="nav-item dropdown" style="position: absolute; right: 10px;">
@@ -65,7 +54,7 @@
                       </li>
                     {% else %}
                     <li class="nav4-item">
-                        <a class="nav-link" style="margin-left: 860px;" href="/acceder"><i class= "fas fa-sign-in"></i> &nbsp Acceder</a>
+                        <a class="nav-link" style="margin-left: 1000px;" href="/acceder"><i class= "fas fa-sign-in"></i> &nbsp Acceder</a>
                     </li>
                     {% endif %} 
                     

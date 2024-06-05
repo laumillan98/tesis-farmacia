@@ -20,7 +20,7 @@
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#filtroModal">Exportar Trazas</button>
                 </div>
                 <br>
-                <table id="miTabla" class="table table-bordered table-striped" data-url="{% url 'lista_de_trazas' %}">
+                <table id="miTabla" class="table table-bordered table-striped" data-url="{% url 'lista_de_trazas_crud' %}">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -55,7 +55,7 @@
                         <div class="form-group">
                             <label for="usuario">Nombre de Usuario</label>
                             <input type="text" class="form-control" id="usuario" name="usuario" placeholder="Todos">
-                            <input type="hidden" name="tipo_objeto" value="traza">
+                            <input type="hidden" name="tipo_objeto" value="trazaCrud">
                         </div>
                         <div class="form-group">
                             <label for="fecha_inicio">Fecha de Inicio</label>
@@ -116,7 +116,7 @@
                         var blob = new Blob([response], { type: 'application/pdf' });
                         var link = document.createElement('a');
                         link.href = window.URL.createObjectURL(blob);
-                        link.download = 'reporte_trazas.pdf';
+                        link.download = 'reporte_trazas_crud.pdf';
                         link.click();
                         $('#filtroModal').modal('hide');
 
@@ -148,6 +148,6 @@
   </script>
   
 
-<script src="{% static 'js/lista_de_trazas.js' %}"></script>
+<script src="{% static 'js/lista_de_trazas_crud.js' %}"></script>
 
 {% endblock %}

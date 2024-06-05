@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.gis.db import models as gis_models
 import uuid
+
 # Create your models here.
 
 class CustomUser(AbstractUser):
@@ -14,7 +15,7 @@ class CustomUser(AbstractUser):
 class TipoFarmacia(models.Model):
     id_tipo_farmacia = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False)
-    nombre = models.CharField(max_length=20)
+    nombre = models.CharField(max_length=20, unique=True)
 
     def __str__(self):
         return self.nombre
@@ -23,7 +24,7 @@ class TipoFarmacia(models.Model):
 class TurnoFarmacia(models.Model):
     id_turno_farmacia = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False)
-    nombre = models.CharField(max_length=20)
+    nombre = models.CharField(max_length=20, unique=True)
 
     def __str__(self):
         return self.nombre
@@ -32,7 +33,7 @@ class TurnoFarmacia(models.Model):
 class RestriccionMedicamento(models.Model):
     id_restriccion = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False)
-    nombre = models.CharField(max_length=20)
+    nombre = models.CharField(max_length=20, unique=True)
 
     def __str__(self):
         return self.nombre 
@@ -41,7 +42,7 @@ class RestriccionMedicamento(models.Model):
 class ClasificacionMedicamento(models.Model):
     id_clasificacion = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False)
-    nombre = models.CharField(max_length=20)
+    nombre = models.CharField(max_length=20, unique=True)
 
     def __str__(self):
         return self.nombre    
@@ -50,7 +51,7 @@ class ClasificacionMedicamento(models.Model):
 class FormatoMedicamento(models.Model):
     id_formato = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False)
-    nombre = models.CharField(max_length=20)
+    nombre = models.CharField(max_length=20, unique=True)
 
     def __str__(self):
         return self.nombre    
@@ -59,7 +60,7 @@ class FormatoMedicamento(models.Model):
 class Provincia(models.Model):
     id_prov = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False)
-    nombre = models.CharField(max_length=20)
+    nombre = models.CharField(max_length=20, unique=True)
 
     def __str__(self):
         return self.nombre
@@ -87,7 +88,6 @@ class Medicamento(models.Model):
     id_clasificacion = models.ForeignKey(ClasificacionMedicamento, on_delete=models.RESTRICT, null=True, blank=True, to_field='id_clasificacion')
     id_formato = models.ForeignKey(FormatoMedicamento, on_delete=models.RESTRICT, null=True, blank=True, to_field='id_formato')
     reacciones = models.TextField(null=True, blank=True)
-    #reacciones = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='reacciones_con')
     
     def __str__(self):
         return self.nombre      
@@ -95,9 +95,9 @@ class Medicamento(models.Model):
 
 class Farmacia(models.Model):
     id_farma = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    nombre = models.CharField(max_length=100)
+    nombre = models.CharField(max_length=100, unique=True)
     direccion = models.CharField(max_length=200)
-    telefono = models.IntegerField(null=True, blank=True) 
+    telefono = models.IntegerField(null=True, blank=True, unique=True) 
     id_turno = models.ForeignKey(TurnoFarmacia, on_delete=models.RESTRICT, null=True)
     id_tipo = models.ForeignKey(TipoFarmacia, on_delete=models.RESTRICT)
     id_munic = models.ForeignKey(Municipio, on_delete=models.RESTRICT)
@@ -140,8 +140,8 @@ class FarmaciaMedicamento(models.Model):
 
 
 class TareaExistencia(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.RESTRICT, null=True, blank=True)
-    medicamento = models.ForeignKey(Medicamento, on_delete=models.RESTRICT, null=True, blank=True, to_field='id_medic')
+    id_user = models.ForeignKey(CustomUser, on_delete=models.RESTRICT, null=True, blank=True)
+    id_medic = models.ForeignKey(Medicamento, on_delete=models.RESTRICT, null=True, blank=True, to_field='id_medic')
 
     def __str__(self):
-        return self.user.first_name + ' ' + self.medicamento.nombre + 'task'
+        return self.id_user.first_name + ' ' + self.id_medic.nombre + 'task'

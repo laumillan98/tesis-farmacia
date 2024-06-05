@@ -10,8 +10,8 @@ from django.core.validators import RegexValidator
 
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(help_text='Escriba una dirección de correo válida por favor', required=True)
-    first_name = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
-    last_name = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Apellido no válido')], label="Apellidos", required=True)
+    first_name = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
+    last_name = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Apellido no válido')], label="Apellidos", required=True)
 
     class Meta:
         model = get_user_model()
@@ -54,8 +54,8 @@ class CustomUserCreationForm(UserCreationForm):
 
 class FarmaUserCreationForm(UserCreationForm):
     email = forms.EmailField(help_text='Escriba una dirección de correo válida por favor', required=True)
-    first_name = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
-    last_name = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Apellido no válido')], label="Apellidos", required=True)
+    first_name = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido.')], label="Nombre", required=True)
+    last_name = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Apellido no válido.')], label="Apellidos", required=True)
     farma_name = forms.ModelChoiceField(queryset=Farmacia.objects.exclude(farmauser__isnull=False), label="Farmacia Asociada") 
 
     class Meta:
@@ -68,7 +68,6 @@ class FarmaUserCreationForm(UserCreationForm):
         
         if commit:
             user.save()
-
         return user    
     
     def clean_email(self):
@@ -78,7 +77,7 @@ class FarmaUserCreationForm(UserCreationForm):
         if FarmaUser.objects.filter(email=email).exists():
             raise forms.ValidationError("El correo introducido ya está en uso")
 
-        with open ("base/static/txt/disposable_email_providers.txt", 'r') as f:
+        with open ("static/txt/disposable_email_providers.txt", 'r') as f:
             blacklist = f.read().splitlines() 
 
         for disposable_email in blacklist:
@@ -101,7 +100,7 @@ class FarmaUserCreationForm(UserCreationForm):
         if farma:
             self.instance.farma = farma
         return farma
-
+    
 
 class UserLoginForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
@@ -133,8 +132,8 @@ class PasswordResetForm(PasswordResetForm):
 
 class UserProfileForm(UserChangeForm):
     #email = forms.EmailField(required=True)
-    first_name = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
-    last_name = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Apellido no válido')], label="Apellidos", required=True)
+    first_name = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
+    last_name = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Apellido no válido')], label="Apellidos", required=True)
 
     class Meta:
         model = get_user_model()
@@ -142,8 +141,8 @@ class UserProfileForm(UserChangeForm):
     
 
 class UserUpdateForm(UserChangeForm):
-    first_name = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
-    last_name = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Apellido no válido')], label="Apellidos", required=True)
+    first_name = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
+    last_name = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Apellido no válido')], label="Apellidos", required=True)
     
     class Meta:
         model = CustomUser
@@ -151,8 +150,8 @@ class UserUpdateForm(UserChangeForm):
 
 
 class FarmaUserUpdateForm(UserChangeForm):
-    first_name = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
-    last_name = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Apellido no válido')], label="Apellidos", required=True)
+    first_name = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
+    last_name = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Apellido no válido')], label="Apellidos", required=True)
     
     class Meta:
         model = FarmaUser
@@ -162,7 +161,7 @@ class FarmaUserUpdateForm(UserChangeForm):
 class FarmaUpdateForm(forms.ModelForm):
     nombre = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
     direccion = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Dirección no válida')], label="Dirección", required=True)
-    telefono = forms.CharField(label="Teléfono", required=True)
+    telefono = forms.CharField(validators=[RegexValidator(regex=r'^7\d{7}$', message='El teléfono debe comenzar con 7 y tener exactamente 8 dígitos.')], label="Teléfono", required=True)
     
     class Meta:
         model = Farmacia
@@ -170,41 +169,65 @@ class FarmaUpdateForm(forms.ModelForm):
 
 
 class TipoFarmaciaUpdateForm(forms.ModelForm):
-    nombre = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
+    nombre = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
 
     class Meta:
         model = TipoFarmacia
         fields = ('nombre',)
 
+    def clean_nombre(self):
+        nombre = self.cleaned_data.get('nombre')
+        if TipoFarmacia.objects.filter(nombre=nombre).exists():
+            raise ValidationError('Este nombre ya existe.')
+        return nombre
+
 
 class TurnoFarmaciaUpdateForm(forms.ModelForm):
-    nombre = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
+    nombre = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido.')], label="Nombre", required=True)
 
     class Meta:
         model = TurnoFarmacia
         fields = ('nombre',)
 
+    def clean_nombre(self):
+        nombre = self.cleaned_data.get('nombre')
+        if TurnoFarmacia.objects.filter(nombre=nombre).exists():
+            raise ValidationError('Este nombre ya existe.')
+        return nombre
+
 
 class MunicUpdateForm(forms.ModelForm):
-    nombre = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
+    nombre = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
   
     class Meta:
         model = Municipio
         fields = ('nombre', 'id_prov')
 
+    def clean_nombre(self):
+        nombre = self.cleaned_data.get('nombre')
+        if Municipio.objects.filter(nombre=nombre).exists():
+            raise ValidationError('Este nombre ya existe.')
+        return nombre
+
 
 class ProvUpdateForm(forms.ModelForm):
-    nombre = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
+    nombre = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
 
     class Meta:
         model = Provincia
         fields = ('nombre',)
 
+    def clean_nombre(self):
+        nombre = self.cleaned_data.get('nombre')
+        if Provincia.objects.filter(nombre=nombre).exists():
+            raise ValidationError('Este nombre ya existe.')
+        return nombre
+
 
 class MedicUpdateForm(forms.ModelForm):
-    nombre = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
-    cant_max = forms.IntegerField(required=True, label="Cantidad Máxima")
-    precio_unidad = forms.FloatField(required=True)
+    nombre = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
+    cant_max = forms.IntegerField(validators=[MinValueValidator(1, message="La cantidad debe ser mayor que cero.")], required=True, label="Cantidad Máxima")
+    precio_unidad = forms.FloatField(validators=[MinValueValidator(1.00, message="El precio por unidad debe ser mayor que cero.")], required=True, label="Precio por Unidad")
     origen_natural = forms.BooleanField(widget=BooleanCheckbox, required=False, label="Origen Natural")
     id_restriccion = forms.ModelChoiceField(queryset=RestriccionMedicamento.objects.all(), required=True, label="Restricción")
     id_clasificacion = forms.ModelChoiceField(queryset=ClasificacionMedicamento.objects.all(), required=True, label="Clasificación")
@@ -214,29 +237,57 @@ class MedicUpdateForm(forms.ModelForm):
         model = Medicamento
         fields = ('nombre', 'description', 'cant_max', 'precio_unidad', 'origen_natural', 'id_restriccion', 'id_clasificacion', 'id_formato')
 
+    def clean(self):
+        cleaned_data = super().clean()
+        nombre = cleaned_data.get('nombre')
+        id_formato = cleaned_data.get('id_formato')
+
+        if Medicamento.objects.filter(nombre=nombre, id_formato=id_formato).exists():
+            raise forms.ValidationError("Ya existe un medicamento con este nombre y formato.")
+
+        return cleaned_data
+
 
 class RestriccionMedicamentoUpdateForm(forms.ModelForm):
-    nombre = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
+    nombre = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
     
     class Meta:
         model = RestriccionMedicamento
         fields = ('nombre',)
 
+    def clean_nombre(self):
+        nombre = self.cleaned_data.get('nombre')
+        if RestriccionMedicamento.objects.filter(nombre=nombre).exists():
+            raise ValidationError('Este nombre ya existe.')
+        return nombre
+
 
 class ClasificacionMedicamentoUpdateForm(forms.ModelForm):
-    nombre = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
+    nombre = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
     
     class Meta:
         model = ClasificacionMedicamento
         fields = ('nombre',)
 
+    def clean_nombre(self):
+        nombre = self.cleaned_data.get('nombre')
+        if ClasificacionMedicamento.objects.filter(nombre=nombre).exists():
+            raise ValidationError('Este nombre ya existe.')
+        return nombre
+
 
 class FormatoMedicamentoUpdateForm(forms.ModelForm):
-    nombre = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
+    nombre = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
     
     class Meta:
         model = FormatoMedicamento
         fields = ('nombre',)
+
+    def clean_nombre(self):
+        nombre = self.cleaned_data.get('nombre')
+        if FormatoMedicamento.objects.filter(nombre=nombre).exists():
+            raise ValidationError('Este nombre ya existe.')
+        return nombre
 
 
 class FarmaciaAdminForm(forms.ModelForm):
@@ -254,12 +305,3 @@ class FarmaciaAdminForm(forms.ModelForm):
             self.fields['longitud'].initial = self.instance.ubicacion.x
 
 
-"""class MedicamentoAdminForm(forms.ModelForm):
-    class Meta:
-        model = Medicamento
-        fields = '__all__'
-
-    def __init__(self, *args, **kwargs):
-        super(MedicamentoAdminForm, self).__init__(*args, **kwargs)
-        if self.instance.pk:
-            self.fields['reacciones'].queryset = Medicamento.objects.exclude(pk=self.instance.pk)"""

@@ -1,4 +1,4 @@
-{% extends "./index.html" %}
+{% extends "./index_especialista.html" %}
 
 {% load static %}
 
@@ -13,7 +13,7 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <a href="/registrar_tipo_de_farmacia" class="btn btn-md btn-secondary">Registrar Tipo de Farmacia</a>
+                <button id="registrarTipoFarmaciaButton" class="btn btn-md btn-success"><i class="fa-solid fa-plus"></i> Registrar Nuevo Tipo</button>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -22,7 +22,6 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>id</th>
                                 <th>Tipos de farmacias</th>
                                 <th>Opciones</th>
                             </tr>
@@ -54,19 +53,45 @@
                                 <input type="text" class="form-control" id="id" hidden name="id">
                             </div>
                         </div>
-                        <!-- /.card-body -->
                         <div class="card-footer">
                             <button type="submit" class="btn btn-primary">Aceptar</button>
                         </div>
                     </form>
                 </div>
             </div>
-            <!-- /.modal-content -->
         </div>
-        <!-- /.modal-dialog -->
     </div>
     <!-- /.modal -->
     
+
+    <!-- Modal para registrar tipo de farmacia -->
+    <div class="modal fade" id="modal-registrar-tipo">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Registrar Tipo de Farmacia</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="registroTipoFarmaciaForm">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="nuevoTipoFarmacia">Nombre:</label>
+                                <input type="text" class="form-control" id="nuevoTipoFarmacia" name="nombre" placeholder="Tipo de Farmacia" required>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Registrar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 {% endblock %}   
 
