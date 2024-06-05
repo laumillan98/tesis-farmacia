@@ -689,7 +689,6 @@ def listaDeFarmacias(request):
     order_column_index = request.GET.get("order[0][column]", "")
     order_direction = request.GET.get("order[0][dir]", "")
     search_value = request.GET.get("search[value]", "")
-    print("resultado " + order_column + " " + order)
 
     farmacias = filterFarmas(farmacias, search_value)
     farmacias = orderFarmas(farmacias, order_column_index, order_direction)
@@ -1583,7 +1582,7 @@ def visualizarTablaMedicamentos(request):
 
 def buscarInfoMedicamento(request):
     if request.method == 'GET':
-        id_medicamento = request.GET.get('id_medicamento', '')
+        nombre_medicamento = request.GET.get('nombre_medicamento', '')
 
         if nombre_medicamento:
             medicamentos = Medicamento.objects.filter(nombre__icontains=nombre_medicamento)
