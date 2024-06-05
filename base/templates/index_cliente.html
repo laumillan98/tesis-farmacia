@@ -36,6 +36,8 @@
   <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
   <!-- Font Awesome mio --> 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
   <!-- DataTables.js mio 
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css"/>-->
   {% block mycss %}{% endblock %}
@@ -167,6 +169,18 @@
                   <p>¿Dónde hay?</p>
                 </a>
               </li>
+              <li class="nav-item">
+                <a href="/visualizar_tabla_farmacias" class="nav-link {% if request.path == '/visualizar_tabla_farmacias/' %}active{% endif %}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Farmacias</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/visualizar_tabla_medicamentos" class="nav-link {% if request.path == '/visualizar_tabla_medicamentos/' %}active{% endif %}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Medicamentos</p>
+                </a>
+              </li>
             </ul>
           </li>
         </ul>
@@ -279,6 +293,8 @@
 <script src="{% static 'js/restore_bd.js' %}"></script>
 <!-- Sweet Alert  --> 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
 <!-- DataTables.js  
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>-->

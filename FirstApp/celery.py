@@ -1,6 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 import os
 from celery import Celery
+from FirstApp import settings
 
 # Establecer el módulo de configuración predeterminado de Django para el programa 'celery'.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'FirstApp.settings')
@@ -12,4 +13,4 @@ app = Celery('FirstApp')
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
 # Cargar módulos de tareas de todas las configuraciones de aplicaciones registradas en Django.
-app.autodiscover_tasks()
+app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)

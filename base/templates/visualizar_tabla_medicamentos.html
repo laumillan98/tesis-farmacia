@@ -2,7 +2,7 @@
 
 {% load static %}
 
-{% block mytitle %}Medicamentos Existentes{% endblock %}
+{% block mytitle %}InfoMedicamentos{% endblock %}
 
 {% block mycss %}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css">
 {% endblock %}
 
-{% block title %}Existencias{% endblock %}
+{% block title %}Información{% endblock %}
 
 {% block content %}
     <div class="container">
@@ -23,18 +23,36 @@
             <button type="button" class="btn btn-success" id="buscarMedicamentoBtn">Buscar</button>
         </form>
 
-        <div id="alertaReacciones" class="alert alert-info mt-4 d-none" role="alert"></div>
-
         <div class="table-responsive mt-4">
             <table class="table table-bordered table-striped" id="resultadosTabla">
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Medicamento</th>
+                        <th>Nombre</th>
+                        <th>Formato</th>
+                        <th>Cantidad máxima</th>
+                        <th>Precio</th>
+                        <th>Origen</th>
+                        <th>Restricción</th>
+                        <th>Clasificación</th>
+                        <th>Descripción</th>
+                        <th>Disponibilidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Los resultados de la búsqueda se agregarán aquí -->
+                </tbody>
+            </table>
+        </div>
+        <br>
+        <div class="table-responsive mt-4">
+            <table class="table table-bordered table-striped" id="disponibilidadTabla">
+                <thead>
+                    <tr>
+                        <th>#</th>
                         <th>Farmacia</th>
                         <th>Existencia</th>
                         <th>Mapa</th>
-                        <th>Reacciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -44,12 +62,56 @@
         </div>
     </div>
 
-    <!-- Modal para el mapa -->
-    <div class="modal fade" id="mapaModal" tabindex="-1" role="dialog" aria-labelledby="mapaModalLabel" aria-hidden="true">
+
+     <!-- Modal Mostrar Descripcion-->
+     <div class="modal fade" id="modaldesc-lg">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Descripción</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <p id="descripcionMostrar" class="form-control-plaintext"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Fin Modal Mostrar Descripcion -->
+
+    <div class="modal fade" id="reacModal">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="mapaModalLabel">Ubicación</h5>
+                    <h5 class="modal-title">Reacciones</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <p id="reacciones-id"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para el mapa -->
+    <div class="modal fade" id="mapaModal">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ubicación</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -65,33 +127,14 @@
         </div>
     </div>
 
-    <div class="modal fade" id="reacModal" tabindex="-1" role="dialog" aria-labelledby="mapaModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="mapaModalLabel">Reacciones</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div id="mapa">
-                        <p id="reacciones-id"></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+
 {% endblock %}
 
-{% block subtitle %}Existencias{% endblock %}
+{% block subtitle %}InfoMedicamentos{% endblock %}
 
 {% block custom_scripts %}
-<script>
-    var buscarMedicamentoUrl = "{% url 'buscar_medicamento' %}";
-</script>
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.81.1/dist/L.Control.Locate.min.js" charset="utf-8"></script>
 <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
-<script src="{% static 'js/lista_existencias_de_medicamentos.js' %}"></script>
+<script src="{% static 'js/lista_tabla_de_medicamentos.js' %}"></script>
 {% endblock %}

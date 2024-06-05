@@ -1,0 +1,13 @@
+
+{% autoescape off %}
+
+Hola {{ user.username }},
+
+Le notificamos que el medicamento {{result.0.medicamento}} se encuentra disponible en varias farmacias:
+
+{% for item in result %}
+  Farmacia:{{item.farmacia}} - Existencias({{item.existencias}})
+{% endfor %}
+
+{% endautoescape %}
+

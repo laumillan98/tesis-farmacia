@@ -20,12 +20,24 @@ $(document).ready(function () {
         },
         columns: [
             { data: "index" },
-            { data: "id" },
             { data: "action_time" },
             { data: "user" },
+            { data: "ip_address" },
+            { data: "content_type" },
             { data: "object_repr" },
-            { data: "action_flag" },
-            { data: "change_message" }
+            { data: "action_flag" }, 
+            {
+                data: "change_message",
+                render: function(data, type, row) {
+                    if (data) {
+                        return data;
+                    } else {
+                        return "Sin cambios";
+                    }
+                }
+            }
         ]
     });
+
+    
 });

@@ -1,17 +1,19 @@
 .existencia-alta {
     color: green;
     font-weight: bold;
+    font-size: 14px;
 }
 .existencia-baja {
     color: red;
     font-weight: bold;
+    font-size: 14px;
 }
-
 
 #mapa {
     height: 500px;
     position: relative;
 }
+
 #routeIcon {
     width: 32px;
     height: 32px;
@@ -28,7 +30,8 @@
     align-items: center; /* Centrar verticalmente */
     display: none; /* Asegúrate de cambiar esto si quieres que se muestre */
 }
+
 .fa-route {
     font-size: 24px; /* Tamaño del icono */
     line-height: 1; /* Añadido */
-}
+};

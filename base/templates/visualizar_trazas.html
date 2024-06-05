@@ -17,16 +17,17 @@
             <div class="table-responsive">
                 <div>
                     <!-- Botón para abrir el modal -->
-                    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#filtroModal">Exportar Trazas</button>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#filtroModal">Exportar Trazas</button>
                 </div>
                 <br>
                 <table id="miTabla" class="table table-bordered table-striped" data-url="{% url 'lista_de_trazas' %}">
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Id</th>
                             <th>Fecha y Hora</th>
                             <th>Usuario</th>
+                            <th>IP Remota</th> 
+                            <th>Tipo de Objeto</th>
                             <th>Objeto</th>
                             <th>Acción</th>
                             <th>Detalles</th>

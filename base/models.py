@@ -86,6 +86,8 @@ class Medicamento(models.Model):
     id_restriccion = models.ForeignKey(RestriccionMedicamento, on_delete=models.RESTRICT, null=True, blank=True, to_field='id_restriccion')
     id_clasificacion = models.ForeignKey(ClasificacionMedicamento, on_delete=models.RESTRICT, null=True, blank=True, to_field='id_clasificacion')
     id_formato = models.ForeignKey(FormatoMedicamento, on_delete=models.RESTRICT, null=True, blank=True, to_field='id_formato')
+    reacciones = models.TextField(null=True, blank=True)
+    #reacciones = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='reacciones_con')
     
     def __str__(self):
         return self.nombre      
@@ -119,6 +121,27 @@ class FarmaciaMedicamento(models.Model):
     id_medic = models.ForeignKey(Medicamento, on_delete=models.RESTRICT, null=True, blank=True, to_field='id_medic')
     id_farma = models.ForeignKey(Farmacia, on_delete=models.RESTRICT, null=True, blank=True, to_field='id_farma')
     existencia = models.IntegerField(default=0)
+    fecha_expiracion = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return self.id_medic.nombre + ' ' + self.id_farma.nombre + str(self.existencia)
+    
+
+"""class LoteMedicamento(models.Model):
+    id_loteMedicamento = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id_farmaMedic = models.ForeignKey(FarmaciaMedicamento, on_delete=models.CASCADE)
+    lote = models.CharField(max_length=25, unique=True)
+    fecha_elaboracion = models.DateField(null=True, blank=True)
+    fecha_expiracion = models.DateField(null=True, blank=True)
+    
+
+    def __str__(self):
+        return self.nombre"""
+
+
+class TareaExistencia(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.RESTRICT, null=True, blank=True)
+    medicamento = models.ForeignKey(Medicamento, on_delete=models.RESTRICT, null=True, blank=True, to_field='id_medic')
+
+    def __str__(self):
+        return self.user.first_name + ' ' + self.medicamento.nombre + 'task'

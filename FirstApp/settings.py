@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+from celery.schedules import crontab
 import os
 from pathlib import Path
 
@@ -154,14 +155,22 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 DEFAULT_CHARSET = 'utf-8'
 
 
-# Emailing settings
+# Emailing settings for google
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_FROM = 'testtesisfarma@gmail.com'
-EMAIL_HOST_USER = 'testtesisfarma@gmail.com'
-EMAIL_HOST_PASSWORD = 'pooa tvdz yaln xpmz'
+EMAIL_FROM = 'cepero911001@gmail.com'
+EMAIL_HOST_USER = 'cepero911001@gmail.com'
+EMAIL_HOST_PASSWORD = 'loph tvjw ezxz wdzu'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+
+# Emailing settings for mailersend
+#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+#EMAIL_HOST = 'smtp.mailersend.net'
+#EMAIL_HOST_USER = 'MS_owa9aZ@trial-o65qngkkmdogwr12.mlsender.net'  # Este es el usuario estándar para autenticarse con la API Key
+#EMAIL_HOST_PASSWORD = 'C9X0eEHnMK7dhTwI'
+#EMAIL_PORT = 587
+#EMAIL_USE_TLS = True
 
 
 # Backup de la bd 
@@ -181,3 +190,10 @@ LEAFLET_CONFIG = {
 EASY_AUDIT_WATCH_MODEL_EVENTS = True
 EASY_AUDIT_WATCH_AUTH_EVENTS = True
 EASY_AUDIT_WATCH_REQUEST_EVENTS = True
+
+CELERY_BEAT_SCHEDULE = {
+    'check-condition-every-10-minutes': {
+        'task': 'FirstApp.tasks.check_stock_for_pills',
+        'schedule': crontab(minute='*/2'),
+    },
+}

@@ -10,7 +10,7 @@ urlpatterns = [
      path('restore_database/', views.restore_database, name='restore_database'),
      path('salir/', views.salir),
      path('acceder/', views.autenticar, name='acceder'),
-     path('activate/<username>/<token>', views.activate, name='activate'),
+     path('activate/<uidb64>/<token>', views.activate, name='activate'),
      path('registrar/', views.registrar),
      path("cambiarPass", views.cambiarPass, name="cambiarPass"),
      path("solicitar_restablecer_pass", views.restablecerPass, name="solicitar_restablecer_pass"),
@@ -58,14 +58,12 @@ urlpatterns = [
      path('gestionar_medicfarma/', views.gestionarMedicFarma),
      path('lista_de_medicfarma/', views.listaDeMedicFarma, name='lista_de_medicfarma'),
      path('gestionar_medicfarma/obtenerDescripcion/<uuid>/', views.obtenerDescripcion, name ='obtener_descripcion'),
+     path('actualizar_fecha_expiracion/', views.actualizarFechaExpiracion, name='actualizar_fecha_expiracion'),
      path('actualizar_existencia/', views.actualizarExistencia, name='actualizar_existencia'),
      path('gestionar_medicamentos_disponibles/', views.gestionarMedicamentosDisponibles, name = 'gestionar_medicamentos_disponibles'),
      path('lista_de_medicamentos_disponibles/', views.listaDeMedicamentosDisponibles, name='lista_de_medicamentos_disponibles'),
      path('gestionar_medicamentos_disponibles/obtenerDescripcion/<uuid>/', views.obtenerDescripcion, name ='obtener_descripcion'),
      path('gestionar_medicamentos_disponibles/exportarMedicamento/<uuid>/', views.exportarMedicamento, name='exportar_medicamento'),
-     
-     
-     
      #Medicamentos
      path('gestionar_medicamentos/', views.gestionarMedicamentos),
      path('lista_de_medicamentos/', views.listaDeMedicamentos, name='lista_de_medicamentos'),
@@ -91,30 +89,25 @@ urlpatterns = [
      path('registrar_formato_de_medicamento/', views.registrarFormatoMedicamento),
      path('gestionar_formatos_de_medicamentos/obtenerFormatoMedicamento/<uuid>/', views.obtenerFormatoMedicamento, name ='obtener_formato_de_medicamento'),
      path('gestionar_formatos_de_medicamentos/editarFormatoMedicamento/', views.editarFormatoMedicamento, name ='editar_formato_de_medicamento'),
-     # Buscar Medicamento
+     # Buscar Existencias de Medicamentos 
      path('visualizar_existencias_medicamentos/', views.visualizarExistenciasMedicamentos),
      path('buscar_medicamento/', views.buscarMedicamento, name='buscar_medicamento'),
-
-     
-     #path('actualizarCantidad', views.actualizarCantidad),
-     path('farmacias_tabla/', views.farmaciasTabla),
-     path('medicamentos_tabla/', views.medicamentosTabla),
-     #path('existencias_tabla/', views.existenciasTabla),
-     #path('buscarMedicamento/', views.buscarMedicamento),
-     #path('buscarDisponibilidad/', views.buscarDisponibilidad),
-     path('buscarMunicipio/', views.buscarMunicipio),
-     path('buscarDisponibilidadFarmacia/', views.buscarDisponibilidadFarmacia),
-     path('buscarDescripcionMedicamento/', views.buscarDescripcionMedicamento),
-
+     # Buscar Farmacias por Municipio
+     path('visualizar_tabla_farmacias/', views.visualizarTablaFarmacias),
+     path('buscar_farmacia/', views.buscarFarmacia, name='buscar_farmacia'),
+     # Buscar Informacion de Medicamentos
+     path('visualizar_tabla_medicamentos/', views.visualizarTablaMedicamentos),
+     path('buscar_infoMedicamento/', views.buscarInfoMedicamento, name='buscar_infoMedicamento'),
+     path('visualizar_tabla_medicamentos/obtenerDescripcion/<uuid>/', views.obtenerDescripcion, name ='obtener_descripcion'),
      # Trazas
      path('visualizar_trazas/', views.visualizarTrazas),
      path('lista_de_trazas/', views.listaDeTrazas, name='lista_de_trazas'),
      # Graficos
      path('visualizar_charts/', views.visualizarCharts),
      path('usuarios_xgrupos_chart/', views.usuariosXGruposChart, name='usuarios_xgrupos_chart'),
-    
      # Reportes
-     path('generar_reporte/', views.generar_reporte_pdf_error, name='generar_reporte_pdf'),
+     path('generar_reporte_pdf/', views.generar_reporte_pdf, name='generar_reporte_pdf'),
      path('lote_farmacias/', views.generar_lote_farmacias, name='generar_lote_farmacias'),
      path('borrar_lote_farmacias/', views.borrar_lote_farmacias, name='borrar_lote_farmacias'),
+     path('crear_notificacion/', views.start_notification_task, name='crear_notificacion'),
 ]

@@ -13,9 +13,10 @@ admin.site.register(ClasificacionMedicamento)
 admin.site.register(FormatoMedicamento)
 admin.site.register(Provincia)
 admin.site.register(Municipio)
-admin.site.register(Medicamento)
 admin.site.register(FarmaUser)
 admin.site.register(FarmaciaMedicamento)
+admin.site.register(Medicamento)
+
 
 @admin.register(Farmacia)
 class FarmaciaAdmin(LeafletGeoAdmin):
@@ -28,3 +29,11 @@ class FarmaciaAdmin(LeafletGeoAdmin):
             if latitud is not None and longitud is not None:
                 obj.ubicacion = Point(longitud, latitud)
         super(FarmaciaAdmin, self).save_model(request, obj, form, change)
+
+
+"""@admin.register(Medicamento)
+class MedicamentoAdmin(admin.ModelAdmin):
+    form = MedicamentoAdminForm
+    list_display = ['nombre', 'cant_max', 'precio_unidad', 'origen_natural']
+    search_fields = ['nombre']
+    filter_horizontal = ('reacciones',)"""

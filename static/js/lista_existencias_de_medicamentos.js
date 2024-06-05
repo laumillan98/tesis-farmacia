@@ -4,6 +4,7 @@ $(document).ready(function() {
     let userMarker; // Variable para guardar el marcador del usuario
     let routingControl;
     var locationControl;
+    let resultadosTabla;
 
     $('#buscarMedicamentoBtn').click(function() {
         var nombreMedicamento = $('#nombre_medicamento').val();
@@ -13,53 +14,95 @@ $(document).ready(function() {
             type: "GET",
             data: { nombre_medicamento: nombreMedicamento },
             success: function(response) {
-                var resultadosTabla = $('#resultadosTabla tbody');
-                resultadosTabla.empty();
+                if(resultadosTabla) {
+                    resultadosTabla.clear()
+                    resultadosTabla.destroy();
+                }
 
-                if (response.length > 0) {
-                    $.each(response, function(index, farmacia) {
-                        var existenciaClass = farmacia.existencia > 10 ? 'existencia-alta' : 'existencia-baja';
-                        var existenciaTexto = farmacia.existencia > 10 ? 'Suficientes unidades' : 'Pocas unidades';
-                        var mapaBtnId = 'mapaBtn' + index;
+                resultadosTabla = $('#resultadosTabla').DataTable({
+                    "columnDefs": [
+                        {
+                            "targets": 3,
+                            "render": function (data, type, row) {
+                                let existenciaClass = data.existencia > 10 ? 'existencia-alta' : 'existencia-baja';
+                                let existenciaTexto = data.existencia > 10 ? 'Suficientes unidades' : 'Pocas unidades';
+                                // Apply a CSS class for special formatting:
+                                let button = `<a href="#" id="notificame" class="icon-button" data-medic=`+data.medicamento+`>
+                                (Avísame <i class="fa-solid fa-bell"></i>)</a>`
+                                if(data.existencia > 10 || data.notificacion_activa) {
+                                    button = ''
+                                }
+                                let texto = '<p class="'+existenciaClass+'">' + existenciaTexto + ' '+button+ '</p>'
+                                return texto;
+                            }
+                        },
+                        {
+                            "targets": 4, // Index of the actions column
+                            "render": function (data, type, row) {
+                                let button = "<button class='btn btn-info ver-mapa-btn'"+
+                                " data-lat="+row[3].latitude+' data-lng='+row[3].longitude+' data-name='+row[3].nombre+"><i class='fa-solid fa-map-location-dot'></i></button>"
+                                return button;
+                            }
+                        },
+                        {
+                            "targets": 5, // Index of the actions column
+                            "render": function (data, type, row) {
+                              let button ="<button class='btn btn-warning ver-reacciones-btn' data-desc='"+data+"'><i class='fa-solid fa-triangle-exclamation' style='color:white'></i></button>"
+                              return button;
+                            }
+                        }
+                    ],
+                });
+                resultadosTabla.clear();
 
-                        resultadosTabla.append(`
-                            <tr>
-                                <td>${index + 1}</td>
-                                <td>${farmacia.nombre_farmacia}</td>
-                                <td>${farmacia.direccion}</td>
-                                <td>${farmacia.telefono}</td>
-                                <td>${farmacia.nombre_provincia}</td>
-                                <td>${farmacia.nombre_municipio}</td>
-                                <td>${farmacia.tipo}</td>
-                                <td>${farmacia.turno}</td>
-                                <td class="${existenciaClass}">${existenciaTexto}</td>
-                                <td>
-                                    <button id="${mapaBtnId}" class="btn btn-info ver-mapa-btn" data-lat="${farmacia.latitud}" data-lng="${farmacia.longitud}" data-name="${farmacia.nombre_farmacia}">
-                                        <i class="fa-solid fa-map-location-dot"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        `);
+                if (response.result.length > 0) {
+                    if (response.has_interactions) {
+                        toastr.error('Los resultados de busqueda muetran medicamentos con reacciones, presione sobre el icono ⚠️ para visualizarlas');
+                    }    
+                    $.each(response.result, function(index, farmacia) {
+                        let location = {'nombre': farmacia.nombre_farmacia, 'latitude': farmacia.latitud, 'longitude': farmacia.longitud}
+                        let existencia = {'medicamento': farmacia.id_medic,'existencia': farmacia.existencia, 'notificacion_activa': farmacia.notificacion_activa}
+                        resultadosTabla.row.add([
+                            index + 1,
+                            farmacia.medicamento,
+                            farmacia.nombre_farmacia,
+                            existencia,
+                            location,
+                            farmacia.reacciones
+                        ]).draw();
                     });
 
                     $('.ver-mapa-btn').click(function() {
                         var lat = $(this).data('lat');
                         var lng = $(this).data('lng');
                         var name = $(this).data('name');
-
+                
                         $('#mapaModal').data('lat', lat);
                         $('#mapaModal').data('lng', lng);
                         $('#mapaModal').data('name', name);
                         $('#mapaModal').modal('show');
-
                     });
+                
+                    $('.ver-reacciones-btn').click(function() {
+                        let reac = $(this).data('desc');
+                
+                        $('#reacModal').data('desc', reac);
+                        $('#reacModal').modal('show');
+                    });
+
                 } else {
                     Swal.fire({
                         title: 'No encontrado',
                         text: 'No se encontraron farmacias con el medicamento buscado.',
                         icon: 'info',
-                        confirmButtonText: 'Aceptar'
-                    });
+                        showCancelButton: true,
+                        confirmButtonText: 'Avísame 🔔',
+                        cancelButtonText: 'Cerrar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                         
+                        }
+                      });
                 }
             },
             error: function(response) {
@@ -71,6 +114,40 @@ $(document).ready(function() {
                 });
             }
         });
+    });
+
+    function notificame() {
+        $('#notificame').on('click', function(event) {
+            event.preventDefault(); // Previene la acción por defecto del enlace
+        
+            let medic = $(this).data('medic');
+            // Realiza la solicitud AJAX
+            $.ajax({
+                url: '/crear_notificacion/', 
+                type: 'GET', 
+                data: {
+                    'medicamento': medic
+                },
+                success: function(response) {
+                    // Si la respuesta es exitosa, oculta el icono
+                    Swal.fire({
+                        title: "Good job!",
+                        text: "You clicked the button!",
+                        icon: "success"
+                    });
+                    $('#notificame').hide();
+                },
+                error: function(xhr, status, error) {
+                    // Manejo opcional de errores
+                    console.error("Error en la solicitud AJAX:", status, error);
+                }
+            });
+        });
+    }
+
+    $('#reacModal').on('shown.bs.modal', function() {
+        const reac = $('#reacModal').data('desc');
+        $('#reacciones-id').text(reac);
     });
 
    
@@ -101,7 +178,7 @@ $(document).ready(function() {
                 setView: false // No ajustar la vista
             }
         }).addTo(map);
-        L.marker([pharmacyLat, pharmacyLng], {draggable: false}).addTo(map).bindPopup(pharmacyName).openPopup();
+        L.marker([pharmacyLat, pharmacyLng], {draggable: false}).addTo(map).bindPopup("Farmacia" + pharmacyName).openPopup();
         // Agregar un callback para cuando se encuentra la ubicación del usuario
         map.on('locationfound', function(e) {
             const userLatLng = e.latlng;
