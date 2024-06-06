@@ -1,0 +1,103 @@
+
+{% extends "./index_farmaceutico.html" %}
+
+{% load static %}
+
+{% block mytitle %}Gestionar Entradas{% endblock %}
+
+{% block mycss %}{% endblock %}
+
+{% block title %}Gestionar Entradas{% endblock %}
+
+{% block content %}
+
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <button id="registrarEntradaButton" class="btn btn-md btn-success"><i class="fa-solid fa-plus"></i> Registrar Nueva Entrada</button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <br>
+                    <table id="miTabla" class="table table-bordered table-striped" data-url="{% url 'lista_de_entradas_medicamento' %}">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Factura</th>
+                                <th>Lote</th>
+                                <th>Cantidad</th>
+                                <th>Fecha Creación</th>
+                                <th>Fecha Elaboración</th>
+                                <th>Fecha Vencimiento</th>
+                                <th>Medicamento</th>
+                                <th>Opciones</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- /.modal -->
+    <div class="modal fade" id="modal-lg">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Editar Entrada</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="edicionEntradaForm">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="factura">Factura</label>
+                                <input type="text" class="form-control" id="factura" name="factura" placeholder="Factura">
+                            </div>
+                            <div class="form-group">
+                                <label for="numero_lote">Número de Lote</label>
+                                <input type="text" class="form-control" id="numero_lote" name="numero_lote" placeholder="Número de Lote">
+                            </div>
+                            <div class="form-group">
+                                <label for="cantidad">Cantidad</label>
+                                <input type="number" class="form-control" id="cantidad" name="cantidad" placeholder="Cantidad">
+                            </div>
+                            <div class="form-group">
+                                <label for="fecha_creacion">Fecha de Creación</label>
+                                <input type="date" class="form-control" id="fecha_creacion" name="fecha_creacion" placeholder="Fecha de Creación">
+                            </div>
+                            <div class="form-group">
+                                <label for="fecha_elaboracion">Fecha de Elaboración</label>
+                                <input type="date" class="form-control" id="fecha_elaboracion" name="fecha_elaboracion" placeholder="Fecha de Elaboración">
+                            </div>
+                            <div class="form-group">
+                                <label for="fecha_vencimiento">Fecha de Vencimiento</label>
+                                <input type="date" class="form-control" id="fecha_vencimiento" name="fecha_vencimiento" placeholder="Fecha de Vencimiento">
+                            </div>
+                            <input type="hidden" id="id" name="id">
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Aceptar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+{% endblock %}   
+
+{% block subtitle %}Entradas{% endblock %}
+
+{% block custom_scripts %}
+<script src="{% static 'plugins/jquery-validation/jquery.validate.min.js' %}"></script>
+<script src="{% static 'plugins/jquery-validation/additional-methods.min.js' %}"></script>
+<script src="{% static 'js/lista_de_entradas_medicamento.js' %}"></script>
+{% endblock %}

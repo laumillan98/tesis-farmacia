@@ -36,7 +36,7 @@ $.getScript("/static/js/datatables.spanish.js", function() {
                               <button id='editar' class='btn btn-sm btn-success' data-action='editar' data-id='${row.id}' data-toggle='modal' data-target='#modal-lg'>
                                   <i class="fas fa-pencil-alt"></i>
                               </button>&nbsp
-                              <button id='mapa' class='btn btn-sm btn-info' data-lat='${row.latitud}' data-lng='${row.longitud}' data-id='${row.id}' data-toggle='modal' data-target='#mapModal'>
+                              <button id='mapabtn' class='btn btn-sm btn-info' data-lat='${row.latitud}' data-lng='${row.longitud}' data-id='${row.id}' data-toggle='modal' data-target='#mapModal'>
                                   <i class="fa-solid fa-map-location-dot'></i>
                               </button>`
                           return editButton;
@@ -102,7 +102,7 @@ $.getScript("/static/js/datatables.spanish.js", function() {
       }
 
       // Evento de clic en el botón "Mapa"
-      $('#miTabla').on('click', '#mapa', function() {
+      $('#miTabla').on('click', '#mapabtn', function() {
           let lat = $(this).data('lat');
           let lng = $(this).data('lng');
           let id = $(this).data('id');

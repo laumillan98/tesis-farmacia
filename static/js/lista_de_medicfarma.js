@@ -10,20 +10,10 @@ $.getScript("/static/js/datatables.spanish.js", function() {
                 { data: "index" },
                 { data: "nombre" },
                 { data: "formato" },
-                //{ data: "cant_max" },
                 { data: "precio" },
                 { data: "origen" },
                 { data: "restriccion" },
                 { data: "clasificacion" },
-                {
-                    data: "fecha_expiracion",
-                    orderable: false,
-                    searchable: false,
-                    render: function(data, type, row) {
-                        return '<input style="width: 125px; display: inline;" type="date" class="form-control fecha-editable" value="' + data + '" data-id="' + row.id + '" />' +
-                            '<button class="btn btn-sm btn-success btn-guardar-fecha" style="margin-left: 5px;" data-id="' + row.id + '"><i class="fa-solid fa-calendar-days"></i></button>';
-                    }
-                },
                 {
                     data: "existencia",
                     orderable: false,
@@ -48,51 +38,6 @@ $.getScript("/static/js/datatables.spanish.js", function() {
                 }
             ]
         });
-
-
-        // Manejar clic en el botón de guardar fecha de expiración
-        $('#miTabla').on('click', '.btn-guardar-fecha', function() {
-            var id_medic = $(this).data('id');
-            var fechaInput = $(this).closest('td').find('.fecha-editable');
-            var fecha_expiracion = fechaInput.val();
-
-            // Validar que la fecha de expiración sea futura
-            var today = new Date().toISOString().split('T')[0];
-            if (fecha_expiracion <= today) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Fecha inválida',
-                    text: 'La fecha de expiración debe ser una fecha futura.'
-                });
-                return; // Detener la ejecución si la fecha es inválida
-            }
-
-            // Realizar una solicitud AJAX para actualizar la fecha de expiración
-            $.ajax({
-                url: '/actualizar_fecha_expiracion/',
-                method: 'POST',
-                headers: { 'X-CSRFToken': getCookie('csrftoken') },
-                data: { 'id_medic': id_medic, 'fecha_expiracion': fecha_expiracion },
-                success: function(response) {
-                    console.log('Fecha de expiración actualizada correctamente');
-                    table.ajax.reload();
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Fecha de expiración actualizada',
-                        text: 'La fecha de expiración se ha actualizado correctamente.'
-                    });
-                },
-                error: function(error) {
-                    console.error('Error al actualizar fecha de expiración');
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Ocurrió un error al actualizar la fecha de expiración.'
-                    });
-                }
-            });
-        });
-
 
         
         // Evento de clic en el botón "Mostrar" Descripcion
@@ -180,32 +125,6 @@ $.getScript("/static/js/datatables.spanish.js", function() {
         }
 
 
-        // Función para agregar los medicamentos seleccionados
-        $('#agregarMedicamentosBtn').on('click', function() {
-            var selectedMedicamentos = [];
-            $('input[name="medicamentos_seleccionados"]:checked').each(function() {
-                selectedMedicamentos.push($(this).val());
-            });
-
-            $.ajax({
-                url: '/agregar_medicfarma/',
-                type: 'POST',
-                headers: {
-                    'X-CSRFToken': $('input[name=csrfmiddlewaretoken]').val()
-                },
-                data: {
-                    'medicamentos': selectedMedicamentos,
-                    'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val()
-                },
-                success: function(response) {
-                    // Manejar la respuesta del servidor si es necesario
-                    console.log('Medicamentos agregados exitosamente');
-                },
-                error: function(error) {
-                    console.log('Error al agregar medicamentos');
-                }
-            });
-        });
-
     });
+    
 });

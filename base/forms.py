@@ -1,12 +1,13 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, SetPasswordForm, PasswordResetForm, UserChangeForm
-from .models import CustomUser, FarmaUser, Farmacia, Municipio, Provincia, TipoFarmacia, TurnoFarmacia, Medicamento, RestriccionMedicamento, ClasificacionMedicamento, FormatoMedicamento
+from .models import CustomUser, FarmaUser, Farmacia, Municipio, Provincia, TipoFarmacia, TurnoFarmacia, Medicamento, RestriccionMedicamento, ClasificacionMedicamento, FormatoMedicamento, Entrada, Salida
 from .widgets import BooleanCheckbox
 from django.contrib.auth import get_user_model
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
 from django.core.validators import RegexValidator, MinValueValidator
 from django.core.exceptions import ValidationError
+from datetime import date, timedelta
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -289,6 +290,45 @@ class FormatoMedicamentoUpdateForm(forms.ModelForm):
         if FormatoMedicamento.objects.filter(nombre=nombre).exists():
             raise ValidationError('Este nombre ya existe.')
         return nombre
+    
+
+class EntradaMedicamentoUpdateForm(forms.ModelForm):
+    factura = forms.CharField(validators=[RegexValidator(regex='^[A-Za-z0-9]{3,20}$', message='Factura no válida, solo se permiten números y letras')], label="Factura", required=True)
+    numero_lote = forms.CharField(validators=[RegexValidator(regex='^[A-Za-z0-9]{3,20}$', message='Número de lote no válido, solo se permiten números y letras')], label="Número de Lote", required=True)
+    cantidad = forms.IntegerField(validators=[MinValueValidator(1, message="La cantidad debe ser mayor que cero.")], required=True, label="Cantidad")
+    fecha_creacion = forms.DateField(required=False, label="Fecha de Creación", widget=forms.DateInput(attrs={'type': 'date'}))
+    fecha_elaboracion = forms.DateField(required=True, label="Fecha de Elaboración", widget=forms.DateInput(attrs={'type': 'date'}))
+    fecha_vencimiento = forms.DateField(required=True, label="Fecha de Vencimiento", widget=forms.DateInput(attrs={'type': 'date'}))
+
+    class Meta:
+        model = Entrada
+        fields = ('factura', 'numero_lote', 'cantidad', 'fecha_creacion', 'fecha_elaboracion', 'fecha_vencimiento')
+
+    def clean_fecha_elaboracion(self):
+        fecha_elaboracion = self.cleaned_data.get('fecha_elaboracion')
+        if fecha_elaboracion and fecha_elaboracion > date.today():
+            raise ValidationError("La fecha de elaboración no puede ser posterior a la fecha actual.")
+        return fecha_elaboracion
+
+    def clean_fecha_vencimiento(self):
+        fecha_vencimiento = self.cleaned_data.get('fecha_vencimiento')
+        if fecha_vencimiento and fecha_vencimiento <= date.today():
+            raise ValidationError("La fecha de vencimiento debe ser mayor que la fecha actual.")
+        return fecha_vencimiento
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        fecha_elaboracion = cleaned_data.get('fecha_elaboracion')
+        fecha_vencimiento = cleaned_data.get('fecha_vencimiento')
+
+        if fecha_elaboracion and fecha_vencimiento:
+            if fecha_elaboracion > fecha_vencimiento:
+                raise forms.ValidationError("La fecha de elaboración no puede ser posterior a la fecha de vencimiento.")
+            if fecha_vencimiento <= date.today():
+                raise forms.ValidationError("La fecha de vencimiento debe ser mayor que la fecha actual.")
+            if fecha_vencimiento - fecha_elaboracion < timedelta(days=365):
+                raise forms.ValidationError("Debe haber al menos un año entre la fecha de elaboración y la fecha de vencimiento.")
+        return cleaned_data
 
 
 class FarmaciaAdminForm(forms.ModelForm):

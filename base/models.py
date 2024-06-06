@@ -121,22 +121,32 @@ class FarmaciaMedicamento(models.Model):
     id_medic = models.ForeignKey(Medicamento, on_delete=models.RESTRICT, null=True, blank=True, to_field='id_medic')
     id_farma = models.ForeignKey(Farmacia, on_delete=models.RESTRICT, null=True, blank=True, to_field='id_farma')
     existencia = models.IntegerField(default=0)
-    fecha_expiracion = models.DateField(null=True, blank=True)
+    #fecha_expiracion = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return self.id_medic.nombre + ' ' + self.id_farma.nombre + str(self.existencia)
     
 
-"""class LoteMedicamento(models.Model):
-    id_loteMedicamento = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    id_farmaMedic = models.ForeignKey(FarmaciaMedicamento, on_delete=models.CASCADE)
-    lote = models.CharField(max_length=25, unique=True)
-    fecha_elaboracion = models.DateField(null=True, blank=True)
-    fecha_expiracion = models.DateField(null=True, blank=True)
+class Entrada(models.Model):
+    id_farmaciaMedicamento = models.ForeignKey(FarmaciaMedicamento, on_delete=models.CASCADE)
+    factura = models.CharField(max_length=100)
+    numero_lote = models.CharField(max_length=100)
+    cantidad = models.IntegerField()
+    fecha_creacion = models.DateField(null=True, blank=True)
+    fecha_elaboracion = models.DateField()
+    fecha_vencimiento = models.DateField()
+
+    def _str_(self):
+        return f"Lote {self.numero_lote} - {self.medicamento.nombre}"
     
 
-    def __str__(self):
-        return self.nombre"""
+class Salida(models.Model):
+    id_farmaciaMedicamento = models.ForeignKey(FarmaciaMedicamento, on_delete=models.CASCADE)
+    cantidad = models.IntegerField() # Recuerda que esta cantidad tiene que ser menor a la sumatoria de las cantidades totales de entrada
+    fecha_movimiento = models.DateField(auto_now_add=True)
+
+    def _str_(self):
+        return f"{self.tipo_movimiento.capitalize()} - Lote {self.lote.numero_lote}"
 
 
 class TareaExistencia(models.Model):

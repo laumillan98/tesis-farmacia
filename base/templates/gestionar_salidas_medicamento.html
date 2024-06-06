@@ -1,0 +1,47 @@
+
+{% extends "./index_farmaceutico.html" %}
+
+{% load static %}
+
+{% block mytitle %}Gestionar Salidas{% endblock %}
+
+{% block mycss %}{% endblock %}
+
+{% block title %}Gestionar Salidas{% endblock %}
+
+{% block content %}
+
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <button id="registrarSalidaButton" class="btn btn-md btn-success"><i class="fa-solid fa-plus"></i> Registrar Nueva Salida</button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <br>
+                    <table id="miTabla" class="table table-bordered table-striped" data-url="{% url 'lista_de_salidas_medicamento' %}">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Cantidad</th>
+                                <th>Fecha de Movimiento</th>
+                                <th>Opciones</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}   
+
+{% block subtitle %}Salidas{% endblock %}
+
+{% block custom_scripts %}
+<script src="{% static 'plugins/jquery-validation/jquery.validate.min.js' %}"></script>
+<script src="{% static 'plugins/jquery-validation/additional-methods.min.js' %}"></script>
+<script src="{% static 'js/lista_de_salidas_medicamento.js' %}"></script>
+{% endblock %}
