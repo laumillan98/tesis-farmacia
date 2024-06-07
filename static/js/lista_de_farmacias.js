@@ -115,7 +115,6 @@ $.getScript("/static/js/datatables.spanish.js", function () {
       console.log(lat)
       console.log(lng)
       if (!validarCoordenadas(lat, lng)) {
-        console.log("entro")
         lat = 23.136666666667
         lng = -82.358888888889
       }
