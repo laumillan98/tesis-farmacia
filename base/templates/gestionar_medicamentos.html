@@ -4,7 +4,10 @@
 
 {% block mytitle %}Gestionar Medicamentos{% endblock %}
 
-{% block mycss %}{% endblock %}
+{% block mycss %}
+    <!-- summernote -->
+    <link rel="stylesheet" href="{% static 'plugins/summernote/summernote-bs4.min.css' %}">
+{% endblock %}
 
 {% block title %}Gestionar Medicamentos{% endblock %}
 
@@ -66,7 +69,8 @@
                             </div>
                             <div class="form-group">
                                 <label for="name">Descripción</label>
-                                <input type="text" class="form-control" id="descriptionEdit" name="description" placeholder="Descripcion">
+                                <textarea class="form-control" id="descriptionEdit" name="description" placeholder="Descripcion">
+                                </textarea>
                             </div>
                             <div class="form-group">
                                 <label for="name">Cantidad Máxima</label>
@@ -199,7 +203,8 @@
 {% block subtitle %}Medicamentos{% endblock %}
 
 {% block custom_scripts %}
-
+<!-- Summernote -->
+<script src="{% static 'plugins/summernote/summernote-bs4.min.js' %}"></script>
 <script>
     $(document).ready(function() {
         $('#generarReporteBtn').click(function() {
@@ -247,7 +252,6 @@
         });
     });
 </script>
-
 <script src="{% static 'plugins/jquery-validation/jquery.validate.min.js' %}"></script>
 <script src="{% static 'plugins/jquery-validation/additional-methods.min.js' %}"></script>
 <script src="{% static 'js/lista_de_medicamentos.js' %}"></script>

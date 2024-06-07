@@ -2191,55 +2191,11 @@ def generar_lote_farmacias(request):
         )
         farmacia.save()
     return JsonResponse({'success': True})
-#################################################################################################################################
-#############################################     GRAFICOS     ##################################################################
 
 def borrar_lote_farmacias(request):
     farmacias = Farmacia.objects.all()
     farmacias.delete()
     return JsonResponse({'success': True})
-
-@login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['admin'])
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def visualizarCharts(request):
-    return render(request, "visualizar_charts.html")
-
-
-@login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['admin'])
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def visualizarCharts(request):
-    return render(request, "visualizar_charts.html")
-
-
-def usuariosXGruposChart(request):
-    # Obtener el recuento de usuarios por grupo
-    group_counts = CustomUser.objects.values('groups').annotate(count=Count('id'))
-
-    # Definir los nombres de los grupos y los contadores
-    labels = ['clientes', 'farmacéuticos', 'admin']
-    counts = [0, 0, 0]  # Inicializar contadores para cada grupo
-
-    # Asignar los recuentos reales a los contadores correspondientes
-    for item in group_counts:
-        group_name = item['groups']
-        user_count = item['count']
-        if group_name == '1':
-            counts[0] = user_count
-        elif group_name == '2':
-            counts[1] = user_count
-        elif group_name == '3':
-            counts[2] = user_count
-
-    # Pasar datos al contexto de la plantilla
-    context = {
-        'labels': labels,
-        'counts': counts,
-    }
-
-    return JsonResponse(context)
-
 
 ##############################################################################################################################
 ################################################    REPORTES    ##################################################################
@@ -2644,12 +2600,25 @@ def editarUbicacionFarmacia(request, uuid):
 
 
 def obtenerNotificaciones(request):
-    if request.user.is_authenticated:
-        notificaciones = Notificacion.objects.filter(user=request.user, leido=False).order_by('-fecha')
-        data = [{'id_notificacion': n.id, 'mensaje': n.mensaje, 'fecha': n.fecha.strftime('%Y-%m-%d %H:%M:%S')} for n in notificaciones]
-        return JsonResponse({'notificaciones': data}, safe=False)
-    else:
-        return JsonResponse({'error': 'No autorizado'}, status=403)
+    data = [
+        {
+            'id_notificacion': "test",
+            'mensaje': "Mensaje prueba",
+            'fecha': "fecha prueba"
+        },
+        {
+            'id_notificacion': "test 2",
+            'mensaje': "Mensaje prueba",
+            'fecha': "fecha prueba 2"
+        }
+    ]
+    return JsonResponse({'notificaciones': data}, safe=False)
+    #if request.user.is_authenticated:
+    #    notificaciones = Notificacion.objects.filter(user=request.user, leido=False).order_by('-fecha')
+    #    data = [{'id_notificacion': n.id, 'mensaje': n.mensaje, 'fecha': n.fecha.strftime('%Y-%m-%d %H:%M:%S')} for n in notificaciones]
+    #    return JsonResponse({'notificaciones': data}, safe=False)
+    #else:
+    #    return JsonResponse({'error': 'No autorizado'}, status=403)
 
 
 @csrf_exempt
