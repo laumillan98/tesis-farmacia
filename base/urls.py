@@ -99,7 +99,10 @@ urlpatterns = [
      path('lista_de_entradas_medicamento/', views.listaDeEntradasMedicamento, name='lista_de_entradas_medicamento'),
      path('gestionar_entradas_medicamento/registrarEntradaMedicamento/', views.registrarEntradaMedicamento, name='registrar_entrada_medicamento'),
           #Salidas
-     path('gestionar_salidas_medicamento/', views.gestionarSalidasMedicamento),
+     path('realizar_cierre_farmacia/', views.realizarCierreFarmacia),
+     path('realizar_cierre_farmacia/guardar_ventas/', views.guardarVentas, name='guardar_ventas'),
+     path('gestionar_salidas_medicamento/', views.gestionarSalidasMedicamento, name='gestionar_salidas_medicamento'),
+     path('realizar_cierre_farmacia/', views.realizarCierreFarmacia),
      path('lista_de_salidas_medicamento/', views.listaDeSalidasMedicamento, name='lista_de_salidas_medicamento'),
 
      # Cliente

@@ -1,0 +1,45 @@
+{% extends "./index_farmaceutico.html" %}
+
+{% load static %}
+
+{% block mytitle %}Cierre{% endblock %}
+
+{% block mycss %}{% endblock %}
+
+{% block title %}Realizar cierre en Farmacia: {{ farmacia_del_farmaceutico }}.</p>{% endblock %}
+
+{% block content %}
+
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <button type="button" class="btn btn-success" id="guardarCierre" data-url="{% url 'guardar_ventas' %}">Guardar</button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <br>
+                    <table id="miTabla" class="table table-bordered table-striped" data-url="{% url 'lista_de_medicfarma' %}">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nombre</th>
+                                <th>Formato</th>
+                                <th>Precios</th>
+                                <th>Ventas</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}   
+
+{% block subtitle %}Cierre{% endblock %}
+
+{% block custom_scripts %}
+<script src="{% static 'plugins/jquery-validation/jquery.validate.min.js' %}"></script>
+<script src="{% static 'plugins/jquery-validation/additional-methods.min.js' %}"></script>
+<script src="{% static 'js/realizar_cierre_farmacia.js' %}"></script>
+{% endblock %}
