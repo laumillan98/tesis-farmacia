@@ -111,9 +111,17 @@
                     </button>
                 </div>
                 <div class="modal-body">
+                    <div class="row">
+                        <div class="col-4">
+                          <input type="number" class="form-control" placeholder="Latitud" id="latitud">
+                        </div>
+                        <div class="col-4">
+                          <input type="number" class="form-control" placeholder="Longitud" id="longitud">
+                        </div>
+                        <button type="button" class="btn btn-success" id="ubicarBtn">Ubicar</button>
+                    </div>
+                    <br>
                     <div id="mapa" style="height: 400px;"></div>
-                    <input type="hidden" id="latitud">
-                    <input type="hidden" id="longitud">
                     <input type="hidden" id="farmacia_id">
                 </div>
                 <div class="modal-footer">

@@ -52,6 +52,8 @@ from reportlab.lib.pagesizes import letter
 from django.views.decorators.csrf import csrf_exempt
 from .pdf_utils import header_footer
 
+from django.contrib.gis.geos import Point
+
 # Create your views here.
 
 
@@ -106,7 +108,6 @@ def restore_database(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def salir(request):
     logout(request)
-    messages.success(request, f"Su sesión se ha cerrado correctamente")
     return redirect('/acceder/')
 
 
@@ -122,7 +123,6 @@ def autenticar(request):
             )
             if user is not None:
                 login(request, user)
-                messages.success(request, f"Hola <b>{user.username}</b>! Usted se ha autenticado satisfactoriamente.")
                 usuario = request.user
                 grupo_admin = Group.objects.get(name='admin')
                 grupo_clientes = Group.objects.get(name='clientes')
@@ -136,14 +136,13 @@ def autenticar(request):
                     return redirect('/gestionar_medicfarma/')
                 elif grupo_especialista in usuario.groups.all():
                     return redirect('/gestionar_farmacias/')  
-                     
-       # else:
-        #    for key, error in list(form.errors.items()):
-        #        if key == 'captcha' and error[0] == 'This field is required.':
-        #            messages.error(request, "You must pass the reCAPTCHA test")
-        #            continue
-
-         #       messages.error(request, error) 
+            else:
+                messages.error(request, "Nombre de usuario o contraseña incorrectos")
+        else:
+            for field, errors in form.errors.items():
+                if errors:
+                    messages.error(request, errors[0])
+                    break
 
     form = UserLoginForm()
 
@@ -2248,3 +2247,22 @@ def crearTareaNotificacion(request):
             print(e)
             return JsonResponse({'error': 'Invalid request'}, status=400)
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['especialista'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@require_POST
+def editarUbicacionFarmacia(request, uuid):
+    farmacia = Farmacia.objects.get(id_farma=uuid)
+    latitud = request.POST.get('latitud')
+    longitud = request.POST.get('longitud')
+    flat = float(latitud)
+    flon = float(longitud)
+    print(flat)
+    print(flon)
+    if farmacia is not None and latitud is not None and longitud is not None:
+        farmacia.ubicacion = Point(flon, flat)
+        farmacia.save()
+        return JsonResponse({'success': True}, status=200)
+    else:
+        JsonResponse({'error': 'Invalid request'}, status=400)

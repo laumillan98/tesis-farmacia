@@ -5,13 +5,14 @@ from .widgets import BooleanCheckbox
 from django.contrib.auth import get_user_model
 from django_recaptcha.fields import ReCaptchaField
 from django_recaptcha.widgets import ReCaptchaV2Checkbox
-from django.core.validators import RegexValidator
+from django.core.validators import RegexValidator, MinValueValidator
+from django.core.exceptions import ValidationError
 
 
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(help_text='Escriba una dirección de correo válida por favor', required=True)
-    first_name = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
-    last_name = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Apellido no válido')], label="Apellidos", required=True)
+    first_name = forms.CharField(validators=[RegexValidator(regex=r'^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
+    last_name = forms.CharField(validators=[RegexValidator(regex=r'^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Apellido no válido')], label="Apellidos", required=True)
 
     class Meta:
         model = get_user_model()
@@ -54,8 +55,8 @@ class CustomUserCreationForm(UserCreationForm):
 
 class FarmaUserCreationForm(UserCreationForm):
     email = forms.EmailField(help_text='Escriba una dirección de correo válida por favor', required=True)
-    first_name = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido.')], label="Nombre", required=True)
-    last_name = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Apellido no válido.')], label="Apellidos", required=True)
+    first_name = forms.CharField(validators=[RegexValidator(regex=r'^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido.')], label="Nombre", required=True)
+    last_name = forms.CharField(validators=[RegexValidator(regex=r'^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Apellido no válido.')], label="Apellidos", required=True)
     farma_name = forms.ModelChoiceField(queryset=Farmacia.objects.exclude(farmauser__isnull=False), label="Farmacia Asociada") 
 
     class Meta:
@@ -132,8 +133,8 @@ class PasswordResetForm(PasswordResetForm):
 
 class UserProfileForm(UserChangeForm):
     #email = forms.EmailField(required=True)
-    first_name = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
-    last_name = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Apellido no válido')], label="Apellidos", required=True)
+    first_name = forms.CharField(validators=[RegexValidator(regex=r'^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
+    last_name = forms.CharField(validators=[RegexValidator(regex=r'^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Apellido no válido')], label="Apellidos", required=True)
 
     class Meta:
         model = get_user_model()
@@ -141,8 +142,8 @@ class UserProfileForm(UserChangeForm):
     
 
 class UserUpdateForm(UserChangeForm):
-    first_name = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
-    last_name = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Apellido no válido')], label="Apellidos", required=True)
+    first_name = forms.CharField(validators=[RegexValidator(regex=r'^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
+    last_name = forms.CharField(validators=[RegexValidator(regex=r'^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Apellido no válido')], label="Apellidos", required=True)
     
     class Meta:
         model = CustomUser
@@ -150,8 +151,8 @@ class UserUpdateForm(UserChangeForm):
 
 
 class FarmaUserUpdateForm(UserChangeForm):
-    first_name = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
-    last_name = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Apellido no válido')], label="Apellidos", required=True)
+    first_name = forms.CharField(validators=[RegexValidator(regex=r'^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
+    last_name = forms.CharField(validators=[RegexValidator(regex=r'^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Apellido no válido')], label="Apellidos", required=True)
     
     class Meta:
         model = FarmaUser
@@ -159,8 +160,8 @@ class FarmaUserUpdateForm(UserChangeForm):
 
 
 class FarmaUpdateForm(forms.ModelForm):
-    nombre = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
-    direccion = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Dirección no válida')], label="Dirección", required=True)
+    nombre = forms.CharField(validators=[RegexValidator(r'[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
+    direccion = forms.CharField(validators=[RegexValidator(r'[A-Za-z ]{3,50}', message='Dirección no válida')], label="Dirección", required=True)
     telefono = forms.CharField(validators=[RegexValidator(regex=r'^7\d{7}$', message='El teléfono debe comenzar con 7 y tener exactamente 8 dígitos.')], label="Teléfono", required=True)
     
     class Meta:
@@ -169,7 +170,7 @@ class FarmaUpdateForm(forms.ModelForm):
 
 
 class TipoFarmaciaUpdateForm(forms.ModelForm):
-    nombre = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
+    nombre = forms.CharField(validators=[RegexValidator(regex=r'^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
 
     class Meta:
         model = TipoFarmacia
@@ -183,7 +184,7 @@ class TipoFarmaciaUpdateForm(forms.ModelForm):
 
 
 class TurnoFarmaciaUpdateForm(forms.ModelForm):
-    nombre = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido.')], label="Nombre", required=True)
+    nombre = forms.CharField(validators=[RegexValidator(regex=r'^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido.')], label="Nombre", required=True)
 
     class Meta:
         model = TurnoFarmacia
@@ -197,7 +198,7 @@ class TurnoFarmaciaUpdateForm(forms.ModelForm):
 
 
 class MunicUpdateForm(forms.ModelForm):
-    nombre = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
+    nombre = forms.CharField(validators=[RegexValidator(regex=r'^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
   
     class Meta:
         model = Municipio
@@ -211,7 +212,7 @@ class MunicUpdateForm(forms.ModelForm):
 
 
 class ProvUpdateForm(forms.ModelForm):
-    nombre = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
+    nombre = forms.CharField(validators=[RegexValidator(regex=r'^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
 
     class Meta:
         model = Provincia
@@ -225,7 +226,7 @@ class ProvUpdateForm(forms.ModelForm):
 
 
 class MedicUpdateForm(forms.ModelForm):
-    nombre = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
+    nombre = forms.CharField(validators=[RegexValidator(regex=r'^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
     cant_max = forms.IntegerField(validators=[MinValueValidator(1, message="La cantidad debe ser mayor que cero.")], required=True, label="Cantidad Máxima")
     precio_unidad = forms.FloatField(validators=[MinValueValidator(1.00, message="El precio por unidad debe ser mayor que cero.")], required=True, label="Precio por Unidad")
     origen_natural = forms.BooleanField(widget=BooleanCheckbox, required=False, label="Origen Natural")
@@ -249,7 +250,7 @@ class MedicUpdateForm(forms.ModelForm):
 
 
 class RestriccionMedicamentoUpdateForm(forms.ModelForm):
-    nombre = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
+    nombre = forms.CharField(validators=[RegexValidator(regex=r'^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
     
     class Meta:
         model = RestriccionMedicamento
@@ -263,7 +264,7 @@ class RestriccionMedicamentoUpdateForm(forms.ModelForm):
 
 
 class ClasificacionMedicamentoUpdateForm(forms.ModelForm):
-    nombre = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
+    nombre = forms.CharField(validators=[RegexValidator(regex=r'^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
     
     class Meta:
         model = ClasificacionMedicamento
@@ -277,7 +278,7 @@ class ClasificacionMedicamentoUpdateForm(forms.ModelForm):
 
 
 class FormatoMedicamentoUpdateForm(forms.ModelForm):
-    nombre = forms.CharField(validators=[RegexValidator(regex='^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
+    nombre = forms.CharField(validators=[RegexValidator(regex=r'^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
     
     class Meta:
         model = FormatoMedicamento

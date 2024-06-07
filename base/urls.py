@@ -33,6 +33,7 @@ urlpatterns = [
      path('registrar_farmacia/', views.registrarFarmacia),
      path('gestionar_farmacias/obtenerFarmacia/<uuid>/', views.obtenerFarmacia, name ='obtener_farmacia'),
      path('gestionar_farmacias/editarFarmacia/', views.editarFarmacia, name ='editar_farmacia'),
+     path('gestionar_farmacias/editarUbicacionFarmacia/<uuid>/', views.editarUbicacionFarmacia, name ='editar_ubicacion_farmacia'),
           # Tipo Farmacia
      path('gestionar_tipos_de_farmacias/', views.gestionarTiposFarmacias),
      path('lista_tipos_de_farmacias/', views.listaDeTiposDeFarmacias, name='lista_tipos_de_farmacias'),
