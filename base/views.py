@@ -11,12 +11,14 @@ from django.db.models import Count
 from django.db.models.query_utils import Q
 from django.http.response import FileResponse
 from django.http.response import JsonResponse
+from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from django.core.paginator import Paginator, EmptyPage
 from django.core.management import call_command
 from django.contrib import messages
+from django.contrib.gis.geos import Point
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
@@ -24,6 +26,7 @@ from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
 from django.contrib.sites.shortcuts import get_current_site
 from django.views.decorators.http import require_POST
 from django.views.decorators.cache import cache_control
+from django.utils import timezone
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.utils.timezone import localtime
@@ -32,8 +35,8 @@ from django.contrib.contenttypes.models import ContentType
 from easyaudit.models import CRUDEvent, LoginEvent, RequestEvent
 from base.pdf_utils import header_footer
 
-from .models import CustomUser, Medicamento, Farmacia, FarmaUser, FarmaciaMedicamento, TipoFarmacia, TurnoFarmacia, Municipio, Provincia, RestriccionMedicamento, ClasificacionMedicamento, FormatoMedicamento, TareaExistencia
-from .forms import CustomUserCreationForm, FarmaUserCreationForm, UserLoginForm, SetPasswordForm, PasswordResetForm, UserProfileForm, UserUpdateForm, FarmaUserUpdateForm, FarmaUpdateForm, TipoFarmaciaUpdateForm, TurnoFarmaciaUpdateForm, MunicUpdateForm, ProvUpdateForm, MedicUpdateForm, RestriccionMedicamentoUpdateForm, ClasificacionMedicamentoUpdateForm, FormatoMedicamentoUpdateForm
+from .models import CustomUser, Medicamento, Farmacia, FarmaUser, FarmaciaMedicamento, Entrada, Salida, TipoFarmacia, TurnoFarmacia, Municipio, Provincia, RestriccionMedicamento, ClasificacionMedicamento, FormatoMedicamento, TareaExistencia, Notificacion
+from .forms import CustomUserCreationForm, FarmaUserCreationForm, UserLoginForm, SetPasswordForm, PasswordResetForm, UserProfileForm, UserUpdateForm, FarmaUserUpdateForm, FarmaUpdateForm, TipoFarmaciaUpdateForm, TurnoFarmaciaUpdateForm, MunicUpdateForm, ProvUpdateForm, MedicUpdateForm, RestriccionMedicamentoUpdateForm, ClasificacionMedicamentoUpdateForm, FormatoMedicamentoUpdateForm, EntradaMedicamentoCreateForm
 from .decorators import usuarios_permitidos, unauthenticated_user
 from .tokens import account_activation_token
 from FirstApp.tasks import send_activation_email
@@ -139,10 +142,14 @@ def autenticar(request):
             else:
                 messages.error(request, "Nombre de usuario o contraseña incorrectos")
         else:
-            for field, errors in form.errors.items():
-                if errors:
-                    messages.error(request, errors[0])
-                    break
+            messages.error(request, "Nombre de usuario o contraseña incorrectos")
+                     
+        #    for key, error in list(form.errors.items()):
+        #        if key == 'captcha' and error[0] == 'This field is required.':
+        #            messages.error(request, "You must pass the reCAPTCHA test")
+        #            continue
+
+         #       messages.error(request, error) 
 
     form = UserLoginForm()
 
@@ -305,8 +312,9 @@ def confirmarRestablecerPass(request, uidb64, token):
 
 
 @login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['admin'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def perfilUsuario(request, username):
+def perfilAdmin(request, username):
     show_alert = False
     if request.method == "POST":
         user = request.user
@@ -314,9 +322,9 @@ def perfilUsuario(request, username):
         if form.is_valid():
             user_form = form.save()
             show_alert = True
-            return redirect('/perfil_de_usuario/'+ user_form.username)
+            return redirect('/perfil_admin/' + user_form.username)
         
-        for error in list (form.errors.values()):
+        for error in list(form.errors.values()):
             messages.error(request, error)
 
     user = get_user_model().objects.get(username=username)
@@ -324,8 +332,92 @@ def perfilUsuario(request, username):
         form = UserProfileForm(instance=user)
         return render(
             request=request,
-            template_name="perfil_de_usuario.html",
-            context = {"form": form, "show_alert": show_alert}
+            template_name="perfil_admin.html",
+            context={"form": form, "show_alert": show_alert}
+        )
+    
+    return redirect('/')
+
+
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['especialista'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def perfilEspecialista(request, username):
+    show_alert = False
+    if request.method == "POST":
+        user = request.user
+        form = UserProfileForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            user_form = form.save()
+            show_alert = True
+            return redirect('/perfil_especialista/' + user_form.username)
+        
+        for error in list(form.errors.values()):
+            messages.error(request, error)
+
+    user = get_user_model().objects.get(username=username)
+    if user:
+        form = UserProfileForm(instance=user)
+        return render(
+            request=request,
+            template_name="perfil_especialista.html",
+            context={"form": form, "show_alert": show_alert}
+        )
+    
+    return redirect('/')
+
+
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['clientes'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def perfilCliente(request, username):
+    show_alert = False
+    if request.method == "POST":
+        user = request.user
+        form = UserProfileForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            user_form = form.save()
+            show_alert = True
+            return redirect('/perfil_cliente/' + user_form.username)
+        
+        for error in list(form.errors.values()):
+            messages.error(request, error)
+
+    user = get_user_model().objects.get(username=username)
+    if user:
+        form = UserProfileForm(instance=user)
+        return render(
+            request=request,
+            template_name="perfil_cliente.html",
+            context={"form": form, "show_alert": show_alert}
+        )
+    
+    return redirect('/')
+
+
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['farmacéuticos'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def perfilFarmaceutico(request, username):
+    show_alert = False
+    if request.method == "POST":
+        user = request.user
+        form = UserProfileForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            user_form = form.save()
+            show_alert = True
+            return redirect('/perfil_farmaceutico/' + user_form.username)
+        
+        for error in list(form.errors.values()):
+            messages.error(request, error)
+
+    user = get_user_model().objects.get(username=username)
+    if user:
+        form = UserProfileForm(instance=user)
+        return render(
+            request=request,
+            template_name="perfil_farmaceutico.html",
+            context={"form": form, "show_alert": show_alert}
         )
     
     return redirect('/')
@@ -395,7 +487,7 @@ def listaDeUsuarios(request):
         user_last_login = user.last_login.strftime('%Y-%m-%d %H:%M:%S') if user.last_login else None
 
         user_data = {
-            'index': index + 1,
+            'index': start + index + 1,
             'first_name': user.first_name,
             'last_name': user.last_name,
             'username': user.username,
@@ -426,7 +518,7 @@ def registrarFarmaceutico(request):
         form = FarmaUserCreationForm(data=request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.farma = form.cleaned_data['farma_name']
+            user.id_farma = form.cleaned_data['id_farma']
             user = form.save()
             user.is_active=True
             user.save()
@@ -538,6 +630,8 @@ def obtenerUsuario(request, username):
             'username': farmaUser.username,
             'name': farmaUser.first_name,
             'lastname': farmaUser.last_name,
+            'description': farmaUser.description,
+            'email': farmaUser.email,
             'farmacias': [{'id_farma': obj.id_farma, 'nombre': obj.nombre} for obj in farma],
         }
 
@@ -551,6 +645,8 @@ def obtenerUsuario(request, username):
             'username': user.username,
             'name': user.first_name,
             'lastname': user.last_name,
+            'description': user.description,
+            'email': user.email,
         })
 
 
@@ -631,6 +727,138 @@ def editarRolUsuario(request):
     else:
         return JsonResponse({'success': False, 'errors': form.errors})"""
 
+
+##################################################################################################################################
+#####################################################  PROVINCIA  ################################################################
+
+
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['especialista'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def gestionarProvincias(request):
+    return render(request, "gestionar_provincias.html")
+
+
+def listaDeProvincias(request):
+    provincias = Provincia.objects.all()
+    provincias_list = []
+    for index,prov in enumerate(provincias):
+        prov_data = {
+            'index': index + 1,
+            'id': prov.id_prov,
+            'nombre': prov.nombre,
+        }
+        provincias_list.append(prov_data)
+    data = {'data': provincias_list}
+    return JsonResponse(data, safe=False)
+
+
+@login_required(login_url='/acceder')
+@require_POST
+def registrarProvincia(request):
+    if request.method == 'POST':
+        form = ProvUpdateForm(data=request.POST)
+        if form.is_valid():
+            prov = form.save(commit=False)
+            prov.save()
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({'success': False, 'errors': form.errors})
+    return JsonResponse({'success': False, 'errors': 'Invalid request method'})
+
+
+def obtenerProvincia(request, uuid):
+    prov = Provincia.objects.get(id_prov = uuid)
+    return JsonResponse({
+        'id': prov.id_prov,
+        'name': prov.nombre,
+    })
+
+
+@login_required(login_url='/acceder')
+@require_POST
+def editarProvincia(request):
+    prov = Provincia.objects.get(id_prov = request.POST.get('id'))
+    form = ProvUpdateForm(request.POST, instance=prov)
+    if form.is_valid():
+        form.save()
+        return JsonResponse({'success': True})
+    else:
+        return JsonResponse({'success': False, 'errors': form.errors})
+    
+
+##################################################################################################################################
+######################################################  MUNICIPIO  ###############################################################
+
+
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['especialista'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def gestionarMunicipios(request):
+    return render(request, "gestionar_municipios.html")
+
+
+def listaDeMunicipios(request):
+    municipios = Municipio.objects.all()
+    municipios_list = []
+    for index,munic in enumerate(municipios):
+        munic_data = {
+            'index': index + 1,
+            'id': munic.id_munic,
+            'nombre': munic.nombre,
+            'provincia': munic.id_prov.nombre,
+        }
+        municipios_list.append(munic_data)
+    data = {'data': municipios_list}
+    return JsonResponse(data, safe=False)
+
+
+@login_required(login_url='/acceder')
+@require_POST
+def registrarMunicipio(request):
+    if request.method == 'POST':
+        form = MunicUpdateForm(data=request.POST)
+        if form.is_valid():
+            munic = form.save(commit=False)
+            munic.save()
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({'success': False, 'errors': form.errors})
+    return JsonResponse({'success': False, 'errors': 'Invalid request method'})
+
+
+def obtenerProvMunicipio(request):
+    provincias = Provincia.objects.all()
+    data = [{'id_prov': prov.id_prov, 'nombre': prov.nombre} for prov in provincias]
+    return JsonResponse({'provincias': data})
+
+
+def obtenerMunicipio(request, uuid):
+    prov = Provincia.objects.all()
+    munic = Municipio.objects.get(id_munic = uuid)
+    return JsonResponse({
+        'id': munic.id_munic,
+        'name': munic.nombre,
+        'selected_prov_name': munic.id_prov.id_prov,
+        'provincias': [{'id_prov': obj.id_prov, 'nombre': obj.nombre} for obj in prov],
+    })
+
+
+@login_required(login_url='/acceder')
+@require_POST
+def editarMunicipio(request):
+    munic = Municipio.objects.get(id_munic = request.POST.get('id'))
+    form = MunicUpdateForm(request.POST, instance=munic)
+    if form.is_valid():
+        form.save()
+        return JsonResponse({'success': True})
+    else:
+        return JsonResponse({'success': False, 'errors': form.errors})
+
+
+##################################################################################################################################
+######################################################  FARMACIA  ################################################################
+
         
 @login_required(login_url='/acceder')
 @usuarios_permitidos(roles_permitidos=['especialista'])
@@ -707,7 +935,7 @@ def listaDeFarmacias(request):
             nombre_usuario_asignado = "Ninguno"
 
         farma_data = {
-            'index': index + 1,
+            'index': start + index + 1,
             'id': farma.id_farma,
             'nombre': farma.nombre,
             'prov': farma.id_munic.id_prov.nombre,
@@ -787,6 +1015,26 @@ def editarFarmacia(request):
         return JsonResponse({'success': True})
     else:
         return JsonResponse({'success': False, 'errors': form.errors})
+    
+
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['especialista'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@require_POST
+def editarUbicacionFarmacia(request, uuid):
+    farmacia = Farmacia.objects.get(id_farma=uuid)
+    latitud = request.POST.get('latitud')
+    longitud = request.POST.get('longitud')
+    flat = float(latitud)
+    flon = float(longitud)
+    print(flat)
+    print(flon)
+    if farmacia is not None and latitud is not None and longitud is not None:
+        farmacia.ubicacion = Point(flon, flat)
+        farmacia.save()
+        return JsonResponse({'success': True}, status=200)
+    else:
+        JsonResponse({'error': 'Invalid request'}, status=400)
     
 
 @login_required(login_url='/acceder')
@@ -899,376 +1147,8 @@ def editarTurnoFarmacia(request):
         return JsonResponse({'success': False, 'errors': form.errors})
 
 
-@login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['especialista'])
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def gestionarMunicipios(request):
-    return render(request, "gestionar_municipios.html")
-
-
-def listaDeMunicipios(request):
-    municipios = Municipio.objects.all()
-    municipios_list = []
-    for index,munic in enumerate(municipios):
-        munic_data = {
-            'index': index + 1,
-            'id': munic.id_munic,
-            'nombre': munic.nombre,
-            'provincia': munic.id_prov.nombre,
-        }
-        municipios_list.append(munic_data)
-    data = {'data': municipios_list}
-    return JsonResponse(data, safe=False)
-
-
-@login_required(login_url='/acceder')
-@require_POST
-def registrarMunicipio(request):
-    if request.method == 'POST':
-        form = MunicUpdateForm(data=request.POST)
-        if form.is_valid():
-            munic = form.save(commit=False)
-            munic.save()
-            return JsonResponse({'success': True})
-        else:
-            return JsonResponse({'success': False, 'errors': form.errors})
-    return JsonResponse({'success': False, 'errors': 'Invalid request method'})
-
-
-def obtenerProvMunicipio(request):
-    provincias = Provincia.objects.all()
-    data = [{'id_prov': prov.id_prov, 'nombre': prov.nombre} for prov in provincias]
-    return JsonResponse({'provincias': data})
-
-
-def obtenerMunicipio(request, uuid):
-    prov = Provincia.objects.all()
-    munic = Municipio.objects.get(id_munic = uuid)
-    return JsonResponse({
-        'id': munic.id_munic,
-        'name': munic.nombre,
-        'selected_prov_name': munic.id_prov.id_prov,
-        'provincias': [{'id_prov': obj.id_prov, 'nombre': obj.nombre} for obj in prov],
-    })
-
-
-@login_required(login_url='/acceder')
-@require_POST
-def editarMunicipio(request):
-    munic = Municipio.objects.get(id_munic = request.POST.get('id'))
-    form = MunicUpdateForm(request.POST, instance=munic)
-    if form.is_valid():
-        form.save()
-        return JsonResponse({'success': True})
-    else:
-        return JsonResponse({'success': False, 'errors': form.errors})
-    
-
-@login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['especialista'])
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def gestionarProvincias(request):
-    return render(request, "gestionar_provincias.html")
-
-
-def listaDeProvincias(request):
-    provincias = Provincia.objects.all()
-    provincias_list = []
-    for index,prov in enumerate(provincias):
-        prov_data = {
-            'index': index + 1,
-            'id': prov.id_prov,
-            'nombre': prov.nombre,
-        }
-        provincias_list.append(prov_data)
-    data = {'data': provincias_list}
-    return JsonResponse(data, safe=False)
-
-
-@login_required(login_url='/acceder')
-@require_POST
-def registrarProvincia(request):
-    if request.method == 'POST':
-        form = ProvUpdateForm(data=request.POST)
-        if form.is_valid():
-            prov = form.save(commit=False)
-            prov.save()
-            return JsonResponse({'success': True})
-        else:
-            return JsonResponse({'success': False, 'errors': form.errors})
-    return JsonResponse({'success': False, 'errors': 'Invalid request method'})
-
-
-def obtenerProvincia(request, uuid):
-    prov = Provincia.objects.get(id_prov = uuid)
-    return JsonResponse({
-        'id': prov.id_prov,
-        'name': prov.nombre,
-    })
-
-
-@login_required(login_url='/acceder')
-@require_POST
-def editarProvincia(request):
-    prov = Provincia.objects.get(id_prov = request.POST.get('id'))
-    form = ProvUpdateForm(request.POST, instance=prov)
-    if form.is_valid():
-        form.save()
-        return JsonResponse({'success': True})
-    else:
-        return JsonResponse({'success': False, 'errors': form.errors})
-    
-
 ############################################################################################################################
 ###############################################   MEDICAMENTOS   ###########################################################
-
-
-@login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['farmacéuticos'])
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def gestionarMedicFarma(request): 
-    # Obtener nombre de la Farmacia del farmaceutico actual
-    farmaceutico = FarmaUser.objects.get(username=request.user.username)
-    farmacia_del_farmaceutico = farmaceutico.id_farma.nombre
-    # Codigo para poder seleccionar de las listas siguientes en el filtrado para exportar la tabla
-    formatos = FormatoMedicamento.objects.all()
-    restricciones = RestriccionMedicamento.objects.all()
-    clasificaciones = ClasificacionMedicamento.objects.all()
-    context = {
-        'farmacia_del_farmaceutico': farmacia_del_farmaceutico,
-        'formatos': formatos,
-        'restricciones': restricciones,
-        'clasificaciones': clasificaciones
-    }
-    return render(request, "gestionar_medicfarma.html", context)
-
-
-def listaDeMedicFarma(request): 
-    if request.user.is_authenticated:
-        try:
-            farmaceutico = FarmaUser.objects.get(username=request.user.username)
-            farmacia_del_farmaceutico = farmaceutico.id_farma
-            farmacia_medicamento = FarmaciaMedicamento.objects.filter(id_farma=farmacia_del_farmaceutico)
-            medicamentos_list = []
-            for index, farmaMedic in enumerate(farmacia_medicamento):
-                medic = farmaMedic.id_medic
-
-                if medic.cant_max == 1:
-                    cant_max_texto = f'{medic.cant_max} unidad'
-                else:
-                    cant_max_texto = f'{medic.cant_max} unidades'
-
-                origen_texto = "Natural" if medic.origen_natural else "Fármaco"
-                medic_data = {
-                    'index': index + 1,
-                    'id': str(medic.id_medic),
-                    'farma': farmaMedic.id_farma.nombre,
-                    'nombre': medic.nombre,
-                    'formato': medic.id_formato.nombre,
-                    'descripcion': medic.description,
-                    'cant_max': cant_max_texto,
-                    'precio': f'{medic.precio_unidad} CUP/u',
-                    'origen': origen_texto,
-                    'restriccion': medic.id_restriccion.nombre if medic.id_restriccion else None,
-                    'clasificacion': medic.id_clasificacion.nombre if medic.id_clasificacion else None,
-                    'fecha_expiracion': farmaMedic.fecha_expiracion.strftime('%Y-%m-%d'),
-                    'existencia': farmaMedic.existencia,
-                }
-                medicamentos_list.append(medic_data)
-            data = {'data': medicamentos_list}
-            return JsonResponse(data, safe=False)
-        
-        except FarmaUser.DoesNotExist:
-            return JsonResponse({'error': 'Usuario farmacéutico no encontrado'}, status=404)
-    
-    return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
-
-
-@csrf_exempt
-def actualizarFechaExpiracion(request):
-    if request.method == 'POST':
-        try:
-            id_medic = request.POST.get('id_medic')
-            fecha_expiracion = request.POST.get('fecha_expiracion')
-
-            farmaceutico = FarmaUser.objects.get(username=request.user.username)
-            farmacia = farmaceutico.id_farma
-
-            farmacia_medicamento = FarmaciaMedicamento.objects.get(id_medic=id_medic, id_farma=farmacia)
-            farmacia_medicamento.fecha_expiracion = fecha_expiracion
-            farmacia_medicamento.save()
-
-            return JsonResponse({'status': 'success'}, status=200)
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
-    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
-
-
-@require_POST
-def actualizarExistencia(request):
-    id_medic = request.POST.get('id_medic')
-    existencia = request.POST.get('existencia')
-    try:
-        farmacia_medicamento = FarmaciaMedicamento.objects.get(id_medic=id_medic)
-        farmacia_medicamento.existencia = existencia
-        farmacia_medicamento.save()
-        return JsonResponse({'message': 'Existencia actualizada correctamente'}, status=200)
-    except FarmaciaMedicamento.DoesNotExist:
-        return JsonResponse({'error': 'Medicamento no encontrado'}, status=404)
-    
-
-@login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['farmacéuticos'])
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def gestionarMedicamentosDisponibles(request):
-    # Obtener el usuario actual
-    #usuario = request.user
-# esta parte del try y el except es para hacer la exportacion por grupo en medicicamentos disponibles a medic farma
-    #try:
-    #    farmaceutico = FarmaUser.objects.get(username=usuario.username)
-     #   farmacia = farmaceutico.id_farma
-      #  medicamentos_en_farmacia = FarmaciaMedicamento.objects.filter(id_farma=farmacia).values_list('id_medic', flat=True)
-       # medicamentos_disponibles = Medicamento.objects.exclude(id_medic__in=medicamentos_en_farmacia) # Filtrar los medicamentos que no están en la farmacia del usuario actual
-   
-   # except FarmaUser.DoesNotExist:
-      #  medicamentos_disponibles = Medicamento.objects.all()
-
-    # Código para poder seleccionar de las listas siguientes en el filtrado para exportar la tabla
-    restricciones = RestriccionMedicamento.objects.all()
-    clasificaciones = ClasificacionMedicamento.objects.all()
-    formatos = FormatoMedicamento.objects.all()
-
-    context = {
-      #  'medicamentos_disponibles': medicamentos_disponibles,
-        'restricciones': restricciones,
-        'clasificaciones': clasificaciones,
-        'formatos': formatos
-    }
-
-    return render(request, "gestionar_medicamentos_disponibles.html", context)
-
-
-def filterMedics(medicamentos, search_value):
-    if search_value:
-        search_value_lower = search_value.lower()
-
-        origen_natural_search = None
-        if search_value_lower == 'natural':
-            origen_natural_search = True
-        elif search_value_lower == 'fármaco' or search_value_lower == 'farmaco':
-            origen_natural_search = False
-
-        medicamentos = medicamentos.filter(
-            Q(nombre__icontains=search_value) |
-            Q(id_formato__nombre__icontains=search_value) |
-            Q(cant_max__icontains=search_value) |
-            Q(precio_unidad__icontains=search_value) |
-            Q(id_restriccion__nombre__icontains=search_value) |
-            Q(id_clasificacion__nombre__icontains=search_value) |
-            Q(origen_natural=origen_natural_search)
-        )
-    return medicamentos
-
-
-def orderMedics(medicamentos, order_column_index, order_direction):
-    order_column_mapping = {
-        '1': 'nombre',
-        '2': 'id_formato__nombre',
-        '3': 'cant_max',
-        '4': 'precio_unidad',
-        '5': 'origen_natural',
-        '6': 'id_restriccion__nombre',
-        '7': 'id_clasificacion__nombre',
-    }
-    if order_column_index in order_column_mapping:
-        order_column = order_column_mapping[order_column_index]
-        if order_direction == 'desc':
-            order_column = '-' + order_column
-        medicamentos = medicamentos.order_by(order_column)
-    return medicamentos
-
-
-def listaDeMedicamentosDisponibles(request):
-    usuario = request.user
-    farmaceutico = FarmaUser.objects.get(username=usuario.username)
-    farmacia = farmaceutico.id_farma
-    # Obtén los IDs de los medicamentos que ya están en la farmacia del usuario actual
-    medicamentos_en_farmacia = FarmaciaMedicamento.objects.filter(id_farma=farmacia).values_list('id_medic', flat=True)
-    # Filtra los medicamentos disponibles excluyendo los que ya están en la farmacia del usuario
-    medicamentos = Medicamento.objects.exclude(id_medic__in=medicamentos_en_farmacia)
-
-    order_column_index = request.GET.get("order[0][column]", "")
-    order_direction = request.GET.get("order[0][dir]", "")
-    search_value = request.GET.get("search[value]", "")
-
-    medicamentos = filterMedics(medicamentos, search_value)
-    medicamentos = orderMedics(medicamentos, order_column_index, order_direction)
-
-    paginator = Paginator(medicamentos, request.GET.get('length', 10))  # Cantidad de objetos por página
-    start = int(request.GET.get('start', 0))
-    page_number = start // paginator.per_page + 1  # Calcular el número de página basado en 'start'
-    page_obj = paginator.get_page(page_number)
-
-    medicamentos_list = []
-
-    for index, medic in enumerate(page_obj.object_list):
-        if medic.cant_max == 1:
-            cant_max_texto = f'{medic.cant_max} unidad'
-        else:
-            cant_max_texto = f'{medic.cant_max} unidades'
-        origen_texto = "Natural" if medic.origen_natural else "Fármaco"
-        medic_data = {
-            'index': index + 1,
-            'id': medic.id_medic,
-            'nombre': medic.nombre,
-            'description': medic.description,
-            'cant_max': cant_max_texto,
-            'precio_unidad': f'{medic.precio_unidad} CUP/u',
-            'origen': origen_texto,
-            'restriccion': medic.id_restriccion.nombre if medic.id_restriccion else None,
-            'clasificacion': medic.id_clasificacion.nombre if medic.id_clasificacion else None,
-            'formato': medic.id_formato.nombre if medic.id_formato else None,
-        }
-        medicamentos_list.append(medic_data)
-
-    data = {
-        "draw": int(request.GET.get('draw', 0)),
-        'recordsTotal': paginator.count,
-        'recordsFiltered': paginator.count,
-        'data': medicamentos_list
-    }
-    return JsonResponse(data, safe=False)
-
-
-@csrf_exempt
-def exportarMedicamento(request, uuid):
-    if request.method == 'POST':
-        try:
-            medicamento = Medicamento.objects.get(id_medic=uuid)
-            usuario = request.user
-            farmaceutico = FarmaUser.objects.get(username=usuario.username)
-            farmacia = farmaceutico.id_farma
-
-            if farmacia:
-                # Verificar si el medicamento ya está en la farmacia
-                if FarmaciaMedicamento.objects.filter(id_medic=medicamento, id_farma=farmacia).exists():
-                    return JsonResponse({'status': 'error', 'message': 'El medicamento ya está en tu farmacia.'}, status=400)
-
-                FarmaciaMedicamento.objects.create(
-                    id_medic=medicamento,
-                    id_farma=farmacia,
-                    fecha_expiracion=None,
-                    existencia=0  
-                )
-                return JsonResponse({'status': 'success'}, status=200)
-            else:
-                return JsonResponse({'status': 'error', 'message': 'Farmacia no encontrada'}, status=400)
-        except Medicamento.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': 'Medicamento no encontrado'}, status=404)
-        except FarmaUser.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': 'Usuario no encontrado'}, status=404)
-    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
-
 
 
 @login_required(login_url='/acceder')
@@ -1311,7 +1191,7 @@ def listaDeMedicamentos(request):
             cant_max_texto = f'{medic.cant_max} unidades'
         origen_texto = "Natural" if medic.origen_natural else "Fármaco"
         medic_data = {
-            'index': index + 1,
+            'index': start + index + 1,
             'id': medic.id_medic,
             'nombre': medic.nombre,
             'description': medic.description,
@@ -1565,11 +1445,401 @@ def editarFormatoMedicamento(request):
         return JsonResponse({'success': True})
     else:
         return JsonResponse({'success': False, 'errors': form.errors})
+    
 
+################################################################################################################################
+###############################################   FARMACIA MEDICAMENTOS   ######################################################
+
+
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['farmacéuticos'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def gestionarMedicFarma(request): 
+    # Obtener nombre de la Farmacia del farmaceutico actual
+    farmaceutico = FarmaUser.objects.get(username=request.user.username)
+    farmacia_del_farmaceutico = farmaceutico.id_farma.nombre
+    # Codigo para poder seleccionar de las listas siguientes en el filtrado para exportar la tabla
+    formatos = FormatoMedicamento.objects.all()
+    restricciones = RestriccionMedicamento.objects.all()
+    clasificaciones = ClasificacionMedicamento.objects.all()
+    context = {
+        'farmacia_del_farmaceutico': farmacia_del_farmaceutico,
+        'formatos': formatos,
+        'restricciones': restricciones,
+        'clasificaciones': clasificaciones
+    }
+    return render(request, "gestionar_medicfarma.html", context)
+
+
+def listaDeMedicFarma(request): 
+    if request.user.is_authenticated:
+        try:
+            farmaceutico = FarmaUser.objects.get(username=request.user.username)
+            farmacia_del_farmaceutico = farmaceutico.id_farma
+            farmacia_medicamento = FarmaciaMedicamento.objects.filter(id_farma=farmacia_del_farmaceutico)
+            medicamentos_list = []
+            for index, farmaMedic in enumerate(farmacia_medicamento):
+                medic = farmaMedic.id_medic
+
+                if medic.cant_max == 1:
+                    cant_max_texto = f'{medic.cant_max} unidad'
+                else:
+                    cant_max_texto = f'{medic.cant_max} unidades'
+
+                origen_texto = "Natural" if medic.origen_natural else "Fármaco"
+                medic_data = {
+                    'index': index + 1,
+                    'id': str(medic.id_medic),
+                    'farma': farmaMedic.id_farma.nombre,
+                    'nombre': medic.nombre,
+                    'formato': medic.id_formato.nombre,
+                    'descripcion': medic.description,
+                    'cant_max': cant_max_texto,
+                    'precio': f'{medic.precio_unidad} CUP/u',
+                    'origen': origen_texto,
+                    'restriccion': medic.id_restriccion.nombre if medic.id_restriccion else None,
+                    'clasificacion': medic.id_clasificacion.nombre if medic.id_clasificacion else None,
+                    'existencia': farmaMedic.existencia,
+                }
+                medicamentos_list.append(medic_data)
+            data = {'data': medicamentos_list}
+            return JsonResponse(data, safe=False)
+        
+        except FarmaUser.DoesNotExist:
+            return JsonResponse({'error': 'Usuario farmacéutico no encontrado'}, status=404)
+    
+    return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
+    
+
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['farmacéuticos'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def gestionarMedicamentosDisponibles(request):
+    # Obtener el usuario actual
+    #usuario = request.user
+# esta parte del try y el except es para hacer la exportacion por grupo en medicicamentos disponibles a medic farma
+    #try:
+    #    farmaceutico = FarmaUser.objects.get(username=usuario.username)
+     #   farmacia = farmaceutico.id_farma
+      #  medicamentos_en_farmacia = FarmaciaMedicamento.objects.filter(id_farma=farmacia).values_list('id_medic', flat=True)
+       # medicamentos_disponibles = Medicamento.objects.exclude(id_medic__in=medicamentos_en_farmacia) # Filtrar los medicamentos que no están en la farmacia del usuario actual
+   
+   # except FarmaUser.DoesNotExist:
+      #  medicamentos_disponibles = Medicamento.objects.all()
+
+    # Código para poder seleccionar de las listas siguientes en el filtrado para exportar la tabla
+    restricciones = RestriccionMedicamento.objects.all()
+    clasificaciones = ClasificacionMedicamento.objects.all()
+    formatos = FormatoMedicamento.objects.all()
+
+    context = {
+      #  'medicamentos_disponibles': medicamentos_disponibles,
+        'restricciones': restricciones,
+        'clasificaciones': clasificaciones,
+        'formatos': formatos
+    }
+
+    return render(request, "gestionar_medicamentos_disponibles.html", context)
+
+
+def filterMedics(medicamentos, search_value):
+    if search_value:
+        search_value_lower = search_value.lower()
+
+        origen_natural_search = None
+        if search_value_lower == 'natural':
+            origen_natural_search = True
+        elif search_value_lower == 'fármaco' or search_value_lower == 'farmaco':
+            origen_natural_search = False
+
+        medicamentos = medicamentos.filter(
+            Q(nombre__icontains=search_value) |
+            Q(id_formato__nombre__icontains=search_value) |
+            Q(cant_max__icontains=search_value) |
+            Q(precio_unidad__icontains=search_value) |
+            Q(id_restriccion__nombre__icontains=search_value) |
+            Q(id_clasificacion__nombre__icontains=search_value) |
+            Q(origen_natural=origen_natural_search)
+        )
+    return medicamentos
+
+
+def orderMedics(medicamentos, order_column_index, order_direction):
+    order_column_mapping = {
+        '1': 'nombre',
+        '2': 'id_formato__nombre',
+        '3': 'cant_max',
+        '4': 'precio_unidad',
+        '5': 'origen_natural',
+        '6': 'id_restriccion__nombre',
+        '7': 'id_clasificacion__nombre',
+    }
+    if order_column_index in order_column_mapping:
+        order_column = order_column_mapping[order_column_index]
+        if order_direction == 'desc':
+            order_column = '-' + order_column
+        medicamentos = medicamentos.order_by(order_column)
+    return medicamentos
+
+
+def listaDeMedicamentosDisponibles(request):
+    usuario = request.user
+    farmaceutico = FarmaUser.objects.get(username=usuario.username)
+    farmacia = farmaceutico.id_farma
+    # Obtén los IDs de los medicamentos que ya están en la farmacia del usuario actual
+    medicamentos_en_farmacia = FarmaciaMedicamento.objects.filter(id_farma=farmacia).values_list('id_medic', flat=True)
+    # Filtra los medicamentos disponibles excluyendo los que ya están en la farmacia del usuario
+    medicamentos = Medicamento.objects.exclude(id_medic__in=medicamentos_en_farmacia)
+
+    order_column_index = request.GET.get("order[0][column]", "")
+    order_direction = request.GET.get("order[0][dir]", "")
+    search_value = request.GET.get("search[value]", "")
+
+    medicamentos = filterMedics(medicamentos, search_value)
+    medicamentos = orderMedics(medicamentos, order_column_index, order_direction)
+
+    paginator = Paginator(medicamentos, request.GET.get('length', 10))  # Cantidad de objetos por página
+    start = int(request.GET.get('start', 0))
+    page_number = start // paginator.per_page + 1  # Calcular el número de página basado en 'start'
+    page_obj = paginator.get_page(page_number)
+
+    medicamentos_list = []
+
+    for index, medic in enumerate(page_obj.object_list):
+        if medic.cant_max == 1:
+            cant_max_texto = f'{medic.cant_max} unidad'
+        else:
+            cant_max_texto = f'{medic.cant_max} unidades'
+        origen_texto = "Natural" if medic.origen_natural else "Fármaco"
+        medic_data = {
+            'index': start + index + 1,
+            'id': medic.id_medic,
+            'nombre': medic.nombre,
+            'description': medic.description,
+            'cant_max': cant_max_texto,
+            'precio_unidad': f'{medic.precio_unidad} CUP/u',
+            'origen': origen_texto,
+            'restriccion': medic.id_restriccion.nombre if medic.id_restriccion else None,
+            'clasificacion': medic.id_clasificacion.nombre if medic.id_clasificacion else None,
+            'formato': medic.id_formato.nombre if medic.id_formato else None,
+        }
+        medicamentos_list.append(medic_data)
+
+    data = {
+        "draw": int(request.GET.get('draw', 0)),
+        'recordsTotal': paginator.count,
+        'recordsFiltered': paginator.count,
+        'data': medicamentos_list
+    }
+    return JsonResponse(data, safe=False)
+
+
+@csrf_exempt
+def exportarMedicamento(request, uuid):
+    if request.method == 'POST':
+        try:
+            medicamento = Medicamento.objects.get(id_medic=uuid)
+            usuario = request.user
+            farmaceutico = FarmaUser.objects.get(username=usuario.username)
+            farmacia = farmaceutico.id_farma
+
+            if farmacia:
+                # Verificar si el medicamento ya está en la farmacia
+                if FarmaciaMedicamento.objects.filter(id_medic=medicamento, id_farma=farmacia).exists():
+                    return JsonResponse({'status': 'error', 'message': 'El medicamento ya está en tu farmacia.'}, status=400)
+
+                FarmaciaMedicamento.objects.create(
+                    id_medic=medicamento,
+                    id_farma=farmacia,
+                    existencia=0  
+                )
+                return JsonResponse({'status': 'success'}, status=200)
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Farmacia no encontrada'}, status=400)
+        except Medicamento.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Medicamento no encontrado'}, status=404)
+        except FarmaUser.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Usuario no encontrado'}, status=404)
+    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
+
+
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['farmacéuticos'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def gestionarEntradasMedicamento(request):
+    farmacia_actual = request.user.farmauser.id_farma  # Obteniendo la farmacia del usuario actual
+    farmaciaMedicamentos = FarmaciaMedicamento.objects.filter(id_farma=farmacia_actual)
+    return render(request, "gestionar_entradas_medicamento.html", {
+        'farmacia_actual': farmacia_actual, 
+        'farmaciaMedicamentos': farmaciaMedicamentos
+    })
+
+
+def filterEntries(entradas, search_value):
+    if search_value:
+        entradas = entradas.filter(
+            Q(factura__icontains=search_value) |
+            Q(numero_lote__icontains=search_value) |
+            Q(cantidad__icontains=search_value) |
+            Q(fecha_creacion__icontains=search_value) |
+            Q(fecha_elaboracion__icontains=search_value) |
+            Q(fecha_vencimiento__icontains=search_value) |
+            Q(id_farmaciaMedicamento__id_medic__nombre__icontains=search_value)
+        )
+    return entradas
+
+
+def orderEntries(entradas, order_column_index, order_direction):
+    order_column_mapping = {
+        '1': 'factura',
+        '2': 'numero_lote',
+        '3': 'cantidad',
+        '4': 'fecha_creacion',
+        '5': 'fecha_elaboracion',
+        '6': 'fecha_vencimiento',
+        '7': 'id_farmaciaMedicamento__id_medic__nombre',
+    }
+    if order_column_index in order_column_mapping:
+        order_column = order_column_mapping[order_column_index]
+        if order_direction == 'desc':
+            order_column = '-' + order_column
+        entradas = entradas.order_by(order_column)
+    return entradas
+
+
+def listaDeEntradasMedicamento(request): 
+    farmacia_id = request.GET.get('farmacia_id')
+    entradas = Entrada.objects.filter(id_farmaciaMedicamento__id_farma=farmacia_id)
+
+    order_column_index = request.GET.get("order[0][column]", "")
+    order_direction = request.GET.get("order[0][dir]", "")
+    search_value = request.GET.get("search[value]", "")
+
+    entradas = filterEntries(entradas, search_value)
+    entradas = orderEntries(entradas, order_column_index, order_direction)
+
+    paginator = Paginator(entradas, request.GET.get('length', 10))  # Cantidad de objetos por página
+    start = int(request.GET.get('start', 0))
+    page_number = start // paginator.per_page + 1  # Calcular el número de página basado en 'start'
+    page_obj = paginator.get_page(page_number)
+
+    entradas_list = []
+
+    for index, ent in enumerate(page_obj.object_list):
+        medicamento_nombre = ent.id_farmaciaMedicamento.id_medic.nombre if ent.id_farmaciaMedicamento.id_medic else ''
+        formato_nombre = ent.id_farmaciaMedicamento.id_medic.id_formato.nombre if ent.id_farmaciaMedicamento.id_medic.id_formato else ''
+        medicamento_formato = f"{medicamento_nombre} - {formato_nombre}"
+        
+        ent_data = {
+            'index': start + index + 1,
+            'id': ent.id,
+            'factura': ent.factura,
+            'numero_lote': ent.numero_lote,
+            'cantidad': ent.cantidad,
+            'fecha_creacion': ent.fecha_creacion.strftime('%Y-%m-%d'),
+            'fecha_elaboracion': ent.fecha_elaboracion.strftime('%Y-%m-%d'),
+            'fecha_vencimiento': ent.fecha_vencimiento.strftime('%Y-%m-%d'),
+            'medicamento_formato': medicamento_formato,
+        }
+        entradas_list.append(ent_data)
+    data = {
+        "draw": int(request.GET.get('draw', 0)),
+        'recordsTotal': paginator.count,
+        'recordsFiltered': paginator.count,
+        'data': entradas_list
+    }
+    return JsonResponse(data, safe=False)
+
+
+def registrarEntradaMedicamento(request):
+    form = EntradaMedicamentoCreateForm(request.POST)
+    if form.is_valid():
+        entrada = form.save(commit=False)
+        entrada.fecha_creacion = timezone.now().date()
+        entrada.save()
+
+        # Actualizar la existencia en FarmaciaMedicamento
+        farmacia_medicamento = entrada.id_farmaciaMedicamento
+        farmacia_medicamento.existencia += entrada.cantidad
+        farmacia_medicamento.save()
+
+        return JsonResponse({'success': True})
+    else:
+        return JsonResponse({'success': False, 'errors': form.errors})
+
+
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['farmacéuticos'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def gestionarSalidasMedicamento(request):
+    return render(request, "gestionar_salidas_medicamento.html")
+
+
+def filterExits(salidas, search_value):
+    if search_value:
+        salidas = salidas.filter(
+            Q(factura__icontains=search_value) |
+            Q(numero_lote__icontains=search_value) |
+            Q(cantidad__icontains=search_value) |
+            Q(fecha_elaboracion__icontains=search_value) |
+            Q(fecha_vencimiento__icontains=search_value)
+        )
+    return salidas
+
+
+def orderExits(salidas, order_column_index, order_direction):
+    order_column_mapping = {
+        '1': 'factura',
+        '2': 'numero_lote',
+        '3': 'cantidad',
+        '4': 'fecha_elaboracion',
+        '5': 'fecha_vencimiento',
+    }
+    if order_column_index in order_column_mapping:
+        order_column = order_column_mapping[order_column_index]
+        if order_direction == 'desc':
+            order_column = '-' + order_column
+        salidas = salidas.order_by(order_column)
+    return salidas
+
+
+def listaDeSalidasMedicamento(request): 
+    salidas = Entrada.objects.all()
+
+    order_column_index = request.GET.get("order[0][column]", "")
+    order_direction = request.GET.get("order[0][dir]", "")
+    search_value = request.GET.get("search[value]", "")
+
+    salidas = filterExits(salidas, search_value)
+    salidas = orderExits(salidas, order_column_index, order_direction)
+
+    paginator = Paginator(salidas, request.GET.get('length', 10))  # Cantidad de objetos por página
+    start = int(request.GET.get('start', 0))
+    page_number = start // paginator.per_page + 1  # Calcular el número de página basado en 'start'
+    page_obj = paginator.get_page(page_number)
+
+    salidas_list = []
+
+    for index, sal in enumerate(page_obj.object_list):
+        
+        sal_data = {
+            'index': start + index + 1,
+            'id': sal.id_farmaciaMedicamento,
+            'cantidad': sal.cantidad,
+            'fecha_movimiento': sal.fecha_movimiento.strftime('%Y-%m-%d')
+        }
+        salidas_list.append(sal_data)
+    data = {
+        "draw": int(request.GET.get('draw', 0)),
+        'recordsTotal': paginator.count,
+        'recordsFiltered': paginator.count,
+        'data': salidas_list
+    }
+    return JsonResponse(data, safe=False)
 
 
 ################################################################################################################################
-#############################################     CLIENTES    ##################################################################
+#######################################################   CLIENTES   ###########################################################
 
 
 @login_required(login_url='/acceder')
@@ -1683,11 +1953,8 @@ def buscarFarmacia(request):
 
 
 
-
-
-
 ##############################################################################################################################
-#############################################     TRAZAS    ##################################################################
+###############################################   TRAZAS   ###################################################################
 
 
 @login_required(login_url='/acceder')
@@ -1697,12 +1964,60 @@ def visualizarTrazasCrud(request):
     return render(request, "visualizar_trazas_crud.html")
 
 
+def filterTrazasCrud(trazas, search_value):
+    if search_value:
+        event_type_mapping = {
+            'adición': CRUDEvent.CREATE,
+            'modificación': CRUDEvent.UPDATE,
+            'eliminación': CRUDEvent.DELETE,
+        }
+        
+        search_value_lower = search_value.lower()
+        event_type = event_type_mapping.get(search_value_lower, None)
+        
+        search_filter = Q(datetime__icontains=search_value) | \
+                        Q(user__username__icontains=search_value) | \
+                        Q(content_type__model__icontains=search_value) | \
+                        Q(object_repr__icontains=search_value) | \
+                        Q(changed_fields__icontains=search_value)
+        
+        if event_type is not None:
+            search_filter |= Q(event_type=event_type)
+        
+        trazas = trazas.filter(search_filter)
+    return trazas
+
+
+def orderTrazasCrud(trazas, order_column_index, order_direction):
+    order_column_mapping = {
+        '1': 'datetime',
+        '2': 'user__username',
+        '4': 'content_type__model',
+        '5': 'object_repr',
+        '6': 'event_type',
+        '7': 'changed_fields',
+    }
+    if order_column_index in order_column_mapping:
+        order_column = order_column_mapping[order_column_index]
+        if order_direction == 'desc':
+            order_column = '-' + order_column
+        trazas = trazas.order_by(order_column)
+    return trazas
+
+
 def listaDeTrazasCrud(request):
     try:
         eventos = CRUDEvent.objects.all()  # Obtener todos los eventos de CRUDEvent
         login_events = {event.user_id: event.remote_ip for event in LoginEvent.objects.all()}  # Obtener todos los eventos de LoginEvent y mapear user_id a remote_ip
 
-        paginator = Paginator(eventos, request.GET.get('length', 10))  # Cantidad de objetos por página
+        order_column_index = request.GET.get("order[0][column]", "")
+        order_direction = request.GET.get("order[0][dir]", "")
+        search_value = request.GET.get("search[value]", "")
+
+        trazas = filterTrazasCrud(eventos, search_value)
+        trazas = orderTrazasCrud(trazas, order_column_index, order_direction)
+
+        paginator = Paginator(trazas, request.GET.get('length', 10))  # Cantidad de objetos por página
         start = int(request.GET.get('start', 0))
         page_number = start // paginator.per_page + 1  # Calcular el número de página basado en 'start'
         page_obj = paginator.get_page(page_number)
@@ -1711,18 +2026,18 @@ def listaDeTrazasCrud(request):
         for index, traza in enumerate(page_obj.object_list):
 
             if traza.event_type == CRUDEvent.CREATE:
-                event_type_display = 'Creado'
+                event_type_display = 'Adición'
             elif traza.event_type == CRUDEvent.UPDATE:
-                event_type_display = 'Modificado'
+                event_type_display = 'Modificación'
             elif traza.event_type == CRUDEvent.DELETE:
-                event_type_display = 'Eliminado'
+                event_type_display = 'Eliminación'
             else:
                 event_type_display = traza.get_event_type_display()
 
             ip_address = login_events.get(traza.user_id, "No disponible")  # Obtener la IP del usuario si existe
                 
             traza_data = {
-                'index': index + 1,
+                'index': start + index + 1,
                 'id': traza.id,
                 'action_time': localtime(traza.datetime).strftime('%Y-%m-%d %H:%M:%S'),
                 'user': traza.user.username if traza.user else 'System',
@@ -1748,6 +2063,7 @@ def listaDeTrazasCrud(request):
     except Exception as e:
         print(e)
         return JsonResponse({'error': str(e)}, status=500)
+
     
 
 @login_required(login_url='/acceder')
@@ -1757,8 +2073,65 @@ def visualizarTrazasSistema(request):
     return render(request, "visualizar_trazas_sistema.html")
 
 
+def translate_action_flag(action_flag):
+    action_flag_map = {
+        1: 'Adición',
+        2: 'Modificación',
+        3: 'Eliminación',
+    }
+    return action_flag_map.get(action_flag, 'Desconocido')
+
+
+def filterTrazasSist(trazas, search_value):
+    if search_value:
+        translated_action_flags = {
+            'Adición': 1,
+            'Modificación': 2,
+            'Eliminación': 3,
+        }
+        
+        search_value_action_flag = [flag for flag, value in translated_action_flags.items() if search_value.lower() in flag.lower()]
+
+        q_objects = Q(action_time__icontains=search_value) | \
+                    Q(user__username__icontains=search_value) | \
+                    Q(content_type__app_label__icontains=search_value) | \
+                    Q(content_type__model__icontains=search_value) | \
+                    Q(object_repr__icontains=search_value) | \
+                    Q(change_message__icontains=search_value)
+
+        if search_value_action_flag:
+            q_objects |= Q(action_flag__in=[translated_action_flags[flag] for flag in search_value_action_flag])
+
+        trazas = trazas.filter(q_objects)
+    return trazas
+
+
+def orderTrazasSist(trazas, order_column_index, order_direction):
+    order_column_mapping = {
+        '1': 'action_time',
+        '2': 'user__username',
+        '3': 'content_type__app_label',
+        '4': 'object_repr',
+        '5': 'action_flag',
+        '6': 'change_message',
+    }
+    if order_column_index in order_column_mapping:
+        order_column = order_column_mapping[order_column_index]
+        if order_direction == 'desc':
+            order_column = '-' + order_column
+        trazas = trazas.order_by(order_column)
+    return trazas
+
+
 def listaDeTrazasSistema(request):
     trazas = LogEntry.objects.all()  # Obtener todas las trazas de LogEntry (acciones registradas por Django)
+
+    order_column_index = request.GET.get("order[0][column]", "")
+    order_direction = request.GET.get("order[0][dir]", "")
+    search_value = request.GET.get("search[value]", "")
+
+    trazas = filterTrazasSist(trazas, search_value)
+    trazas = orderTrazasSist(trazas, order_column_index, order_direction)
 
     paginator = Paginator(trazas, request.GET.get('length', 10))  # Cantidad de objetos por página
     start = int(request.GET.get('start', 0))
@@ -1780,14 +2153,16 @@ def listaDeTrazasSistema(request):
         else:
             change_message = {}  # Manejo seguro en caso de que change_message sea None o vacío
 
+        action_flag_display = translate_action_flag(traza.action_flag)
+
         traza_data = {
-            'index': index + 1,
+            'index': start + index + 1,
             'id': traza.id,
             'action_time': traza.action_time.strftime('%Y-%m-%d %H:%M:%S'),
             'user': traza.user.username if traza.user else 'System',
             'content_type': str(traza.content_type),
             'object_repr': traza.object_repr,
-            'action_flag': traza.get_action_flag_display(),
+            'action_flag': action_flag_display,
             'change_message': change_message
         }
         trazas_list.append(traza_data)
@@ -1799,7 +2174,7 @@ def listaDeTrazasSistema(request):
         'data': trazas_list
     }
     return JsonResponse(data, safe=False)
-    
+
 
 def generar_lote_farmacias(request):
     turno = TurnoFarmacia.objects.get(id_turno_farmacia="d331dd6a-9436-48f6-8c1a-ca83cf9707b2")
@@ -1996,7 +2371,7 @@ def generate_traza_crud_report(request, objetos):
     ]
     for index, objeto in enumerate(objetos):
         ip_remota = login_events.get(objeto.user_id, "No disponible")
-        accion = 'Creado' if objeto.event_type == 1 else 'Modificado' if objeto.event_type == 2 else 'Eliminado'
+        accion = 'Adición' if objeto.event_type == 1 else 'Modificación' if objeto.event_type == 2 else 'Eliminación'
         data.append([
             index + 1,
             objeto.datetime.strftime('%Y-%m-%d %H:%M:%S'),
@@ -2051,7 +2426,7 @@ def generate_traza_sistema_report(request, objetos):
             objeto.user.username if objeto.user else 'System',
             str(objeto.content_type) if objeto.content_type else 'N/A',
             objeto.object_repr,
-            {ADDITION: 'Adición', CHANGE: 'Cambio', DELETION: 'Eliminación'}.get(objeto.action_flag, ''),
+            {ADDITION: 'Adición', CHANGE: 'Modificación', DELETION: 'Eliminación'}.get(objeto.action_flag, ''),
         ])
     return data
 
@@ -2266,3 +2641,73 @@ def editarUbicacionFarmacia(request, uuid):
         return JsonResponse({'success': True}, status=200)
     else:
         JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+def obtenerNotificaciones(request):
+    if request.user.is_authenticated:
+        notificaciones = Notificacion.objects.filter(user=request.user, leido=False).order_by('-fecha')
+        data = [{'id_notificacion': n.id, 'mensaje': n.mensaje, 'fecha': n.fecha.strftime('%Y-%m-%d %H:%M:%S')} for n in notificaciones]
+        return JsonResponse({'notificaciones': data}, safe=False)
+    else:
+        return JsonResponse({'error': 'No autorizado'}, status=403)
+
+
+@csrf_exempt
+def marcarNotificacionLeida(request):
+    if request.method == 'POST':
+        notificacion_id = request.POST.get('id')
+        if not notificacion_id:
+            return JsonResponse({'status': 'error', 'message': 'ID de notificación no proporcionado'}, status=400)
+        
+        try:
+            notificacion_id = int(notificacion_id)  # Asegurarse de que el ID sea un número entero
+        except ValueError:
+            return JsonResponse({'status': 'error', 'message': 'ID de notificación no válido'}, status=400)
+
+        try:
+            notificacion = Notificacion.objects.get(id=notificacion_id)
+            notificacion.leido = True
+            notificacion.save()
+            return JsonResponse({'status': 'success'}, status=200)
+        except Notificacion.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Notificación no encontrada'}, status=404)
+    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
+
+
+#################################################################################################################################
+#############################################     GRAFICOS     ##################################################################
+
+
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['admin'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def visualizarCharts(request):
+    return render(request, "visualizar_charts.html")
+
+
+def usuariosXGruposChart(request):
+    # Obtener el recuento de usuarios por grupo
+    group_counts = CustomUser.objects.values('groups').annotate(count=Count('id'))
+
+    # Definir los nombres de los grupos y los contadores
+    labels = ['clientes', 'farmacéuticos', 'admin']
+    counts = [0, 0, 0]  # Inicializar contadores para cada grupo
+
+    # Asignar los recuentos reales a los contadores correspondientes
+    for item in group_counts:
+        group_name = item['groups']
+        user_count = item['count']
+        if group_name == '1':
+            counts[0] = user_count
+        elif group_name == '2':
+            counts[1] = user_count
+        elif group_name == '3':
+            counts[2] = user_count
+
+    # Pasar datos al contexto de la plantilla
+    context = {
+        'labels': labels,
+        'counts': counts,
+    }
+
+    return JsonResponse(context)

@@ -1,0 +1,39 @@
+{% extends "./index_especialista.html" %}
+
+{% block mytitle %}Mi Perfil{% endblock %}
+
+{% block title %}Mi Perfil{% endblock %}
+
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block content %}
+
+<form action="" method="POST">{% csrf_token %}
+    <div class="card mx-auto" style="width: 30rem;">
+        <div class="card-body">
+            {% if user.username == form.instance.username %}
+                <fieldset class="form-group">
+                    <h3 class="border-bottom mb-4" style="text-align: center">Editar Perfil</h3>
+                    {{ form.username|as_crispy_field }}
+                    {{ form.first_name|as_crispy_field }}
+                    {{ form.last_name|as_crispy_field }}
+                    <div class="form-group">
+                        <label for="id_description">Descripción</label>
+                        <textarea name="description" cols="40" rows="10" class="form-control" id="id_description">{{ form.description.value }}</textarea>
+                    </div>
+                </fieldset>
+                <div class="form-group">
+                    <button class="btn btn-md btn-dark btn-block" type="submit">Aceptar</button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</form>
+
+<!--Custom JS-->
+<script src="{% static 'js/custom_alerts.js' %}"></script>
+
+{% endblock %}
+
+{% block subtitle %}Perfil de usuario{% endblock %}

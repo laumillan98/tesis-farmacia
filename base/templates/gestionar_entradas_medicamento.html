@@ -1,0 +1,132 @@
+
+{% extends "./index_farmaceutico.html" %}
+
+{% load static %}
+
+{% block mytitle %}Gestionar Entradas{% endblock %}
+
+{% block mycss %}
+    <style>
+        .select2-container {
+            width: 100% !important;
+        }
+        .select2-selection--single {
+            height: calc(2.25rem + 2px) !important;
+        }
+        .select2-selection__rendered {
+            line-height: calc(2.25rem + 2px) !important;
+        }
+        .select2-selection__arrow {
+            height: calc(2.25rem + 2px) !important;
+        }
+    </style>
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+{% endblock %}
+
+{% block title %}Gestionar Entradas{% endblock %}
+
+{% block content %}
+
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <button id="registrarEntradaButton" class="btn btn-md btn-success"><i class="fa-solid fa-plus"></i> Registrar Nueva Entrada</button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <br>
+                    <table id="miTabla" class="table table-bordered table-striped" data-url="{% url 'lista_de_entradas_medicamento' %}?farmacia_id={{ farmacia_actual.id_farma }}">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Factura</th>
+                                <th>Lote</th>
+                                <th>Cantidad</th>
+                                <th>Fecha Creación</th>
+                                <th>Fecha Elaboración</th>
+                                <th>Fecha Vencimiento</th>
+                                <th>Medicamento</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal para registrar entrada -->
+    <div class="modal fade" id="modal-registrar-entrada">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Registrar Entrada</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="registroEntradaForm">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="nuevaFactura">Factura:</label>
+                                <input type="text" class="form-control" id="nuevaFactura" name="factura" placeholder="Factura" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="nuevoLote">Lote:</label>
+                                <input type="text" class="form-control" id="nuevoLote" name="numero_lote" placeholder="Lote" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="nuevaCantidad">Cantidad:</label>
+                                <input type="number" class="form-control" id="nuevaCantidad" name="cantidad" placeholder="Cantidad" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="nuevaFechaElaboracion">Fecha de Elaboración</label>
+                                <input type="date" class="form-control" id="nuevaFechaElaboracion" name="fecha_elaboracion" placeholder="Fecha de Elaboración" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="nuevaFechaVencimiento">Fecha de Vencimiento</label>
+                                <input type="date" class="form-control" id="nuevaFechaVencimiento" name="fecha_vencimiento" placeholder="Fecha de Vencimiento" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="nuevoMedicamento">Medicamento</label>
+                                <select class="form-control select2" id="nuevoMedicamento" name="id_farmaciaMedicamento" required>
+                                    {% for farmaciaMedicamento in farmaciaMedicamentos %}
+                                        <option value="{{ farmaciaMedicamento.id }}">{{ farmaciaMedicamento.id_medic.nombre }} - {{ farmaciaMedicamento.id_medic.id_formato.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Registrar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}   
+
+{% block subtitle %}Entradas{% endblock %}
+
+{% block custom_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+<script src="{% static 'plugins/jquery-validation/jquery.validate.min.js' %}"></script>
+<script src="{% static 'plugins/jquery-validation/additional-methods.min.js' %}"></script>
+<script src="{% static 'js/lista_de_entradas_medicamento.js' %}"></script>
+
+<script>
+    $(document).ready(function() {
+        $('.select2').select2({
+            width: '100%',   
+        });
+    });
+</script>
+{% endblock %}

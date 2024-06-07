@@ -1,12 +1,13 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, SetPasswordForm, PasswordResetForm, UserChangeForm
-from .models import CustomUser, FarmaUser, Farmacia, Municipio, Provincia, TipoFarmacia, TurnoFarmacia, Medicamento, RestriccionMedicamento, ClasificacionMedicamento, FormatoMedicamento
+from .models import CustomUser, FarmaUser, Farmacia, Municipio, Provincia, TipoFarmacia, TurnoFarmacia, Medicamento, RestriccionMedicamento, ClasificacionMedicamento, FormatoMedicamento, Entrada, Salida
 from .widgets import BooleanCheckbox
 from django.contrib.auth import get_user_model
 from django_recaptcha.fields import ReCaptchaField
 from django_recaptcha.widgets import ReCaptchaV2Checkbox
 from django.core.validators import RegexValidator, MinValueValidator
 from django.core.exceptions import ValidationError
+from datetime import date, timedelta
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -57,11 +58,11 @@ class FarmaUserCreationForm(UserCreationForm):
     email = forms.EmailField(help_text='Escriba una dirección de correo válida por favor', required=True)
     first_name = forms.CharField(validators=[RegexValidator(regex=r'^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido.')], label="Nombre", required=True)
     last_name = forms.CharField(validators=[RegexValidator(regex=r'^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Apellido no válido.')], label="Apellidos", required=True)
-    farma_name = forms.ModelChoiceField(queryset=Farmacia.objects.exclude(farmauser__isnull=False), label="Farmacia Asociada") 
+    id_farma = forms.ModelChoiceField(queryset=Farmacia.objects.exclude(farmauser__isnull=False), label="Farmacia Asociada") 
 
     class Meta:
         model = FarmaUser
-        fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2', 'farma_name']
+        fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2', 'id_farma']
 
     def save(self, commit=True):
         user = super(FarmaUserCreationForm, self).save(commit=False)
@@ -75,7 +76,7 @@ class FarmaUserCreationForm(UserCreationForm):
         print(type(self.cleaned_data))
         email = self.cleaned_data.get('email')
 
-        if FarmaUser.objects.filter(email=email).exists():
+        if CustomUser.objects.filter(email=email).exists():
             raise forms.ValidationError("El correo introducido ya está en uso")
 
         with open ("static/txt/disposable_email_providers.txt", 'r') as f:
@@ -96,11 +97,11 @@ class FarmaUserCreationForm(UserCreationForm):
             raise forms.ValidationError("Tus contraseñas no cinciden")
         return cleaned_data    
 
-    def clean_farma_name(self):
-        farma = self.cleaned_data.get('farma_name')
-        if farma:
-            self.instance.farma = farma
-        return farma
+    def clean_id_farma(self):
+        id_farma = self.cleaned_data.get('id_farma')
+        if id_farma:
+            self.instance.id_farma = id_farma
+        return id_farma
     
 
 class UserLoginForm(AuthenticationForm):
@@ -132,31 +133,42 @@ class PasswordResetForm(PasswordResetForm):
 
 
 class UserProfileForm(UserChangeForm):
-    #email = forms.EmailField(required=True)
+    username = forms.CharField(max_length=20, validators=[RegexValidator(regex=r'^[A-Za-z0-9_]{3,150}$', message='Nombre de usuario no válido')], label="Nombre de usuario", required=True)
     first_name = forms.CharField(validators=[RegexValidator(regex=r'^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
     last_name = forms.CharField(validators=[RegexValidator(regex=r'^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Apellido no válido')], label="Apellidos", required=True)
+    description = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}), label="Descripción", required=False)
 
     class Meta:
         model = get_user_model()
-        fields = ['first_name', 'last_name', 'description']  
+        fields = ['username', 'first_name', 'last_name', 'description']
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if get_user_model().objects.filter(username=username).exists() and self.instance.username != username:
+            raise forms.ValidationError("El nombre de usuario ya está en uso")
+        return username
     
 
 class UserUpdateForm(UserChangeForm):
     first_name = forms.CharField(validators=[RegexValidator(regex=r'^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
     last_name = forms.CharField(validators=[RegexValidator(regex=r'^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Apellido no válido')], label="Apellidos", required=True)
-    
+    description = forms.CharField(widget=forms.Textarea, label="Descripción", required=False)
+    email = forms.EmailField(help_text='Escriba una dirección de correo válida por favor', required=True)
+
     class Meta:
         model = CustomUser
-        fields = ('first_name', 'last_name')
+        fields = ('first_name', 'last_name', 'description', 'email')
 
 
 class FarmaUserUpdateForm(UserChangeForm):
     first_name = forms.CharField(validators=[RegexValidator(regex=r'^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
     last_name = forms.CharField(validators=[RegexValidator(regex=r'^[A-Za-záéíóúÁÉÍÓÚüÜ\s]{3,50}$', message='Apellido no válido')], label="Apellidos", required=True)
-    
+    description = forms.CharField(widget=forms.Textarea, label="Descripción", required=False)
+    email = forms.EmailField(help_text='Escriba una dirección de correo válida por favor', required=True)
+
     class Meta:
         model = FarmaUser
-        fields = ('first_name', 'last_name', 'id_farma')
+        fields = ('first_name', 'last_name', 'id_farma', 'description', 'email')
 
 
 class FarmaUpdateForm(forms.ModelForm):
@@ -289,6 +301,42 @@ class FormatoMedicamentoUpdateForm(forms.ModelForm):
         if FormatoMedicamento.objects.filter(nombre=nombre).exists():
             raise ValidationError('Este nombre ya existe.')
         return nombre
+    
+
+class EntradaMedicamentoCreateForm(forms.ModelForm):
+    factura = forms.CharField(validators=[RegexValidator(regex='^[A-Za-z0-9]{3,20}$', message='Factura no válida, solo se permiten números y letras')], label="Factura", required=True)
+    numero_lote = forms.CharField(validators=[RegexValidator(regex='^[A-Za-z0-9]{3,20}$', message='Número de lote no válido, solo se permiten números y letras')], label="Número de Lote", required=True)
+    cantidad = forms.IntegerField(validators=[MinValueValidator(1, message="La cantidad debe ser mayor que cero.")], required=True, label="Cantidad")
+    fecha_elaboracion = forms.DateField(required=True, label="Fecha de Elaboración", widget=forms.DateInput(attrs={'type': 'date'}))
+    fecha_vencimiento = forms.DateField(required=True, label="Fecha de Vencimiento", widget=forms.DateInput(attrs={'type': 'date'}))
+
+    class Meta:
+        model = Entrada
+        fields = ['id_farmaciaMedicamento', 'factura', 'numero_lote', 'cantidad', 'fecha_elaboracion', 'fecha_vencimiento']
+
+    def clean_fecha_elaboracion(self):
+        fecha_elaboracion = self.cleaned_data.get('fecha_elaboracion')
+        if fecha_elaboracion and fecha_elaboracion > date.today():
+            raise ValidationError("La fecha de elaboración no puede ser posterior a la fecha actual.")
+        return fecha_elaboracion
+
+    def clean_fecha_vencimiento(self):
+        fecha_vencimiento = self.cleaned_data.get('fecha_vencimiento')
+        if fecha_vencimiento and fecha_vencimiento <= date.today():
+            raise ValidationError("La fecha de vencimiento debe ser mayor que la fecha actual.")
+        return fecha_vencimiento
+
+    def clean(self):
+        cleaned_data = super().clean()
+        fecha_elaboracion = cleaned_data.get('fecha_elaboracion')
+        fecha_vencimiento = cleaned_data.get('fecha_vencimiento')
+
+        if fecha_elaboracion and fecha_vencimiento:
+            if fecha_elaboracion > fecha_vencimiento:
+                raise ValidationError("La fecha de elaboración no puede ser posterior a la fecha de vencimiento.")
+            if (fecha_vencimiento - fecha_elaboracion).days < 365:
+                raise ValidationError("Debe haber al menos un año entre la fecha de elaboración y la fecha de vencimiento.")
+        return cleaned_data
 
 
 class FarmaciaAdminForm(forms.ModelForm):
