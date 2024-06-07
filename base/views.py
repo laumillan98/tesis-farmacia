@@ -1771,6 +1771,60 @@ def registrarEntradaMedicamento(request):
 @login_required(login_url='/acceder')
 @usuarios_permitidos(roles_permitidos=['farmacéuticos'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def realizarCierreFarmacia(request):
+    # Obtener nombre de la Farmacia del farmaceutico actual
+    farmaceutico = FarmaUser.objects.get(username=request.user.username)
+    farmacia_del_farmaceutico = farmaceutico.id_farma.nombre
+    
+    formatos = FormatoMedicamento.objects.all()
+    restricciones = RestriccionMedicamento.objects.all()
+    clasificaciones = ClasificacionMedicamento.objects.all()
+    context = {
+        'farmacia_del_farmaceutico': farmacia_del_farmaceutico,
+        'formatos': formatos,
+        'restricciones': restricciones,
+        'clasificaciones': clasificaciones
+    }
+    return render(request, "realizar_cierre_farmacia.html", context)
+
+
+@login_required(login_url='/acceder')
+@require_POST
+def guardarVentas(request):
+    ventas = json.loads(request.body)
+    for venta in ventas:
+        farmacia_medicamento = FarmaciaMedicamento.objects.get(id=venta['id'])
+        cantidad = int(venta['cantidad'])
+        if cantidad <= farmacia_medicamento.existencia:
+            farmacia_medicamento.existencia -= cantidad
+            farmacia_medicamento.save()
+            Salida.objects.create(
+                id_farmaciaMedicamento=farmacia_medicamento,
+                cantidad=cantidad,
+                fecha_movimiento=timezone.now()
+            )
+        else:
+            return JsonResponse({'success': False, 'error': 'La cantidad de ventas no puede ser mayor a la existencia'})
+    return JsonResponse({'success': True})
+
+
+@login_required(login_url='/acceder')
+def gestionarSalidasMedicamento(request):
+    salidas = Salida.objects.filter(fecha_movimiento=timezone.now().date())
+    context = {'salidas': salidas}
+    return render(request, 'gestionar_salidas_medicamento.html', context)
+
+
+
+
+
+
+
+
+
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['farmacéuticos'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def gestionarSalidasMedicamento(request):
     return render(request, "gestionar_salidas_medicamento.html")
 

@@ -142,7 +142,7 @@ class Entrada(models.Model):
 
 class Salida(models.Model):
     id_farmaciaMedicamento = models.ForeignKey(FarmaciaMedicamento, on_delete=models.CASCADE)
-    cantidad = models.IntegerField() # Recuerda que esta cantidad tiene que ser menor a la sumatoria de las cantidades totales de entrada
+    cantidad = models.IntegerField() 
     fecha_movimiento = models.DateField(auto_now_add=True)
 
     def _str_(self):

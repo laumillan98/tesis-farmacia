@@ -304,8 +304,8 @@ class FormatoMedicamentoUpdateForm(forms.ModelForm):
     
 
 class EntradaMedicamentoCreateForm(forms.ModelForm):
-    factura = forms.CharField(validators=[RegexValidator(regex='^[A-Za-z0-9]{3,20}$', message='Factura no válida, solo se permiten números y letras')], label="Factura", required=True)
-    numero_lote = forms.CharField(validators=[RegexValidator(regex='^[A-Za-z0-9]{3,20}$', message='Número de lote no válido, solo se permiten números y letras')], label="Número de Lote", required=True)
+    factura = forms.CharField(validators=[RegexValidator(regex='^\d{8}$', message='Factura no válida, debe contener exactamente 8 dígitos numéricos')], label="Factura", required=True)
+    numero_lote = forms.CharField(validators=[RegexValidator(regex='^[A-Za-z0-9]{6,12}$', message='Número de lote no válido, debe contener de 6 a 12 caracteres alfanuméricos')], label="Número de Lote", required=True)
     cantidad = forms.IntegerField(validators=[MinValueValidator(1, message="La cantidad debe ser mayor que cero.")], required=True, label="Cantidad")
     fecha_elaboracion = forms.DateField(required=True, label="Fecha de Elaboración", widget=forms.DateInput(attrs={'type': 'date'}))
     fecha_vencimiento = forms.DateField(required=True, label="Fecha de Vencimiento", widget=forms.DateInput(attrs={'type': 'date'}))

@@ -45,30 +45,64 @@ $.getScript("/static/js/datatables.spanish.js", function() {
                         registroSuccessful = true;
                         $("#modal-registrar-entrada").modal("hide");
                         $("#miTabla").DataTable().ajax.reload();
-                    } else {
-                        
-                        alert("Ocurrió un error al registrar la entrada");
-    
+                    } else { 
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Ocurrió un error al registrar la entrada',
+                            icon: 'error'
+                        });
                     }
                 },
                 error: function (error) {
-                    alert("Ocurrió un error al registrar la entrada");
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Ocurrió un error al registrar la entrada',
+                        icon: 'error'
+                    });
                 },
             });
         }
 
+        $.validator.addMethod("validFechaElaboracion", function(value, element) {
+            let fechaElaboracion = new Date(value);
+            let today = new Date();
+            let oneMonthAgo = new Date(today.setMonth(today.getMonth() - 1));
+            return fechaElaboracion < today && fechaElaboracion <= oneMonthAgo; 
+        }, "La fecha de elaboración no puede ser posterior a la fecha actual");
+  
+        $.validator.addMethod("validFechaVencimiento", function(value, element) {
+            let fechaVencimiento = new Date(value);
+            let today = new Date();
+            return fechaVencimiento > today; // Verificar que la fecha de vencimiento sea mayor que la fecha actual
+        }, "La fecha de vencimiento debe ser mayor que la fecha actual");
+  
+        $.validator.addMethod("validFechaEntreUnAno", function(value, element, params) {
+            let fechaElaboracion = new Date($(params).val());
+            let fechaVencimiento = new Date(value);
+            let diff = fechaVencimiento - fechaElaboracion;
+            let oneYear = 365 * 24 * 60 * 60 * 1000;
+            return diff >= oneYear; // Verificar que la diferencia entre las fechas sea de al menos un año
+        }, "La diferencia entre la fecha de elaboración y la fecha de vencimiento debe ser de al menos un año");
+
+        $.validator.addMethod("validCantidad", function(value, element) {
+            return value > 0; // Verificar que la cantidad sea mayor que cero
+        }, "La cantidad debe ser mayor que cero");
+
+        $.validator.addMethod("validFactura", function(value, element) {
+            return /^\d{8}$/.test(value); // Verificar que la factura tenga exactamente 8 dígitos
+        }, "Factura no válida, debe contener exactamente 8 dígitos numéricos");
+
+        
         $("#registroEntradaForm").validate({
             rules: {
                 factura: {
                     required: true,
-                    minlength: 3,
-                    maxlength: 20,
-                    pattern: /^[A-Za-z0-9]+$/ 
+                    validFactura: true
                 },
                 numero_lote: {
                     required: true,
-                    minlength: 3,
-                    maxlength: 20,
+                    minlength: 6,
+                    maxlength: 12,
                     pattern: /^[A-Za-z0-9]+$/ 
                 },
                 cantidad: {
@@ -76,6 +110,7 @@ $.getScript("/static/js/datatables.spanish.js", function() {
                     minlength: 1,
                     maxlength: 3,
                     digits: true,
+                    validCantidad: true
                 },
                 fecha_elaboracion: {
                     required: true,
@@ -96,14 +131,12 @@ $.getScript("/static/js/datatables.spanish.js", function() {
             messages: {
                 factura: {
                     required: "Este campo es obligatorio.",
-                    minlength: "Por favor, introduce al menos 3 caracteres.",
-                    maxlength: "Por favor, no introduzcas más de 20 caracteres.",
-                    pattern: "Por favor introduce una factura válida (solo letras y números)."
+                    validFactura: "Factura no válida, debe contener exactamente 8 dígitos numéricos"
                 },
                 numero_lote: {
                     required: "Este campo es obligatorio.",
-                    minlength: "Por favor, introduce al menos 3 caracteres.",
-                    maxlength: "Por favor, no introduzcas más de 20 caracteres.",
+                    minlength: "Por favor, introduce al menos 6 caracteres.",
+                    maxlength: "Por favor, no introduzcas más de 12 caracteres.",
                     pattern: "Por favor introduce un número de lote válido (solo letras y números)."
                 },
                 cantidad: {
@@ -111,6 +144,7 @@ $.getScript("/static/js/datatables.spanish.js", function() {
                     minlength: "Solo puede contener de 1 a 3 dígitos.",
                     maxlength: "Solo puede contener de 1 a 3 dígitos.",
                     digits: "No puede contener letras ni símbolos.",
+                    validCantidad: "La cantidad debe ser mayor que cero."
                 },
                 fecha_elaboracion: {
                     required: "Este campo es obligatorio.",
@@ -156,25 +190,7 @@ $.getScript("/static/js/datatables.spanish.js", function() {
             }
         });
   
-        $.validator.addMethod("validFechaElaboracion", function(value, element) {
-            let fechaElaboracion = new Date(value);
-            let today = new Date();
-            return fechaElaboracion <= today; // Verificar que la fecha de elaboración no sea posterior a la fecha actual
-        }, "La fecha de elaboración no puede ser posterior a la fecha actual");
-  
-        $.validator.addMethod("validFechaVencimiento", function(value, element) {
-            let fechaVencimiento = new Date(value);
-            let today = new Date();
-            return fechaVencimiento > today; // Verificar que la fecha de vencimiento sea mayor que la fecha actual
-        }, "La fecha de vencimiento debe ser mayor que la fecha actual");
-  
-        $.validator.addMethod("validFechaEntreUnAno", function(value, element, params) {
-            let fechaElaboracion = new Date($(params).val());
-            let fechaVencimiento = new Date(value);
-            let diff = fechaVencimiento - fechaElaboracion;
-            let oneYear = 365 * 24 * 60 * 60 * 1000;
-            return diff >= oneYear; // Verificar que la diferencia entre las fechas sea de al menos un año
-        }, "La diferencia entre la fecha de elaboración y la fecha de vencimiento debe ser de al menos un año");
+        
 
     });
 });
