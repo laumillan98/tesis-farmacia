@@ -10,12 +10,14 @@ from django.db.models import Count
 from django.db.models.query_utils import Q
 from django.http.response import FileResponse
 from django.http.response import JsonResponse
+from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from django.core.paginator import Paginator, EmptyPage
 from django.core.management import call_command
 from django.contrib import messages
+from django.contrib.gis.geos import Point
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
@@ -23,6 +25,7 @@ from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
 from django.contrib.sites.shortcuts import get_current_site
 from django.views.decorators.http import require_POST
 from django.views.decorators.cache import cache_control
+from django.utils import timezone
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.utils.timezone import localtime
@@ -30,8 +33,8 @@ from django.contrib.contenttypes.models import ContentType
 
 from easyaudit.models import CRUDEvent, LoginEvent, RequestEvent
 
-from .models import CustomUser, Medicamento, Farmacia, FarmaUser, FarmaciaMedicamento, Entrada, Salida, TipoFarmacia, TurnoFarmacia, Municipio, Provincia, RestriccionMedicamento, ClasificacionMedicamento, FormatoMedicamento, TareaExistencia
-from .forms import CustomUserCreationForm, FarmaUserCreationForm, UserLoginForm, SetPasswordForm, PasswordResetForm, UserProfileForm, UserUpdateForm, FarmaUserUpdateForm, FarmaUpdateForm, TipoFarmaciaUpdateForm, TurnoFarmaciaUpdateForm, MunicUpdateForm, ProvUpdateForm, MedicUpdateForm, RestriccionMedicamentoUpdateForm, ClasificacionMedicamentoUpdateForm, FormatoMedicamentoUpdateForm, EntradaMedicamentoUpdateForm
+from .models import CustomUser, Medicamento, Farmacia, FarmaUser, FarmaciaMedicamento, Entrada, Salida, TipoFarmacia, TurnoFarmacia, Municipio, Provincia, RestriccionMedicamento, ClasificacionMedicamento, FormatoMedicamento, TareaExistencia, Notificacion
+from .forms import CustomUserCreationForm, FarmaUserCreationForm, UserLoginForm, SetPasswordForm, PasswordResetForm, UserProfileForm, UserUpdateForm, FarmaUserUpdateForm, FarmaUpdateForm, TipoFarmaciaUpdateForm, TurnoFarmaciaUpdateForm, MunicUpdateForm, ProvUpdateForm, MedicUpdateForm, RestriccionMedicamentoUpdateForm, ClasificacionMedicamentoUpdateForm, FormatoMedicamentoUpdateForm, EntradaMedicamentoCreateForm
 from .decorators import usuarios_permitidos, unauthenticated_user
 from .tokens import account_activation_token
 from FirstApp.tasks import send_activation_email
@@ -115,7 +118,6 @@ def autenticar(request):
             )
             if user is not None:
                 login(request, user)
-                messages.success(request, f"Hola <b>{user.username}</b>! Usted se ha autenticado satisfactoriamente.")
                 usuario = request.user
                 grupo_admin = Group.objects.get(name='admin')
                 grupo_clientes = Group.objects.get(name='clientes')
@@ -129,8 +131,11 @@ def autenticar(request):
                     return redirect('/gestionar_medicfarma/')
                 elif grupo_especialista in usuario.groups.all():
                     return redirect('/gestionar_farmacias/')  
+            else:
+                messages.error(request, "Nombre de usuario o contraseña incorrectos")
+        else:
+            messages.error(request, "Nombre de usuario o contraseña incorrectos")
                      
-       # else:
         #    for key, error in list(form.errors.items()):
         #        if key == 'captcha' and error[0] == 'This field is required.':
         #            messages.error(request, "You must pass the reCAPTCHA test")
@@ -299,8 +304,9 @@ def confirmarRestablecerPass(request, uidb64, token):
 
 
 @login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['admin'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def perfilUsuario(request, username):
+def perfilAdmin(request, username):
     show_alert = False
     if request.method == "POST":
         user = request.user
@@ -308,9 +314,9 @@ def perfilUsuario(request, username):
         if form.is_valid():
             user_form = form.save()
             show_alert = True
-            return redirect('/perfil_de_usuario/'+ user_form.username)
+            return redirect('/perfil_admin/' + user_form.username)
         
-        for error in list (form.errors.values()):
+        for error in list(form.errors.values()):
             messages.error(request, error)
 
     user = get_user_model().objects.get(username=username)
@@ -318,8 +324,92 @@ def perfilUsuario(request, username):
         form = UserProfileForm(instance=user)
         return render(
             request=request,
-            template_name="perfil_de_usuario.html",
-            context = {"form": form, "show_alert": show_alert}
+            template_name="perfil_admin.html",
+            context={"form": form, "show_alert": show_alert}
+        )
+    
+    return redirect('/')
+
+
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['especialista'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def perfilEspecialista(request, username):
+    show_alert = False
+    if request.method == "POST":
+        user = request.user
+        form = UserProfileForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            user_form = form.save()
+            show_alert = True
+            return redirect('/perfil_especialista/' + user_form.username)
+        
+        for error in list(form.errors.values()):
+            messages.error(request, error)
+
+    user = get_user_model().objects.get(username=username)
+    if user:
+        form = UserProfileForm(instance=user)
+        return render(
+            request=request,
+            template_name="perfil_especialista.html",
+            context={"form": form, "show_alert": show_alert}
+        )
+    
+    return redirect('/')
+
+
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['clientes'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def perfilCliente(request, username):
+    show_alert = False
+    if request.method == "POST":
+        user = request.user
+        form = UserProfileForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            user_form = form.save()
+            show_alert = True
+            return redirect('/perfil_cliente/' + user_form.username)
+        
+        for error in list(form.errors.values()):
+            messages.error(request, error)
+
+    user = get_user_model().objects.get(username=username)
+    if user:
+        form = UserProfileForm(instance=user)
+        return render(
+            request=request,
+            template_name="perfil_cliente.html",
+            context={"form": form, "show_alert": show_alert}
+        )
+    
+    return redirect('/')
+
+
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['farmacéuticos'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def perfilFarmaceutico(request, username):
+    show_alert = False
+    if request.method == "POST":
+        user = request.user
+        form = UserProfileForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            user_form = form.save()
+            show_alert = True
+            return redirect('/perfil_farmaceutico/' + user_form.username)
+        
+        for error in list(form.errors.values()):
+            messages.error(request, error)
+
+    user = get_user_model().objects.get(username=username)
+    if user:
+        form = UserProfileForm(instance=user)
+        return render(
+            request=request,
+            template_name="perfil_farmaceutico.html",
+            context={"form": form, "show_alert": show_alert}
         )
     
     return redirect('/')
@@ -420,7 +510,7 @@ def registrarFarmaceutico(request):
         form = FarmaUserCreationForm(data=request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.farma = form.cleaned_data['farma_name']
+            user.id_farma = form.cleaned_data['id_farma']
             user = form.save()
             user.is_active=True
             user.save()
@@ -532,6 +622,8 @@ def obtenerUsuario(request, username):
             'username': farmaUser.username,
             'name': farmaUser.first_name,
             'lastname': farmaUser.last_name,
+            'description': farmaUser.description,
+            'email': farmaUser.email,
             'farmacias': [{'id_farma': obj.id_farma, 'nombre': obj.nombre} for obj in farma],
         }
 
@@ -545,6 +637,8 @@ def obtenerUsuario(request, username):
             'username': user.username,
             'name': user.first_name,
             'lastname': user.last_name,
+            'description': user.description,
+            'email': user.email,
         })
 
 
@@ -912,6 +1006,26 @@ def editarFarmacia(request):
         return JsonResponse({'success': True})
     else:
         return JsonResponse({'success': False, 'errors': form.errors})
+    
+
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['especialista'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@require_POST
+def editarUbicacionFarmacia(request, uuid):
+    farmacia = Farmacia.objects.get(id_farma=uuid)
+    latitud = request.POST.get('latitud')
+    longitud = request.POST.get('longitud')
+    flat = float(latitud)
+    flon = float(longitud)
+    print(flat)
+    print(flon)
+    if farmacia is not None and latitud is not None and longitud is not None:
+        farmacia.ubicacion = Point(flon, flat)
+        farmacia.save()
+        return JsonResponse({'success': True}, status=200)
+    else:
+        JsonResponse({'error': 'Invalid request'}, status=400)
     
 
 @login_required(login_url='/acceder')
@@ -1386,39 +1500,6 @@ def listaDeMedicFarma(request):
             return JsonResponse({'error': 'Usuario farmacéutico no encontrado'}, status=404)
     
     return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
-
-
-"""@csrf_exempt
-def actualizarFechaExpiracion(request):
-    if request.method == 'POST':
-        try:
-            id_medic = request.POST.get('id_medic')
-            fecha_expiracion = request.POST.get('fecha_expiracion')
-
-            farmaceutico = FarmaUser.objects.get(username=request.user.username)
-            farmacia = farmaceutico.id_farma
-
-            farmacia_medicamento = FarmaciaMedicamento.objects.get(id_medic=id_medic, id_farma=farmacia)
-            farmacia_medicamento.fecha_expiracion = fecha_expiracion
-            farmacia_medicamento.save()
-
-            return JsonResponse({'status': 'success'}, status=200)
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
-    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)"""
-
-
-@require_POST
-def actualizarExistencia(request):
-    id_medic = request.POST.get('id_medic')
-    existencia = request.POST.get('existencia')
-    try:
-        farmacia_medicamento = FarmaciaMedicamento.objects.get(id_medic=id_medic)
-        farmacia_medicamento.existencia = existencia
-        farmacia_medicamento.save()
-        return JsonResponse({'message': 'Existencia actualizada correctamente'}, status=200)
-    except FarmaciaMedicamento.DoesNotExist:
-        return JsonResponse({'error': 'Medicamento no encontrado'}, status=404)
     
 
 @login_required(login_url='/acceder')
@@ -1577,7 +1658,12 @@ def exportarMedicamento(request, uuid):
 @usuarios_permitidos(roles_permitidos=['farmacéuticos'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def gestionarEntradasMedicamento(request):
-    return render(request, "gestionar_entradas_medicamento.html")
+    farmacia_actual = request.user.farmauser.id_farma  # Obteniendo la farmacia del usuario actual
+    farmaciaMedicamentos = FarmaciaMedicamento.objects.filter(id_farma=farmacia_actual)
+    return render(request, "gestionar_entradas_medicamento.html", {
+        'farmacia_actual': farmacia_actual, 
+        'farmaciaMedicamentos': farmaciaMedicamentos
+    })
 
 
 def filterEntries(entradas, search_value):
@@ -1613,7 +1699,8 @@ def orderEntries(entradas, order_column_index, order_direction):
 
 
 def listaDeEntradasMedicamento(request): 
-    entradas = Entrada.objects.all()
+    farmacia_id = request.GET.get('farmacia_id')
+    entradas = Entrada.objects.filter(id_farmaciaMedicamento__id_farma=farmacia_id)
 
     order_column_index = request.GET.get("order[0][column]", "")
     order_direction = request.GET.get("order[0][dir]", "")
@@ -1631,6 +1718,8 @@ def listaDeEntradasMedicamento(request):
 
     for index, ent in enumerate(page_obj.object_list):
         medicamento_nombre = ent.id_farmaciaMedicamento.id_medic.nombre if ent.id_farmaciaMedicamento.id_medic else ''
+        formato_nombre = ent.id_farmaciaMedicamento.id_medic.id_formato.nombre if ent.id_farmaciaMedicamento.id_medic.id_formato else ''
+        medicamento_formato = f"{medicamento_nombre} - {formato_nombre}"
         
         ent_data = {
             'index': start + index + 1,
@@ -1641,7 +1730,7 @@ def listaDeEntradasMedicamento(request):
             'fecha_creacion': ent.fecha_creacion.strftime('%Y-%m-%d'),
             'fecha_elaboracion': ent.fecha_elaboracion.strftime('%Y-%m-%d'),
             'fecha_vencimiento': ent.fecha_vencimiento.strftime('%Y-%m-%d'),
-            'medicamento_nombre': medicamento_nombre,
+            'medicamento_formato': medicamento_formato,
         }
         entradas_list.append(ent_data)
     data = {
@@ -1653,26 +1742,18 @@ def listaDeEntradasMedicamento(request):
     return JsonResponse(data, safe=False)
 
 
-def obtenerEntradaMedicamento(request, uuid):
-    entrada = Entrada.objects.get(id = uuid)
-    return JsonResponse({
-        'id': entrada.id,
-        'factura': entrada.factura,
-        'numero_lote': entrada.numero_lote,
-        'cantidad': entrada.cantidad,
-        'fecha_creacion': entrada.fecha_creacion,
-        'fecha_elaboracion': entrada.fecha_elaboracion,
-        'fecha_vencimiento': entrada.fecha_vencimiento
-    })
-
-
-@login_required(login_url='/acceder')
-@require_POST
-def editarEntradaMedicamento(request):
-    entrada = Entrada.objects.get(id = request.POST.get('id'))
-    form = EntradaMedicamentoUpdateForm(request.POST, instance=entrada)
+def registrarEntradaMedicamento(request):
+    form = EntradaMedicamentoCreateForm(request.POST)
     if form.is_valid():
-        form.save()
+        entrada = form.save(commit=False)
+        entrada.fecha_creacion = timezone.now().date()
+        entrada.save()
+
+        # Actualizar la existencia en FarmaciaMedicamento
+        farmacia_medicamento = entrada.id_farmaciaMedicamento
+        farmacia_medicamento.existencia += entrada.cantidad
+        farmacia_medicamento.save()
+
         return JsonResponse({'success': True})
     else:
         return JsonResponse({'success': False, 'errors': form.errors})
@@ -2462,6 +2543,37 @@ def crearTareaNotificacion(request):
             print(e)
             return JsonResponse({'error': 'Invalid request'}, status=400)
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+def obtenerNotificaciones(request):
+    if request.user.is_authenticated:
+        notificaciones = Notificacion.objects.filter(user=request.user, leido=False).order_by('-fecha')
+        data = [{'id_notificacion': n.id, 'mensaje': n.mensaje, 'fecha': n.fecha.strftime('%Y-%m-%d %H:%M:%S')} for n in notificaciones]
+        return JsonResponse({'notificaciones': data}, safe=False)
+    else:
+        return JsonResponse({'error': 'No autorizado'}, status=403)
+
+
+@csrf_exempt
+def marcarNotificacionLeida(request):
+    if request.method == 'POST':
+        notificacion_id = request.POST.get('id')
+        if not notificacion_id:
+            return JsonResponse({'status': 'error', 'message': 'ID de notificación no proporcionado'}, status=400)
+        
+        try:
+            notificacion_id = int(notificacion_id)  # Asegurarse de que el ID sea un número entero
+        except ValueError:
+            return JsonResponse({'status': 'error', 'message': 'ID de notificación no válido'}, status=400)
+
+        try:
+            notificacion = Notificacion.objects.get(id=notificacion_id)
+            notificacion.leido = True
+            notificacion.save()
+            return JsonResponse({'status': 'success'}, status=200)
+        except Notificacion.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Notificación no encontrada'}, status=404)
+    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
 
 
 #################################################################################################################################

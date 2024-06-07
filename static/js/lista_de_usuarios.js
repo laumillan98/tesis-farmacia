@@ -176,6 +176,8 @@ $.getScript("/static/js/datatables.spanish.js", function() {
                 $('#nombre').val(response.name);
                 $('#apellidos').val(response.lastname);
                 $('#username').val(response.username);
+                $('#description').val(response.description);
+                $('#email').val(response.email);
                 if(response.hasOwnProperty("isFarmaUser")) {
                   $("#form-selector-farmacias").prop('hidden', false);
                   var $selector = $("#farmacia_selector");
@@ -235,6 +237,11 @@ $.getScript("/static/js/datatables.spanish.js", function() {
               minlength: 3,
               pattern: /^[A-Za-z\s]+$/
             },
+            description: {
+              required: false,
+              minlength: 5,
+              pattern: /^[A-Za-z0-9\s.,;:"'ÁáÉéÍíÓóÚúÜüÑñ()]+$/u
+            },
           },
           messages: {
             nombre: {
@@ -246,6 +253,11 @@ $.getScript("/static/js/datatables.spanish.js", function() {
               required: "Este campo es obligatorio.",
               minlength: "Por favor, introduce al menos 3 caracteres.",
               pattern: "No puede contener números ni símbolos."
+            },
+            description: {
+              required: "Este campo no es obligatorio.",
+              minlength: "Por favor, introduce al menos 5 caracteres.",
+              pattern: "Por favor introduce al menos una letra, puede contener números."
             },
           },
           errorElement: 'span',

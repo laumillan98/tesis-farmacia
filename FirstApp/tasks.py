@@ -4,7 +4,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
-from base.models import TareaExistencia, FarmaciaMedicamento
+from base.models import TareaExistencia, FarmaciaMedicamento, Notificacion
 
 @shared_task
 def send_activation_email(domain, username, tok, email, protocol):
@@ -56,4 +56,12 @@ def notificar_existencias():
             })
             email_message = EmailMessage(mail_subject, message, to=[tarea.id_user.email])
             email_message.send()
+
+            # Crear notificación
+            notificacion = Notificacion(
+                user=tarea.id_user,
+                mensaje=f"Se le envió un mensaje a su correo {tarea.id_user.email}. Por favor revise."
+            )
+            notificacion.save()
+
             tarea.delete()

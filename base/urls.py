@@ -16,7 +16,10 @@ urlpatterns = [
      path("solicitar_restablecer_pass", views.restablecerPass, name="solicitar_restablecer_pass"),
      path('reset/<uidb64>/<token>', views.confirmarRestablecerPass, name='cambiar_pass'),
      # Usuarios
-     path('perfil_de_usuario/<username>/', views.perfilUsuario, name='perfil_de_usuario'),
+     path('perfil_admin/<username>/', views.perfilAdmin, name='perfil_admin'),
+     path('perfil_especialista/<username>/', views.perfilEspecialista, name='perfil_especialista'),
+     path('perfil_cliente/<username>/', views.perfilCliente, name='perfil_cliente'),
+     path('perfil_farmaceutico/<username>/', views.perfilFarmaceutico, name='perfil_farmaceutico'),
      path('gestionar_usuarios/', views.gestionarUsuarios),
      path('lista_de_usuarios/', views.listaDeUsuarios, name='lista_de_usuarios'),
      path('registrar_farmaceutico/', views.registrarFarmaceutico,  name='registrar_farmaceutico'),
@@ -45,6 +48,7 @@ urlpatterns = [
      path('registrar_farmacia/', views.registrarFarmacia),
      path('gestionar_farmacias/obtenerFarmacia/<uuid>/', views.obtenerFarmacia, name ='obtener_farmacia'),
      path('gestionar_farmacias/editarFarmacia/', views.editarFarmacia, name ='editar_farmacia'),
+     path('gestionar_farmacias/editarUbicacionFarmacia/<uuid>/', views.editarUbicacionFarmacia, name ='editar_ubicacion_farmacia'),
           # Tipo Farmacia
      path('gestionar_tipos_de_farmacias/', views.gestionarTiposFarmacias),
      path('lista_tipos_de_farmacias/', views.listaDeTiposDeFarmacias, name='lista_tipos_de_farmacias'),
@@ -86,8 +90,6 @@ urlpatterns = [
      path('gestionar_medicfarma/', views.gestionarMedicFarma),
      path('lista_de_medicfarma/', views.listaDeMedicFarma, name='lista_de_medicfarma'),
      path('gestionar_medicfarma/obtenerDescripcion/<uuid>/', views.obtenerDescripcion, name ='obtener_descripcion'),
-     #path('actualizar_fecha_expiracion/', views.actualizarFechaExpiracion, name='actualizar_fecha_expiracion'),
-     path('actualizar_existencia/', views.actualizarExistencia, name='actualizar_existencia'),
      path('gestionar_medicamentos_disponibles/', views.gestionarMedicamentosDisponibles, name = 'gestionar_medicamentos_disponibles'),
      path('lista_de_medicamentos_disponibles/', views.listaDeMedicamentosDisponibles, name='lista_de_medicamentos_disponibles'),
      path('gestionar_medicamentos_disponibles/obtenerDescripcion/<uuid>/', views.obtenerDescripcion, name ='obtener_descripcion'),
@@ -95,8 +97,7 @@ urlpatterns = [
           #Entradas
      path('gestionar_entradas_medicamento/', views.gestionarEntradasMedicamento),
      path('lista_de_entradas_medicamento/', views.listaDeEntradasMedicamento, name='lista_de_entradas_medicamento'),
-     path('gestionar_entradas_medicamento/obtenerEntradaMedicamento/<uuid>/', views.obtenerEntradaMedicamento, name ='obtener_entrada_de_medicamento'),
-     path('gestionar_entradas_medicamento/editarEntradaMedicamento/', views.editarEntradaMedicamento, name ='editar_entrada_de_medicamento'),
+     path('gestionar_entradas_medicamento/registrarEntradaMedicamento/', views.registrarEntradaMedicamento, name='registrar_entrada_medicamento'),
           #Salidas
      path('gestionar_salidas_medicamento/', views.gestionarSalidasMedicamento),
      path('lista_de_salidas_medicamento/', views.listaDeSalidasMedicamento, name='lista_de_salidas_medicamento'),
@@ -105,7 +106,7 @@ urlpatterns = [
      # Buscar Informacion de Medicamentos
      path('visualizar_tabla_medicamentos/', views.visualizarTablaMedicamentos),
      path('buscar_infoMedicamento/', views.buscarInfoMedicamento, name='buscar_infoMedicamento'),
-      path('visualizar_tabla_medicamentos/obtenerDescripcion/<uuid>/', views.obtenerDescripcion, name ='obtener_descripcion'),
+     path('visualizar_tabla_medicamentos/obtenerDescripcion/<uuid>/', views.obtenerDescripcion, name ='obtener_descripcion'),
      # Buscar Existencias de Medicamentos 
      path('buscar_medicamento/', views.buscarMedicamento, name='buscar_medicamento'),
      # Buscar Farmacias por Municipio
@@ -120,6 +121,8 @@ urlpatterns = [
      path('generar_reporte_pdf/', views.generar_reporte_pdf, name='generar_reporte_pdf'),
      # Alertas
      path('crear_notificacion/', views.crearTareaNotificacion, name='crear_notificacion'),
+     path('obtener_notificaciones/', views.obtenerNotificaciones, name='obtener_notificaciones'),
+     path('marcar_notificacion_leida/', views.marcarNotificacionLeida, name='marcar_notificacion_leida'),
      # Graficos
      path('visualizar_charts/', views.visualizarCharts),
      path('usuarios_xgrupos_chart/', views.usuariosXGruposChart, name='usuarios_xgrupos_chart'),

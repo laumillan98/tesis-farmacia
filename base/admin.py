@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CustomUser, TipoFarmacia, TurnoFarmacia, RestriccionMedicamento, ClasificacionMedicamento, FormatoMedicamento, Provincia, Municipio, Medicamento, Farmacia, FarmaUser, FarmaciaMedicamento, Entrada, Salida
+from .models import CustomUser, TipoFarmacia, TurnoFarmacia, RestriccionMedicamento, ClasificacionMedicamento, FormatoMedicamento, Provincia, Municipio, Medicamento, Farmacia, FarmaUser, FarmaciaMedicamento, Entrada, Salida, Notificacion
 from django.contrib.gis.geos import Point
 from leaflet.admin import LeafletGeoAdmin
 from .forms import FarmaciaAdminForm
@@ -18,6 +18,7 @@ admin.site.register(FarmaciaMedicamento)
 admin.site.register(Medicamento)
 admin.site.register(Entrada)
 admin.site.register(Salida)
+admin.site.register(Notificacion)
 
 
 @admin.register(Farmacia)

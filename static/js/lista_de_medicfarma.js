@@ -14,16 +14,7 @@ $.getScript("/static/js/datatables.spanish.js", function() {
                 { data: "origen" },
                 { data: "restriccion" },
                 { data: "clasificacion" },
-                {
-                    data: "existencia",
-                    orderable: false,
-                    searchable: false,
-                    render: function(data, type, row) {
-                        // Renderizar un input editable para existencia con validación para no aceptar valores menores a 0
-                        return '<input type="number" class="form-control existencia-editable" style="width: 60px; display: inline;" min="0" value="' + data + '" data-id="' + row.id + '" />' +
-                            '<button class="btn btn-sm btn-success btn-guardar" style="margin-left: 5px;" data-id="' + row.id + '">Guardar</button>';
-                    }
-                },
+                { data: "existencia"},
                 {
                     data: null,
                     orderable: false,
@@ -35,7 +26,7 @@ $.getScript("/static/js/datatables.spanish.js", function() {
                         </button>`;
                         return mostrarButton;
                     }
-                }
+                },
             ]
         });
 
@@ -58,72 +49,6 @@ $.getScript("/static/js/datatables.spanish.js", function() {
                 },
             })
         }
-
-
-        // Manejar clic en el botón de guardar existencia
-        $('#miTabla').on('click', '.btn-guardar', function() {
-            var id_medic = $(this).data('id');
-            var existenciaInput = $(this).closest('td').find('.existencia-editable');
-            var existencia = existenciaInput.val();
-
-            // Validar que la existencia no sea menor que 0
-            if (existencia < 0) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Valor inválido',
-                    text: 'La existencia no puede ser menor que 0.'
-                });
-                return; // Detener la ejecución si el valor es inválido
-            }
-
-            // Realizar una solicitud AJAX para actualizar la existencia
-            $.ajax({
-                url: '/actualizar_existencia/',
-                method: 'POST',
-                headers: { 'X-CSRFToken': getCookie('csrftoken') },
-                data: { 'id_medic': id_medic, 'existencia': existencia },
-                success: function(response) {
-                    console.log('Existencia actualizada correctamente');
-                    // Actualizar la tabla después de la edición
-                    table.ajax.reload();
-
-                    // Mostrar Sweet Alert de éxito
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Existencia actualizada',
-                        text: 'La existencia se ha actualizado correctamente.'
-                    });
-                },
-                error: function(error) {
-                    console.error('Error al actualizar existencia');
-                    // Mostrar Sweet Alert de error
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Ocurrió un error al actualizar la existencia.'
-                    });
-                }
-            });
-        });
-
-        
-        // Función para obtener el valor de una cookie por su nombre
-        function getCookie(name) {
-            var cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                var cookies = document.cookie.split(';');
-                for (var i = 0; i < cookies.length; i++) {
-                    var cookie = cookies[i].trim();
-                    // Obtener el valor de la cookie si coincide con el nombre
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-
 
     });
     

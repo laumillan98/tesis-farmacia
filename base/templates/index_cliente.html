@@ -64,33 +64,38 @@
     </ul>
     
     <ul class="navbar-nav ml-auto">
-      <!-- Notifications Dropdown Menu -->
+      <!-- Notificaciones Dropdown Menu -->
       <li class="nav-item dropdown">
         <a class="nav-link" data-toggle="dropdown" href="#">
-          <i class="far fa-bell"></i>
-          <span class="badge badge-warning navbar-badge">15</span>
+            <i id="notificaciones-icon" class="fa-regular fa-bell" style="color: #FFD43B;"></i>
+            <span class="badge badge-success navbar-badge" id="notificaciones-count">0</span>
         </a>
-        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-          <span class="dropdown-item dropdown-header">15 Notifications</span>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-envelope mr-2"></i> 4 new messages
-            <span class="float-right text-muted text-sm">3 mins</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-users mr-2"></i> 8 friend requests
-            <span class="float-right text-muted text-sm">12 hours</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-file mr-2"></i> 3 new reports
-            <span class="float-right text-muted text-sm">2 days</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" id="notificaciones-menu">
+            <span class="dropdown-item dropdown-header">Notificaciones</span>
+            <div class="dropdown-divider"></div>
+            <!-- Aquí se llenarán las notificaciones -->
+            <a href="#" class="dropdown-item dropdown-footer">Ver todas las notificaciones</a>
         </div>
       </li>
+
+      <!-- Modal para mostrar el mensaje completo -->
+      <div class="modal fade" id="notificacionModal" tabindex="-1" role="dialog" aria-labelledby="notificacionModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="notificacionModalLabel">Notificación</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="notificacionMensaje"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+      </div>
+
 
       <!-- Settings Dropdown Menu -->
       <li class="nav-item dropdown">
@@ -100,7 +105,7 @@
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
           <span class="dropdown-item dropdown-header">Configuración</span>
           <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
+          <a href="{%url 'perfil_cliente' user.username %}" class="dropdown-item">
             <i class="fas fa-user mr-2"></i> Mi Perfil
           </a>
           <div class="dropdown-divider"></div>
@@ -130,10 +135,10 @@
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-          <img src="{% static 'dist/img/avatar2.png' %}" class="img-circle elevation-2" alt="User Image">
+          <img src="{% static 'dist/img/avatar0.png' %}" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
-          <a href="#" class="d-block">{{user.first_name}}</a>
+          <a href="{%url 'perfil_cliente' user.username %}" class="d-block">{{user.first_name}}</a>
         </div>
       </div>
 
@@ -233,6 +238,91 @@
 
 <!-- jQuery -->
 <script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
+
+
+<script>
+$(document).ready(function() {
+    function truncarMensaje(mensaje, limite) {
+        if (mensaje.length > limite) {
+            return mensaje.substring(0, limite) + '...';
+        }
+        return mensaje;
+    }
+
+    function actualizarIconoNotificaciones(count) {
+        var iconElement = $('#notificaciones-icon');
+        if (count > 0) {
+            iconElement.removeClass('fa-regular fa-bell').addClass('fa-solid fa-bell fa-shake');
+        } else {
+            iconElement.removeClass('fa-solid fa-bell fa-shake').addClass('fa-regular fa-bell');
+        }
+    }
+
+    function obtenerNotificaciones() {
+        $.ajax({
+            url: "{% url 'obtener_notificaciones' %}",
+            type: 'GET',
+            success: function(data) {
+                var count = data.notificaciones.length;
+                $('#notificaciones-count').text(count);
+                actualizarIconoNotificaciones(count);
+
+                var notificacionesMenu = $('#notificaciones-menu');
+                notificacionesMenu.find('.dropdown-item:not(.dropdown-header, .dropdown-footer)').remove();
+                data.notificaciones.forEach(function(n) {
+                    var mensajeTruncado = truncarMensaje(n.mensaje, 22);  // Trunca el mensaje a 22 caracteres
+                    var item = `
+                        <a href="#" class="dropdown-item notificacion-item" data-id="${n.id_notificacion}" data-mensaje="${n.mensaje}">
+                            <i class="fas fa-envelope mr-2"></i> ${mensajeTruncado}
+                            <span class="float-right text-muted text-sm">${n.fecha}</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                    `;
+                    $(item).insertBefore(notificacionesMenu.find('.dropdown-footer'));
+                });
+            }
+        });
+    }
+
+    obtenerNotificaciones();
+    setInterval(obtenerNotificaciones, 60000); // Consultar notificaciones cada minuto
+
+    $(document).on('click', '.notificacion-item', function() {
+        var mensajeCompleto = $(this).data('mensaje');
+        $('#notificacionMensaje').text(mensajeCompleto);
+        $('#notificacionModal').modal('show');
+
+        // Marcar notificación como leída y decrementar el contador
+        var notificacionId = $(this).data('id');
+        console.log("ID de la notificación: " + notificacionId); // Depuración: Asegúrate de que el ID es correcto
+        $.ajax({
+            url: "{% url 'marcar_notificacion_leida' %}",
+            type: 'POST',
+            data: {
+                'id': notificacionId,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(data) {
+                var count = parseInt($('#notificaciones-count').text()) - 1;
+                $('#notificaciones-count').text(count);
+                actualizarIconoNotificaciones(count);
+                // Remove the notification item from the dropdown
+                $(`.notificacion-item[data-id=${notificacionId}]`).parent().remove();
+                $('#notificacionModal').modal('hide'); // Cerrar el modal
+            },
+            error: function(response) {
+                console.error(response.responseText); // Mostrar cualquier error
+            }
+        });
+    });
+
+    $('#notificacionModal').on('hidden.bs.modal', function () {
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+    });
+});
+</script>
+
 <!-- jQuery UI 1.11.4 -->
 <script src="{% static 'plugins/jquery-ui/jquery-ui.min.js' %}"></script>
 <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->

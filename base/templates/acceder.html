@@ -28,22 +28,28 @@
                     <div class="card" style="border-radius: 1rem; box-shadow: 0 0 8px rgba(0, 0, 0, 0.122);">
                         <div class="row g-0">
                             <div class="col-md-6 col-lg-5 d-none d-md-block">
-                                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/img1.webp" alt="login form" class="img-fluid" style="border-radius: 1rem 0 0 1rem;">
+                                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/img1.webp" alt="login form" class="img-fluid" style="border-radius: 1rem 0 0 1rem; height: 100%; object-fit: cover;"/>
                             </div>
                             <div class="col-md-6 col-lg-7 d-flex align-items-center">
                                 <div class="card-body p-4 p-lg-5 text-black">
+                                    <div class="d-flex align-items-center mb-3 pb-1">
+                                        <span class="h3 fw-bold mb-0">Iniciar Sesión</span>
+                                    </div>
+                                    {% if messages %}
+                                    <div id="messages">
+                                        {% for message in messages %}
+                                        <div class="alert alert-danger">{{ message }}</div>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
                                     <form method="POST">
-                                        {% csrf_token %}
-                                        <div class="d-flex align-items-center mb-3 pb-1">
-                                            <span class="h3 fw-bold mb-0">Iniciar Sesión</span>
-                                        </div>
+                                    {% csrf_token %}
                                         <div class="content-section">
-                                            {% csrf_token %}
-                                            {{ form|crispy }}
+                                            {% csrf_token %} {{ form|crispy }}
                                             <div class="form-group">
-                                                <button type="submit" class="btn btn-dark btn-md btn-block" style="margin-bottom: 10px; margin-top: 10px;">Acceder</button>
-                                                <hr>
-                                                <a href="/solicitar_restablecer_pass">¿Olvidó su contraseña?</a><br>
+                                                <button type="submit" class="btn btn-dark btn-md btn-block" style="margin-bottom: 10px; margin-top: 10px">Acceder</button>
+                                                <hr />
+                                                <a href="/solicitar_restablecer_pass">¿Olvidó su contraseña?</a><br />
                                                 <a href="/registrar">Crear cuenta</a>
                                             </div>
                                         </div>
