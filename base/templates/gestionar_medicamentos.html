@@ -4,7 +4,10 @@
 
 {% block mytitle %}Gestionar Medicamentos{% endblock %}
 
-{% block mycss %}{% endblock %}
+{% block mycss %}
+    <!-- summernote -->
+    <link rel="stylesheet" href="{% static 'plugins/summernote/summernote-bs4.min.css' %}">
+{% endblock %}
 
 {% block title %}Gestionar Medicamentos{% endblock %}
 
@@ -30,7 +33,7 @@
                                 <th>Origen</th>
                                 <th>Restricción</th>
                                 <th>Clasificación</th>
-                                <th>Descripción</th>
+                                <th>Ver Info</th>
                                 <th>Editar</th>
                             </tr>
                         </thead>
@@ -66,7 +69,13 @@
                             </div>
                             <div class="form-group">
                                 <label for="name">Descripción</label>
-                                <input type="text" class="form-control" id="descriptionEdit" name="description" placeholder="Descripcion">
+                                <textarea class="form-control" id="descriptionEdit" name="description" placeholder="Descripcion">
+                                </textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="name">Reacciones</label>
+                                <textarea class="form-control" id="reaccionesEdit" name="reacciones" placeholder="Reacciones">
+                                </textarea>
                             </div>
                             <div class="form-group">
                                 <label for="name">Cantidad Máxima</label>
@@ -118,7 +127,7 @@
                 <div class="modal-body">
                     <div class="card-body">
                         <div class="form-group">
-                            <p id="descripcionMostrar" class="form-control-plaintext"></p>
+                            <div id="descripcionMostrar" class="form-control-plaintext"></div>
                         </div>
                     </div>
                 </div>
@@ -129,6 +138,32 @@
         </div>
     </div>
     <!-- /.modal Mostrar Descripcion -->
+
+
+    <!-- /.modal Mostrar Reacciones-->
+    <div class="modal fade" id="modalreac-lg">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Reacciones</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <div id="reaccionesMostrar" class="form-control-plaintext"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.modal Mostrar Reacciones -->
 
 
     <!-- Filtro Modal -->
@@ -199,7 +234,8 @@
 {% block subtitle %}Medicamentos{% endblock %}
 
 {% block custom_scripts %}
-
+<!-- Summernote -->
+<script src="{% static 'plugins/summernote/summernote-bs4.min.js' %}"></script>
 <script>
     $(document).ready(function() {
         $('#generarReporteBtn').click(function() {
@@ -247,7 +283,6 @@
         });
     });
 </script>
-
 <script src="{% static 'plugins/jquery-validation/jquery.validate.min.js' %}"></script>
 <script src="{% static 'plugins/jquery-validation/additional-methods.min.js' %}"></script>
 <script src="{% static 'js/lista_de_medicamentos.js' %}"></script>

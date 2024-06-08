@@ -1,5 +1,22 @@
 $.getScript("/static/js/datatables.spanish.js", function() {  
   $(document).ready(function () {
+    $('#descriptionEdit').summernote(
+      {
+        toolbar: [
+          // Aquí incluyes solo los grupos de botones que deseas habilitar
+          ['style', ['bold', 'italic', 'underline', 'clear']],
+          ['font', ['strikethrough', 'superscript', 'subscript']],
+          ['fontsize', ['fontsize']],
+          ['color', ['color']],
+          ['para', ['ul', 'ol', 'paragraph']],
+          ['height', ['height']]
+          // No incluir ['insert', ['link', 'picture', 'video']],
+          // No incluir ['view', ['fullscreen', 'codeview']],
+          // No incluir ['help', ['help']]
+        ],
+        // Otras opciones de configuración...
+      }
+    );
       let editionSuccessful = false;
       var ajaxUrl = $("#miTabla").data("url");
       var table = $("#miTabla").DataTable({
@@ -27,10 +44,14 @@ $.getScript("/static/js/datatables.spanish.js", function() {
                 searchable: false,
                 render: function (data, type, row, meta) {
                     let mostrarButton = `
-                    <button id='mostrar' class='btn btn-sm btn-info' data-id='${row.id}' data-toggle='modal' data-target='#modaldesc-lg'>
+                    <button id='mostrar' class='btn btn-sm btn-info mr-2' data-id='${row.id}' data-toggle='modal' data-target='#modaldesc-lg'>
                         <i class="fa-solid fa-eye"></i>
                     </button>`;
-                    return mostrarButton;
+                    let reacButton = `
+                    <button id='mostrarReac' class='btn btn-sm btn-warning' data-id='${row.id}' data-toggle='modal' data-target='#modalreac-lg'>
+                        <i class="fa-solid fa-triangle-exclamation fa-beat"></i>
+                    </button>`;
+                    return mostrarButton + reacButton;
                 }
               },
               {
@@ -61,9 +82,29 @@ $.getScript("/static/js/datatables.spanish.js", function() {
             type: 'GET',
             data: {},
             success: function(response) {
-                $('#descripcionMostrar').text(response.description);
+                $('#descripcionMostrar').html(response.description);
                 $('#id').val(response.id);
                 $('#modaldesc-lg').modal('show'); 
+            },
+        })
+      }
+
+
+      // Evento de clic en el botón "Reacciones"
+      $('#miTabla').on('click', '#mostrarReac', function() {
+        let idMedic = $(this).data('id');
+        cargarReaccionesMedicamento(idMedic);
+      });
+
+      function cargarReaccionesMedicamento(id) {
+        $.ajax({
+            url: 'obtenerReacciones/' + id + '/',
+            type: 'GET',
+            data: {},
+            success: function(response) {
+                $('#reaccionesMostrar').html(response.reacciones);
+                $('#id').val(response.id);
+                $('#modalreac-lg').modal('show'); 
             },
         })
       }
@@ -84,7 +125,8 @@ $.getScript("/static/js/datatables.spanish.js", function() {
                   //console.log('Respuesta del servidor:', response);
                   $('#nombre').val(response.nombre);
                   $('#modal-lg').modal('show');
-                  $('#descriptionEdit').val(response.description);
+                  $('#descriptionEdit').summernote('code', response.description);
+                  $('#reaccionesEdit').summernote('code', response.reacciones);
                   $('#cant_max').val(response.cant_max);
                   $('#precio_unidad').val(response.precio_unidad);
 
@@ -174,6 +216,11 @@ $.getScript("/static/js/datatables.spanish.js", function() {
               minlength: 5,
               pattern: /^[A-Za-z0-9\s.,;:"'ÁáÉéÍíÓóÚúÜüÑñ()]+$/u
             },
+            reacciones: {
+              required: true,
+              minlength: 5,
+              pattern: /^[A-Za-z0-9\s.,;:"'ÁáÉéÍíÓóÚúÜüÑñ()]+$/u
+            },
             cant_max: {
               required: true,
               minlength: 1,
@@ -193,9 +240,14 @@ $.getScript("/static/js/datatables.spanish.js", function() {
             nombre: {
               required: "Este campo es obligatorio.",
               minlength: "Por favor, introduce al menos 3 caracteres.",
-              pattern: "Por favor introduce al menos una letra, puede contener números."
+              pattern: "No puede contener números ni símbolos."
             },
             description: {
+              required: "Este campo es obligatorio.",
+              minlength: "Por favor, introduce al menos 5 caracteres.",
+              pattern: "Por favor introduce al menos una letra, puede contener números."
+            },
+            reacciones: {
               required: "Este campo es obligatorio.",
               minlength: "Por favor, introduce al menos 5 caracteres.",
               pattern: "Por favor introduce al menos una letra, puede contener números."

@@ -21,10 +21,14 @@ $.getScript("/static/js/datatables.spanish.js", function() {
                     searchable: false,
                     render: function (data, type, row, meta) {
                         let mostrarButton = `
-                        <button id='mostrar' class='btn btn-sm btn-info' data-id='${row.id}' data-toggle='modal' data-target='#modaldesc-lg'>
+                        <button id='mostrar' class='btn btn-sm btn-info mr-2' data-id='${row.id}' data-toggle='modal' data-target='#modaldesc-lg'>
                             <i class="fa-solid fa-eye"></i>
                         </button>`;
-                        return mostrarButton;
+                        let reacButton = `
+                        <button id='mostrarReac' class='btn btn-sm btn-warning' data-id='${row.id}' data-toggle='modal' data-target='#modalreac-lg'>
+                            <i class="fa-solid fa-triangle-exclamation fa-beat"></i>
+                        </button>`;
+                        return mostrarButton + reacButton;
                     }
                 },
             ]
@@ -43,9 +47,29 @@ $.getScript("/static/js/datatables.spanish.js", function() {
                 type: 'GET',
                 data: {},
                 success: function(response) {
-                    $('#descripcionMostrar').text(response.description);
+                    $('#descripcionMostrar').html(response.description);
                     $('#id').val(response.id);
                     $('#modaldesc-lg').modal('show'); 
+                },
+            })
+        }
+
+
+        // Evento de clic en el botón Reacciones
+        $('#miTabla').on('click', '#mostrarReac', function() {
+            let idMedic = $(this).data('id');
+            cargarReaccionesMedicamento(idMedic);
+        });
+    
+        function cargarReaccionesMedicamento(id) {
+            $.ajax({
+                url: 'obtenerReacciones/' + id + '/',
+                type: 'GET',
+                data: {},
+                success: function(response) {
+                    $('#reaccionesMostrar').html(response.reacciones);
+                    $('#id').val(response.id);
+                    $('#modalreac-lg').modal('show'); 
                 },
             })
         }

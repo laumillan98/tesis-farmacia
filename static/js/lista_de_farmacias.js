@@ -219,6 +219,12 @@ $.getScript("/static/js/datatables.spanish.js", function () {
       })
     }
 
+    $.validator.addMethod(
+      "validPhoneNumber",
+      function (value, element) {
+        return /^7\d{7}$/.test(value) // Verificar que el número de teléfono comience con 7 y tenga 8 dígitos en total
+      },"El número de teléfono debe comenzar con 7 y tener 8 dígitos.")
+
     $("#edicionFarmaciaForm").validate({
       rules: {
         nombre: {
@@ -233,29 +239,25 @@ $.getScript("/static/js/datatables.spanish.js", function () {
         },
         telefono: {
           required: true,
-          minlength: 8,
-          maxlength: 8,
           digits: true,
+          validPhoneNumber: true,
         },
       },
       messages: {
         nombre: {
           required: "Este campo es obligatorio.",
           minlength: "Por favor, introduce al menos 3 caracteres.",
-          pattern:
-            "Por favor introduce al menos una letra, puede contener números.",
+          pattern: "Por favor introduce al menos una letra, puede contener números.",
         },
         direccion: {
           required: "Este campo es obligatorio.",
           minlength: "Por favor, introduce al menos 5 caracteres.",
-          pattern:
-            "Por favor introduce al menos una letra, puede contener números.",
+          pattern: "Por favor introduce al menos una letra, puede contener números.",
         },
         telefono: {
           required: "Este campo es obligatorio.",
-          minlength: "Solo puede contener 8 dígitos.",
-          maxlength: "Solo puede contener 8 dígitos.",
           digits: "No puede contener letras ni símbolos.",
+          validPhoneNumber: "El número de teléfono debe comenzar con 7 y tener 8 dígitos.",
         },
       },
       errorElement: "span",

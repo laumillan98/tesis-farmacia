@@ -66,6 +66,7 @@ urlpatterns = [
      path('lista_de_medicamentos/', views.listaDeMedicamentos, name='lista_de_medicamentos'),
      path('registrar_medicamento/', views.registrarMedicamento),
      path('gestionar_medicamentos/obtenerDescripcion/<uuid>/', views.obtenerDescripcion, name ='obtener_descripcion'),
+     path('gestionar_medicamentos/obtenerReacciones/<uuid>/', views.obtenerReacciones, name ='obtener_reacciones'),
      path('gestionar_medicamentos/obtenerMedicamento/<uuid>/', views.obtenerMedicamento, name ='obtener_medicamento'),
      path('gestionar_medicamentos/editarMedicamento/', views.editarMedicamento, name ='editar_medicamento'),
           # Restriccion Medicamento
@@ -90,9 +91,11 @@ urlpatterns = [
      path('gestionar_medicfarma/', views.gestionarMedicFarma),
      path('lista_de_medicfarma/', views.listaDeMedicFarma, name='lista_de_medicfarma'),
      path('gestionar_medicfarma/obtenerDescripcion/<uuid>/', views.obtenerDescripcion, name ='obtener_descripcion'),
+     path('gestionar_medicfarma/obtenerReacciones/<uuid>/', views.obtenerReacciones, name ='obtener_reacciones'),
      path('gestionar_medicamentos_disponibles/', views.gestionarMedicamentosDisponibles, name = 'gestionar_medicamentos_disponibles'),
      path('lista_de_medicamentos_disponibles/', views.listaDeMedicamentosDisponibles, name='lista_de_medicamentos_disponibles'),
      path('gestionar_medicamentos_disponibles/obtenerDescripcion/<uuid>/', views.obtenerDescripcion, name ='obtener_descripcion'),
+     path('gestionar_medicamentos_disponibles/obtenerReacciones/<uuid>/', views.obtenerReacciones, name ='obtener_reacciones'),
      path('gestionar_medicamentos_disponibles/exportarMedicamento/<uuid>/', views.exportarMedicamento, name='exportar_medicamento'),
           #Entradas
      path('gestionar_entradas_medicamento/', views.gestionarEntradasMedicamento),
@@ -100,9 +103,10 @@ urlpatterns = [
      path('gestionar_entradas_medicamento/registrarEntradaMedicamento/', views.registrarEntradaMedicamento, name='registrar_entrada_medicamento'),
           #Salidas
      path('realizar_cierre_farmacia/', views.realizarCierreFarmacia),
-     path('realizar_cierre_farmacia/guardar_ventas/', views.guardarVentas, name='guardar_ventas'),
-     path('gestionar_salidas_medicamento/', views.gestionarSalidasMedicamento, name='gestionar_salidas_medicamento'),
-     path('realizar_cierre_farmacia/', views.realizarCierreFarmacia),
+     path('lista_de_cierre_farmacia/', views.listaDeCierreFarmacia, name='lista_de_cierre_farmacia'),
+     path('realizar_cierre_farmacia/guardarVentas/', views.guardarVentas, name='guardar_ventas'),
+     path('realizar_cierre_farmacia/gestionar_salidas_medicamento/', views.gestionarSalidasMedicamento, name='gestionar_salidas_medicamento'),
+     path('gestionar_salidas_medicamento/', views.gestionarSalidasMedicamento),
      path('lista_de_salidas_medicamento/', views.listaDeSalidasMedicamento, name='lista_de_salidas_medicamento'),
 
      # Cliente

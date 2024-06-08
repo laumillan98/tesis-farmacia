@@ -26,16 +26,20 @@ $.getScript("/static/js/datatables.spanish.js", function() {
                 { data: "restriccion" },
                 { data: "clasificacion" },
                 {
-                data: null,
-                orderable: false,
-                searchable: false,
-                render: function (data, type, row, meta) {
-                    let mostrarButton = `
-                    <button id='mostrar' class='btn btn-sm btn-info' data-id='${row.id}' data-toggle='modal' data-target='#modaldesc-lg'>
-                        <i class="fa-solid fa-eye"></i>
-                    </button>`;
-                    return mostrarButton;
-                }
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    render: function (data, type, row, meta) {
+                        let mostrarButton = `
+                        <button id='mostrar' class='btn btn-sm btn-info mr-2' data-id='${row.id}' data-toggle='modal' data-target='#modaldesc-lg'>
+                            <i class="fa-solid fa-eye"></i>
+                        </button>`;
+                        let reacButton = `
+                        <button id='mostrarReac' class='btn btn-sm btn-warning' data-id='${row.id}' data-toggle='modal' data-target='#modalreac-lg'>
+                            <i class="fa-solid fa-triangle-exclamation fa-beat"></i>
+                        </button>`;
+                        return mostrarButton + reacButton;
+                    }
                 },
                 {
                 data: null,
@@ -55,21 +59,41 @@ $.getScript("/static/js/datatables.spanish.js", function() {
 
         // Evento de clic en el botón "Mostrar Descripcion"
         $('#miTabla').on('click', '#mostrar', function() {
-        let idMedic = $(this).data('id');
-        cargarDescripcionMedicamento(idMedic);
+            let idMedic = $(this).data('id');
+            cargarDescripcionMedicamento(idMedic);
         });
 
         function cargarDescripcionMedicamento(id) {
-        $.ajax({
-            url: 'obtenerDescripcion/' + id + '/',
-            type: 'GET',
-            data: {},
-            success: function(response) {
-                $('#descripcionMostrar').text(response.description);
-                $('#id').val(response.id);
-                $('#modaldesc-lg').modal('show'); 
-            },
-        })
+            $.ajax({
+                url: 'obtenerDescripcion/' + id + '/',
+                type: 'GET',
+                data: {},
+                success: function(response) {
+                    $('#descripcionMostrar').html(response.description);
+                    $('#id').val(response.id);
+                    $('#modaldesc-lg').modal('show'); 
+                },
+            })
+        }
+
+
+        // Evento de clic en el botón "Mostrar Reacciones"
+        $('#miTabla').on('click', '#mostrarReac', function() {
+            let idMedic = $(this).data('id');
+            cargarReaccionesMedicamento(idMedic);
+        });
+
+        function cargarReaccionesMedicamento(id) {
+            $.ajax({
+                url: 'obtenerReacciones/' + id + '/',
+                type: 'GET',
+                data: {},
+                success: function(response) {
+                    $('#reaccionesMostrar').html(response.reacciones);
+                    $('#id').val(response.id);
+                    $('#modalreac-lg').modal('show'); 
+                },
+            })
         }
 
 
@@ -84,7 +108,7 @@ $.getScript("/static/js/datatables.spanish.js", function() {
                 url: 'exportarMedicamento/' + id + '/',
                 type: 'POST',
                 data: {},
-                headers: { 'X-CSRFToken': '{{ csrf_token }}' },  // Añadir CSRF token
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' },  
                 success: function(response) {
                     if (response.status === 'success') {
                         // Eliminar la fila de la tabla sin recargar la página

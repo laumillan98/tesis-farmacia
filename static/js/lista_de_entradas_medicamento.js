@@ -68,7 +68,7 @@ $.getScript("/static/js/datatables.spanish.js", function() {
             let today = new Date();
             let oneMonthAgo = new Date(today.setMonth(today.getMonth() - 1));
             return fechaElaboracion < today && fechaElaboracion <= oneMonthAgo; 
-        }, "La fecha de elaboración no puede ser posterior a la fecha actual");
+        }, "La fecha de elaboración debe ser al menos un mes antes de la fecha actual");
   
         $.validator.addMethod("validFechaVencimiento", function(value, element) {
             let fechaVencimiento = new Date(value);
@@ -149,7 +149,7 @@ $.getScript("/static/js/datatables.spanish.js", function() {
                 fecha_elaboracion: {
                     required: "Este campo es obligatorio.",
                     date: "Por favor introduce una fecha válida.",
-                    validFechaElaboracion: "La fecha de elaboración no puede ser posterior a la fecha actual."
+                    validFechaElaboracion: "La fecha de elaboración debe ser al menos un mes antes de la fecha actual."
                 },
                 fecha_vencimiento: {
                     required: "Este campo es obligatorio.",
