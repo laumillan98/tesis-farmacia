@@ -1,43 +1,193 @@
-{% extends "./index.html" %}
+{% extends "./index_farmaceutico.html" %}
+{% load static %}
 
 {% block mytitle %}Visualizar Gráficos{% endblock %}
 
 {% load static %}
 
-{% block mycss %}{% endblock %}
+{% block mycss %}
+<style>
+    /* Establece el estilo del contenedor si es necesario */
+    #contenedor {
+        width: 100%; /* Asegúrate de que el contenedor tenga un ancho definido */
+    }
+    canvas {
+        width: 100% !important; /* Hace que el canvas sea responsive */
+        max-width: 100%; /* Limita el ancho máximo al 100% del contenedor */
+        height: auto !important; /* Mantiene la proporción del gráfico */
+    }
+</style>
+{% endblock %}
 
 {% block title %}Visualizar Gráficos{% endblock %}
 
-{% block content %}
+{% block content_root %}
+<!-- Info boxes -->
+    <div class="row">
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box">
+                <span class="info-box-icon bg-info elevation-1"><i class="fa-solid fa-hand-holding-dollar"></i></span>
 
-    <div class="col-md-6">
-        <!-- DONUT CHART -->
-        <div class="card card-danger"  data-url="{% url 'usuarios_xgrupos_chart' %}">
-            <div class="card-header">
-            <h3 class="card-title">Donut Chart</h3>
-
-            <div class="card-tools">
-                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                <i class="fas fa-minus"></i>
-                </button>
-                <button type="button" class="btn btn-tool" data-card-widget="remove">
-                <i class="fas fa-times"></i>
-                </button>
+                <div class="info-box-content">
+                <span class="info-box-text">Total recaudado en mes</span>
+                <span class="info-box-number">
+                    {{contexto_24h.total_recaudado}}CUP
+                    <small>%</small>
+                </span>
+                </div>
+                <!-- /.info-box-content -->
             </div>
-            </div>
-            <div class="card-body">
-            <canvas id="donutChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-            </div>
-            <!-- /.card-body -->
+        <!-- /.info-box -->
         </div>
-        <!-- /.card -->
+        <!-- /.col -->
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box mb-3">
+                <span class="info-box-icon bg-danger elevation-1"><i class="fa-solid fa-dollar-sign"></i></span>
+
+                <div class="info-box-content">
+                <span class="info-box-text">Total recaudado en 24 horas</span>
+                <span class="info-box-number">{{contexto_24h.total_24}}CUP</span>
+                </div>
+                <!-- /.info-box-content -->
+            </div>
+        <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
+
+        <!-- fix for small devices only -->
+        <div class="clearfix hidden-md-up"></div>
+
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box mb-3">
+                <span class="info-box-icon bg-success elevation-1"><i class="fas fa-shopping-cart"></i></span>
+
+                <div class="info-box-content">
+                <span class="info-box-text">Unidades vendidas en el mes</span>
+                <span class="info-box-number">{{contexto_24h.total_unidades}}</span>
+                </div>
+                <!-- /.info-box-content -->
+            </div>
+        <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box mb-3">
+                <span class="info-box-icon bg-warning elevation-1"><i class="fa-solid fa-cart-flatbed" style="color:white;"></i></span>
+
+                <div class="info-box-content">
+                <span class="info-box-text">Unidades ingresadas en almacén</span>
+                <span class="info-box-number">{{contexto_24h.total_entradas}}</span>
+                </div>
+                <!-- /.info-box-content -->
+            </div>
+        <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
     </div>
 
+    <div class="row">
+        <div class="col-12 col-md-8">
+            <!-- DONUT CHART -->
+            <div class="card ml-2">
+                <div class="card-body">
+                    <canvas id="barChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                </div>
+            </div>
+            <!-- /.card -->
+        </div>
+   
+        <div class="col-12 col-md-4">
+            <div class="card mr-2">
+                <div class="card-body">
+            <p class="text-center">
+            <strong>Top 5 más vendidos</strong>
+            </p>
+
+            {% for item in contexto_24h.top_vendidos %}
+            <div class="progress-group">
+                {{item.medicamento}}
+                <span class="float-right"><b>{{item.vendidos}}</b>/{{item.existencia|add:item.vendidos}}</span>
+                <div class="progress progress-sm">
+                <div class="progress-bar bg-primary" style="width: {{item.porciento}}"></div>
+                </div>
+            </div>
+            {% endfor %}
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 col-md-12">
+            <!-- DONUT CHART -->
+            <div class="card ml-2 mr-2">
+                <div class="card-body">
+                    <canvas id="lineChart" style="min-height: 300px; height: 300px; max-height: 300px; max-width: 100%;"></canvas>
+                </div>
+            </div>
+            <!-- /.card -->
+        </div>
+    </div>
 {% endblock %}
+
+
 
 {% block subtitle %}Gráficos{% endblock %}
 
 {% block custom_scripts %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
-<script src="{% static 'js/charts.js' %}"></script>
+<script src="{% static 'plugins/chart.js/Chart.min.js' %}"></script>
+<script>
+    $(document).ready(function() {
+        const barCtx = $('#barChart').get(0).getContext('2d');
+        const ventasChart = new Chart(barCtx, {
+            type: 'bar', // Cambiado de 'line' a 'bar'
+            data: {
+                labels: {{ contexto_24h.fechas|safe }},
+                datasets: [{
+                    label: 'Ventas por día',
+                    data: {{ contexto_24h.cantidades|safe }},
+                    backgroundColor: 'rgba(0, 123, 255, 0.5)',
+                    borderColor: 'rgba(0, 123, 255, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        const lineCtx = $('#lineChart').get(0).getContext('2d');
+        const ventasAnualesChart = new Chart(lineCtx, {
+            type: 'line', // Tipo de gráfico definido como línea
+            data: {
+                labels: {{ contexto_general.meses|safe }}, // Meses del año
+                datasets: [{
+                    label: 'Total recaudado por mes',
+                    data: {{ contexto_general.totales_mes|safe }}, // Totales por mes
+                    backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                    borderColor: 'rgba(0, 123, 255, 1)',
+                    borderWidth: 2,
+                    fill: false // No rellenar el área bajo la línea
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}

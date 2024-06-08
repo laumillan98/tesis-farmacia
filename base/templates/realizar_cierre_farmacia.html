@@ -15,22 +15,25 @@
             <div class="card-header">
                 <button type="button" class="btn btn-success" id="guardarCierre" data-url="{% url 'guardar_ventas' %}">Guardar</button>
             </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <br>
-                    <table id="miTabla" class="table table-bordered table-striped" data-url="{% url 'lista_de_medicfarma' %}">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Nombre</th>
-                                <th>Formato</th>
-                                <th>Precios</th>
-                                <th>Ventas</th>
-                            </tr>
-                        </thead>
-                    </table>
+            <form id="cierreForm">
+                {% csrf_token %}
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <br>
+                        <table id="miTabla" class="table table-bordered table-striped" data-url="{% url 'lista_de_medicfarma' %}">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Nombre</th>
+                                    <th>Formato</th>
+                                    <th>Precios</th>
+                                    <th>Ventas</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 

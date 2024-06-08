@@ -132,5 +132,6 @@ urlpatterns = [
      # Graficos
      path('visualizar_charts/', views.visualizarCharts),
      path('usuarios_xgrupos_chart/', views.usuariosXGruposChart, name='usuarios_xgrupos_chart'),
+     path('venta_grafica_farmacia/<farmacia_id>/', views.ventaGraficaFarmaciaV2, name='venta_grafica_farmacia'),
 ]
 

@@ -1463,6 +1463,7 @@ def gestionarMedicFarma(request):
     restricciones = RestriccionMedicamento.objects.all()
     clasificaciones = ClasificacionMedicamento.objects.all()
     context = {
+        'farmacia_id': farmaceutico.id_farma.id_farma,
         'farmacia_del_farmaceutico': farmacia_del_farmaceutico,
         'formatos': formatos,
         'restricciones': restricciones,
@@ -1489,6 +1490,7 @@ def listaDeMedicFarma(request):
                 origen_texto = "Natural" if medic.origen_natural else "Fármaco"
                 medic_data = {
                     'index': index + 1,
+                    'id_farma_medic': farmaMedic.id,
                     'id': str(medic.id_medic),
                     'farma': farmaMedic.id_farma.nombre,
                     'nombre': medic.nombre,
@@ -1792,7 +1794,10 @@ def realizarCierreFarmacia(request):
 @require_POST
 def guardarVentas(request):
     ventas = json.loads(request.body)
+    print(ventas)
     for venta in ventas:
+        print(venta)
+        print(venta['id'])
         farmacia_medicamento = FarmaciaMedicamento.objects.get(id=venta['id'])
         cantidad = int(venta['cantidad'])
         if cantidad <= farmacia_medicamento.existencia:
@@ -2734,3 +2739,174 @@ def usuariosXGruposChart(request):
     }
 
     return JsonResponse(context)
+
+ # Agregar importaciones necesarias al inicio del archivo
+from django.utils.timezone import now
+from django.db.models.functions import TruncDay, TruncMonth
+from django.db.models import Sum, F, FloatField    
+from django.db.models.functions import Coalesce   
+import datetime 
+
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['farmacéuticos'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def ventaGraficaFarmacia(request, farmacia_id):
+    total_existencias = FarmaciaMedicamento.objects.filter(id_farma=farmacia_id)
+    top_mas_vendidos = []
+    for item in total_existencias:
+        resultado = Salida.objects.filter(id_farmaciaMedicamento=item.pk).aggregate(total_cantidad=Coalesce(Sum('cantidad'), 0))['total_cantidad']
+        print(resultado)
+        # Calcular el porcentaje, evitando la división por cero
+        if item.existencia + resultado > 0:
+            porciento = (resultado / (item.existencia + resultado)) * 100
+        else:
+            porciento = 0
+
+        top_mas_vendidos.append(
+            {
+                'medicamento': item.id_medic.nombre,
+                'existencia': item.existencia,
+                'vendidos': resultado,
+                'porciento': f"{porciento}%"  # Formatear como string con un signo de porcentaje
+            }
+        )
+
+    top_mas_vendidos.sort(key=lambda x: x['vendidos'], reverse=True)  # Añadir reverse=True para ordenar de mayor a menor
+
+
+    # Filtrar las ventas del mes actual
+    ventas_mes = Salida.objects.filter(
+        fecha_movimiento__year=now().year,
+        fecha_movimiento__month=now().month,
+        id_farmaciaMedicamento__id_farma = farmacia_id
+    ).annotate(
+        dia=TruncDay('fecha_movimiento')).values('dia').annotate(total=Sum('cantidad')).order_by('dia')
+
+      # Preparar los datos para el gráfico
+    fechas = [venta['dia'].strftime('%Y-%m-%d') for venta in ventas_mes]
+    cantidades = [venta['total'] for venta in ventas_mes]
+    
+    # Pasar los datos al template
+    contexto = {
+        'fechas': fechas,
+        'cantidades': cantidades,
+        'top_vendidos': top_mas_vendidos[:5]
+    }
+
+    print(contexto)
+
+    return render(request, "visualizar_charts.html", contexto)
+
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['farmacéuticos'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def ventaGraficaFarmaciaV2(request, farmacia_id):
+    
+    contexto24h = graficos24h(farmacia_id)
+    contextoGeneral = graficosGeneral(farmacia_id)
+    # Pasar los datos al template
+   
+    contexto = {
+        'contexto_24h': contexto24h,
+        'contexto_general': contextoGeneral
+    }
+
+    print(contexto)
+    return render(request, "visualizar_charts.html", contexto)
+
+def graficos24h(farmacia_id):
+    total_existencias = FarmaciaMedicamento.objects.filter(id_farma=farmacia_id)
+    top_mas_vendidos = []
+    ahora = timezone.now()
+    # Calcular la fecha y hora de hace 24 horas
+    hace_24_horas = ahora - timedelta(hours=24)
+    # Filtrar las ventas de las últimas 24 horas
+    ventas_ultimas_24_horas = Salida.objects.filter(
+        fecha_movimiento__gte=hace_24_horas,
+        id_farmaciaMedicamento__id_farma=farmacia_id
+    ).annotate(
+        total_por_salida=Sum(F('cantidad') * F('id_farmaciaMedicamento__id_medic__precio_unidad'), output_field=FloatField())
+    )
+    # Calcular el total recaudado en las últimas 24 horas
+    total_recaudado_24_horas = ventas_ultimas_24_horas.aggregate(
+        total_recaudado=Coalesce(Sum('total_por_salida', output_field=FloatField()), 0.0)
+    )['total_recaudado']
+    total_de_entradas = 0
+
+    for item in total_existencias:
+        resultado = Salida.objects.filter(id_farmaciaMedicamento=item.pk).aggregate(total_cantidad=Coalesce(Sum('cantidad'), 0))['total_cantidad']
+        porciento = (resultado / (item.existencia + resultado)) * 100 if item.existencia + resultado > 0 else 0
+        total_de_entradas = total_de_entradas + (resultado+item.existencia)
+        top_mas_vendidos.append({
+            'medicamento': item.id_medic.nombre,
+            'existencia': item.existencia,
+            'vendidos': resultado,
+            'porciento': f"{porciento}%"
+        })
+
+    top_mas_vendidos.sort(key=lambda x: x['vendidos'], reverse=True)
+
+    # Filtrar las ventas del mes actual y calcular el total recaudado
+    ventas_mes = Salida.objects.filter(
+        fecha_movimiento__year=now().year,
+        fecha_movimiento__month=now().month,
+        id_farmaciaMedicamento__id_farma=farmacia_id
+    ).annotate(
+        dia=TruncDay('fecha_movimiento'),
+        total_por_salida=Sum(F('cantidad') * F('id_farmaciaMedicamento__id_medic__precio_unidad'), output_field=FloatField()),
+        total=F('cantidad')
+    ).values('dia', 'total_por_salida', 'total').order_by('dia')
+
+    total_recaudado_mes = ventas_mes.aggregate(total_recaudado=Coalesce(Sum('total_por_salida', output_field=FloatField()), 0.0))['total_recaudado']
+
+   
+    # Preparar los datos para el gráfico
+    ventas_por_dia = ventas_mes.values('dia').annotate(total_vendido=Sum('cantidad')).order_by('dia')
+    fechas = [venta['dia'].strftime('%Y-%m-%d') for venta in ventas_por_dia]
+    cantidades = [venta['total_vendido'] for venta in ventas_por_dia]
+    
+    # Pasar los datos al template
+    contexto = {
+        'fechas': fechas,
+        'cantidades': cantidades,
+        'top_vendidos': top_mas_vendidos[:5],
+        'total_recaudado': total_recaudado_mes,
+        'total_unidades': sum(cantidades),
+        'total_24': total_recaudado_24_horas,
+        'total_entradas': total_de_entradas
+    }
+    
+    return contexto
+
+def graficosGeneral(farmacia_id):
+    # Obtener el año actual
+    year = now().year
+
+    # Crear una lista de todos los meses del año actual
+    meses_del_ano = [datetime.date(year, month, 1) for month in range(1, 13)]
+
+    # Filtrar las ventas del año actual y calcular el total recaudado por mes
+    ventas_ano = Salida.objects.filter(
+        fecha_movimiento__year=year,
+        id_farmaciaMedicamento__id_farma=farmacia_id
+    ).annotate(
+        mes=TruncMonth('fecha_movimiento'),
+        total_por_salida=F('cantidad') * F('id_farmaciaMedicamento__id_medic__precio_unidad')
+    ).values('mes').annotate(total_mes=Sum('total_por_salida')).order_by('mes')
+
+    # Convertir QuerySet a diccionario para acceso rápido
+    ventas_por_mes = {venta['mes']: venta['total_mes'] for venta in ventas_ano}
+
+    # Preparar los datos para el gráfico, asegurándose de que los meses sin ventas tengan un valor de 0
+    totales_mes = [ventas_por_mes.get(mes, 0) for mes in meses_del_ano]
+
+    # Formatear los meses para las etiquetas del gráfico
+    meses = [mes.strftime('%Y-%m') for mes in meses_del_ano]
+
+    # Pasar los datos al template
+    contexto = {
+        'meses': meses,
+        'totales_mes': totales_mes,
+    }
+    
+    return contexto

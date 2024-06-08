@@ -20,7 +20,7 @@ $.getScript("/static/js/datatables.spanish.js", function() {
                 {
                     data: "existencia",
                     render: function(data, type, row, meta) {
-                        return `<input type="number" class="form-control ventas-input" data-id="${row.id}" data-existencia="${row.existencia}" max="${row.existencia}" min="0" value="0">`;
+                        return `<input type="number" class="form-control ventas-input" data-id="${row.id_farma_medic}" data-existencia="${row.existencia}" max="${row.existencia}" min="0" value="0">`;
                     }
                 },
             ],
@@ -49,7 +49,7 @@ $.getScript("/static/js/datatables.spanish.js", function() {
 
             if (ventas.length > 0) {
                 $.ajax({
-                    url: "{% url 'guardar_ventas' %}",
+                    url: "guardar_ventas/",
                     type: "POST",
                     data: JSON.stringify(ventas),
                     contentType: "application/json",
