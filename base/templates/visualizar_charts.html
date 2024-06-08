@@ -1,5 +1,7 @@
 {% extends template %}
 {% load static %}
+{% extends template %}
+{% load static %}
 
 {% block mytitle %}Visualizar Gráficos{% endblock %}
 
@@ -19,6 +21,70 @@
 
 {% block title %}Visualizar Gráficos{% endblock %}
 
+{% block content_root %}
+<!-- Info boxes -->
+    <div class="row">
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box">
+                <span class="info-box-icon bg-info elevation-1"><i class="fa-solid fa-hand-holding-dollar"></i></span>
+
+                <div class="info-box-content">
+                <span class="info-box-text">Total recaudado en {% now "F" %}</span>
+                <span class="info-box-number">
+                    {{contexto_24h.total_recaudado}}CUP
+                </span>
+                </div>
+                <!-- /.info-box-content -->
+            </div>
+        <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box mb-3">
+                <span class="info-box-icon bg-danger elevation-1"><i class="fa-solid fa-dollar-sign"></i></span>
+
+                <div class="info-box-content">
+                <span class="info-box-text">Total recaudado en 24 horas</span>
+                <span class="info-box-number">{{contexto_24h.total_24}}CUP</span>
+                </div>
+                <!-- /.info-box-content -->
+            </div>
+        <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
+
+        <!-- fix for small devices only -->
+        <div class="clearfix hidden-md-up"></div>
+
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box mb-3">
+                <span class="info-box-icon bg-success elevation-1"><i class="fas fa-shopping-cart"></i></span>
+
+                <div class="info-box-content">
+                <span class="info-box-text">Unidades vendidas en {% now "F" %}</span>
+                <span class="info-box-number">{{contexto_24h.total_unidades}}</span>
+                </div>
+                <!-- /.info-box-content -->
+            </div>
+        <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box mb-3">
+                <span class="info-box-icon bg-warning elevation-1"><i class="fa-solid fa-cart-flatbed" style="color:white;"></i></span>
+
+                <div class="info-box-content">
+                <span class="info-box-text">Total de medicamentos</span>
+                <span class="info-box-number">{{contexto_24h.total_entradas}}</span>
+                </div>
+                <!-- /.info-box-content -->
+            </div>
+        <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+    </div>
 {% block content_root %}
 <!-- Info boxes -->
     <div class="row">
@@ -111,6 +177,33 @@
                 </div>
             </div>
             {% endfor %}
+    <div class="row">
+        <div class="col-12 col-md-8">
+            <!-- DONUT CHART -->
+            <div class="card ml-2">
+                <div class="card-body">
+                    <canvas id="barChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                </div>
+            </div>
+            <!-- /.card -->
+        </div>
+   
+        <div class="col-12 col-md-4">
+            <div class="card mr-2">
+                <div class="card-body">
+            <p class="text-center">
+            <strong>Top 5 más vendidos</strong>
+            </p>
+
+            {% for item in contexto_24h.top_vendidos %}
+            <div class="progress-group">
+                {{item.medicamento}}
+                <span class="float-right"><b>{{item.vendidos}}</b>/{{item.existencia|add:item.vendidos}}</span>
+                <div class="progress progress-sm">
+                <div class="progress-bar bg-primary" style="width: {{item.porciento}}"></div>
+                </div>
+            </div>
+            {% endfor %}
             </div>
             </div>
         </div>
@@ -123,7 +216,18 @@
                 <div class="card-body">
                     <canvas id="lineChart" style="min-height: 300px; height: 300px; max-height: 300px; max-width: 100%;"></canvas>
                 </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 col-md-12">
+            <!-- DONUT CHART -->
+            <div class="card ml-2 mr-2">
+                <div class="card-body">
+                    <canvas id="lineChart" style="min-height: 300px; height: 300px; max-height: 300px; max-width: 100%;"></canvas>
+                </div>
             </div>
+            <!-- /.card -->
             <!-- /.card -->
         </div>
     </div>
@@ -131,9 +235,64 @@
 
 
 
+
+
 {% block subtitle %}Gráficos{% endblock %}
 
 {% block custom_scripts %}
+<script src="{% static 'plugins/chart.js/Chart.min.js' %}"></script>
+<script>
+    $(document).ready(function() {
+        const barCtx = $('#barChart').get(0).getContext('2d');
+        const ventasChart = new Chart(barCtx, {
+            type: 'bar', // Cambiado de 'line' a 'bar'
+            data: {
+                labels: {{ contexto_24h.fechas|safe }},
+                datasets: [{
+                    label: 'Ventas por día',
+                    data: {{ contexto_24h.cantidades|safe }},
+                    backgroundColor: 'rgba(0, 123, 255, 0.5)',
+                    borderColor: 'rgba(0, 123, 255, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        const lineCtx = $('#lineChart').get(0).getContext('2d');
+        const ventasAnualesChart = new Chart(lineCtx, {
+            type: 'line', // Tipo de gráfico definido como línea
+            data: {
+                labels: {{ contexto_general.meses|safe }}, // Meses del año
+                datasets: [{
+                    label: 'Total recaudado por mes',
+                    data: {{ contexto_general.totales_mes|safe }}, // Totales por mes
+                    backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                    borderColor: 'rgba(0, 123, 255, 1)',
+                    borderWidth: 2,
+                    fill: false // No rellenar el área bajo la línea
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+</script>
 <script src="{% static 'plugins/chart.js/Chart.min.js' %}"></script>
 <script>
     $(document).ready(function() {

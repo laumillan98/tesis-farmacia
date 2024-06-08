@@ -109,7 +109,6 @@ urlpatterns = [
      path('realizar_cierre_farmacia/gestionar_salidas_medicamento/', views.gestionarSalidasMedicamento, name='gestionar_salidas_medicamento'),
      path('gestionar_salidas_medicamento/', views.gestionarSalidasMedicamento),
      path('lista_de_salidas_medicamento/', views.listaDeSalidasMedicamento, name='lista_de_salidas_medicamento'),
-
      # Cliente
      # Buscar Informacion de Medicamentos
      path('visualizar_tabla_medicamentos/', views.visualizarTablaMedicamentos),
@@ -133,8 +132,6 @@ urlpatterns = [
      path('obtener_notificaciones/', views.obtenerNotificaciones, name='obtener_notificaciones'),
      path('marcar_notificacion_leida/', views.marcarNotificacionLeida, name='marcar_notificacion_leida'),
      # Graficos
-     path('visualizar_charts/', views.visualizarCharts),
-     path('usuarios_xgrupos_chart/', views.usuariosXGruposChart, name='usuarios_xgrupos_chart'),
      path('venta_grafica_farmacia/<farmacia_id>/', views.ventaGraficaFarmacia, name='venta_grafica_farmacia'),
      path('venta_grafica_provincia/', views.ventaGraficaGeneral, name='venta_grafica_provincia'),
 ]
