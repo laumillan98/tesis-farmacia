@@ -248,7 +248,7 @@ class MedicUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Medicamento
-        fields = ('nombre', 'description', 'cant_max', 'precio_unidad', 'origen_natural', 'id_restriccion', 'id_clasificacion', 'id_formato')
+        fields = ('nombre', 'description', 'cant_max', 'precio_unidad', 'origen_natural', 'id_restriccion', 'id_clasificacion', 'id_formato', 'reacciones')
 
     def clean(self):
         cleaned_data = super().clean()

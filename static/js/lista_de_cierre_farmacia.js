@@ -1,6 +1,6 @@
 $.getScript("/static/js/datatables.spanish.js", function() {
     $(document).ready(function () {
-        let guardarSuccessful = false;
+        let registroSuccessful = false;
         var ajaxUrl = $("#miTabla").data("url");
         var table = $("#miTabla").DataTable({
             processing: true,
@@ -14,32 +14,34 @@ $.getScript("/static/js/datatables.spanish.js", function() {
             },
             columns: [
                 { data: "index" },
-                { data: "nombre" },
+                { data: "medicamento" },
                 { data: "formato" },
                 { data: "precio" },
                 {
                     data: "existencia",
                     render: function(data, type, row, meta) {
-                        return `<input type="number" class="form-control ventas-input" data-id="${row.id_farma_medic}" data-existencia="${row.existencia}" max="${row.existencia}" min="0" value="0">`;
+                        return `<input type="number" class="form-control ventas-input" data-id="${row.id_farmaMedic}" data-existencia="${row.existencia}" max="${row.existencia}" min="0" value="0">`;
                     }
                 },
             ],
         });
 
         $('#guardarCierre').on('click', function() {
+            let url = $(this).data('url');
             let ventas = [];
+            let error = false;
             $('.ventas-input').each(function() {
                 let cantidad = parseInt($(this).val());
-                if (cantidad > 0) {
-                    let existencia = parseInt($(this).data('existencia'));
-                    if (cantidad > existencia) {
-                        Swal.fire({
-                            title: 'Error',
-                            text: 'La cantidad de ventas no puede ser mayor a la existencia',
-                            icon: 'error'
-                        });
-                        return false;
-                    }
+                let existencia = parseInt($(this).data('existencia'));
+                if (cantidad > existencia) {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'La cantidad de ventas no puede ser mayor a la existencia',
+                        icon: 'error'
+                    });
+                    error = true;
+                    return false;
+                } else if (cantidad >= 0) {
                     ventas.push({
                         id: $(this).data('id'),
                         cantidad: cantidad
@@ -47,9 +49,13 @@ $.getScript("/static/js/datatables.spanish.js", function() {
                 }
             });
 
+            if (error) {
+                return;  // Si hay un error, detener el flujo aquí.
+            }
+
             if (ventas.length > 0) {
                 $.ajax({
-                    url: "guardar_ventas/",
+                    url: url,
                     type: "POST",
                     data: JSON.stringify(ventas),
                     contentType: "application/json",
@@ -61,7 +67,7 @@ $.getScript("/static/js/datatables.spanish.js", function() {
                                 text: 'Las ventas fueron registradas correctamente.',
                                 icon: 'success'
                             }).then(function() {
-                                window.location.href = "{% url 'gestionar_salidas_medicamento' %}";
+                                window.location.href = redirectUrl;
                             });
                         } else {
                             Swal.fire({

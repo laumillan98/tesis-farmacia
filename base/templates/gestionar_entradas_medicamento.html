@@ -33,7 +33,8 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <button id="registrarEntradaButton" class="btn btn-md btn-success"><i class="fa-solid fa-plus"></i> Registrar Nueva Entrada</button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#filtroModal"><i class="fa-solid fa-file-arrow-down fa-bounce"></i> Exportar Entradas</button>
+                <button id="registrarEntradaButton" class="btn btn-md btn-success" style="margin-left: 10px;"><i class="fa-solid fa-plus"></i> Registrar Nueva Entrada</button>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -111,6 +112,53 @@
     </div>
 
 
+    <!-- Filtro Modal Exportacion-->
+    <div class="modal fade" id="filtroModal" tabindex="-1" role="dialog" aria-labelledby="filtroModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="filtroModalLabel">Filtrar Entradas por:</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="filtroForm">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="factura">Factura</label>
+                            <input type="text" class="form-control" id="factura" name="factura" placeholder="Todas">
+                            <input type="hidden" name="tipo_objeto" value="entrada">
+                        </div>
+                        <div class="form-group">
+                            <label for="lote">Lote</label>
+                            <input type="text" class="form-control" id="lote" name="lote" placeholder="Todos">
+                        </div>
+                        <div class="form-group">
+                            <label for="medicamento">Medicamento</label>
+                            <input type="text" class="form-control" id="medicamento" name="medicamento" placeholder="Todos">
+                        </div>
+                        <div class="form-group">
+                            <label for="fecha_creacion">Fecha de Creación</label>
+                            <input type="date" class="form-control" id="fecha_creacion" name="fecha_creacion">
+                        </div>
+                        <div class="form-group">
+                            <label for="fecha_elaboracion">Fecha de Elaboración</label>
+                            <input type="date" class="form-control" id="fecha_elaboracion" name="fecha_elaboracion">
+                        </div>
+                        <div class="form-group">
+                            <label for="fecha_vencimiento">Fecha de Vencimiento</label>
+                            <input type="date" class="form-control" id="fecha_vencimiento" name="fecha_vencimiento">
+                        </div>
+                        <button type="button" class="btn btn-primary" id="generarReporteBtn">Generar Reporte</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.modal -->
+
+
 
 {% endblock %}   
 
@@ -129,4 +177,54 @@
         });
     });
 </script>
+
+<script>
+    $(document).ready(function() {
+        $('#generarReporteBtn').click(function() {
+            var form = $('#filtroForm');
+            $.ajax({
+                url: '{% url "generar_reporte_pdf" %}',
+                type: 'POST',
+                data: form.serialize(),
+                success: function(response, status, xhr) {
+                    if (xhr.getResponseHeader('content-type') === 'application/json') {
+                        var jsonResponse = JSON.parse(response);
+                        Swal.fire({
+                            title: 'Error',
+                            text: jsonResponse.error,
+                            icon: 'error',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    } else {
+                        var blob = new Blob([response], { type: 'application/pdf' });
+                        var link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        link.download = 'reporte_entrada.pdf';
+                        link.click();
+                        $('#filtroModal').modal('hide');
+
+                        // Show SweetAlert notification
+                        Swal.fire({
+                            title: 'Éxito',
+                            text: 'El reporte se ha generado exitosamente.',
+                            icon: 'success',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    }
+                },
+                error: function(response) {
+                    var jsonResponse = response.responseJSON;
+                    Swal.fire({
+                        title: 'Error',
+                        text: jsonResponse.error,
+                        icon: 'error',
+                        confirmButtonText: 'Aceptar'
+                    });
+                }
+            });
+        });
+
+    });
+</script>
+
 {% endblock %}

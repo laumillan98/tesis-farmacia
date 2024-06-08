@@ -135,7 +135,7 @@ $.getScript("/static/js/datatables.spanish.js", function() {
                                     "targets": 7, // Index of the actions column
                                     "render": function (data, type, row) {
                                         let button = "<button class='btn btn-info ver-mapa-btn'"+
-                                        " data-lat="+row[7].latitude+' data-lng='+row[7].longitude+' data-name='+row[7].nombre+"><i class='fa-solid fa-map-location-dot'></i></button>"
+                                        " data-lat='"+row[7].latitude+"' data-lng='"+row[7].longitude+"' data-name='"+row[7].nombre+"'><i class='fa-solid fa-map-location-dot'></i></button>";
                                         return button;
                                     }
                                 },
