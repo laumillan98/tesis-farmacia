@@ -206,23 +206,6 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-chart-pie"></i>
-              <p>
-                Gráficos
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="/visualizar_charts" class="nav-link {% if request.path == '/visualizar_charts/' %}active{% endif %}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Charts</p>
-                </a>
-              </li>
-            </ul>
-          </li>
         </ul>
       </nav>
       <!-- /.sidebar-menu -->
@@ -253,6 +236,7 @@
     <!-- Main content -->
     <section class="content">
       <div class="container-fluid">
+        {% block content_root %}{% endblock %} 
         <!-- Main row -->
         <div class="row">{% block content %}{% endblock %}</div>
         <!-- /.row (main row) -->

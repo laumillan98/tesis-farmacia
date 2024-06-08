@@ -38,6 +38,7 @@ from .models import CustomUser, Medicamento, Farmacia, FarmaUser, FarmaciaMedica
 from .forms import CustomUserCreationForm, FarmaUserCreationForm, UserLoginForm, SetPasswordForm, PasswordResetForm, UserProfileForm, UserUpdateForm, FarmaUserUpdateForm, FarmaUpdateForm, TipoFarmaciaUpdateForm, TurnoFarmaciaUpdateForm, MunicUpdateForm, ProvUpdateForm, MedicUpdateForm, RestriccionMedicamentoUpdateForm, ClasificacionMedicamentoUpdateForm, FormatoMedicamentoUpdateForm, EntradaMedicamentoCreateForm
 from .decorators import usuarios_permitidos, unauthenticated_user
 from .tokens import account_activation_token
+from.graficos import reporteEstadisticoAnual, reporteEstadisticoNivelProvincial, reporteEstadisticoMensual
 from FirstApp.tasks import send_activation_email
 from django_tables2 import RequestConfig
 
@@ -153,10 +154,10 @@ def autenticar(request):
         )
     
 
-def activate(request, username, token):
+def activate(request, uidb64, token):
     User = get_user_model()
     try:
-        usernameDecode = force_str(urlsafe_base64_decode(username))
+        usernameDecode = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(username=usernameDecode)
     except:
         user = None
@@ -252,14 +253,21 @@ def restablecerPass(request):
                     messages.success(request,
                         """
                         <p>
-                            Le hemos enviado por correo electrónico instrucciones para cambiar su contraseña, si existe una cuenta con el correo que ingresó. 
-                            Debería recibirlo en breve.<br> Si no recibe un correo electrónico asegúrese de haber introducido la dirección con la que se registró y compruebe su carpeta Spam.
+                            Le hemos enviado por correo electrónico instrucciones para cambiar su contraseña.<br>
+                            Debería recibirlo en breve.
                         </p>
                         """
                     )
                 else:
                     messages.error(request, "Problema al enviar el correo para restablecer su contraseña, <b>PROBLEMA EN SERVIDOR</b>")
-
+            else:
+                    messages.success(request,
+                        """
+                        <p>
+                            Le hemos enviado por correo electrónico instrucciones para cambiar su contraseña.<br>
+                            Debería recibirlo en breve.
+                        </p>
+                        """)
             return redirect('/')
         
 
@@ -1465,6 +1473,7 @@ def gestionarMedicFarma(request):
     restricciones = RestriccionMedicamento.objects.all()
     clasificaciones = ClasificacionMedicamento.objects.all()
     context = {
+        'farmacia_id': farmaceutico.id_farma.id_farma,
         'farmacia_del_farmaceutico': farmacia_del_farmaceutico,
         'formatos': formatos,
         'restricciones': restricciones,
@@ -2817,35 +2826,37 @@ def marcarNotificacionLeida(request):
 
 
 @login_required(login_url='/acceder')
-@usuarios_permitidos(roles_permitidos=['admin'])
+@usuarios_permitidos(roles_permitidos=['farmacéuticos', 'especialista'])
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def visualizarCharts(request):
-    return render(request, "visualizar_charts.html")
-
-
-def usuariosXGruposChart(request):
-    # Obtener el recuento de usuarios por grupo
-    group_counts = CustomUser.objects.values('groups').annotate(count=Count('id'))
-
-    # Definir los nombres de los grupos y los contadores
-    labels = ['clientes', 'farmacéuticos', 'admin']
-    counts = [0, 0, 0]  # Inicializar contadores para cada grupo
-
-    # Asignar los recuentos reales a los contadores correspondientes
-    for item in group_counts:
-        group_name = item['groups']
-        user_count = item['count']
-        if group_name == '1':
-            counts[0] = user_count
-        elif group_name == '2':
-            counts[1] = user_count
-        elif group_name == '3':
-            counts[2] = user_count
-
-    # Pasar datos al contexto de la plantilla
-    context = {
-        'labels': labels,
-        'counts': counts,
+def ventaGraficaFarmacia(request, farmacia_id):
+    contexto24h = reporteEstadisticoMensual(farmacia_id)
+    contextoGeneral = reporteEstadisticoAnual(farmacia_id)
+    # Pasar los datos al template
+    if request.user.groups.filter(name='especialista').exists():
+        base_template = './index_especialista.html'
+    else:
+        base_template = './index_farmaceutico.html'
+   
+    contexto = {
+        'contexto_24h': contexto24h,
+        'contexto_general': contextoGeneral,
+        'template': base_template
     }
+    print(contexto)
+    return render(request, "visualizar_charts.html", contexto)
 
-    return JsonResponse(context)
+
+@login_required(login_url='/acceder')
+@usuarios_permitidos(roles_permitidos=['especialista'])
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def ventaGraficaGeneral(request):
+    contexto24h = reporteEstadisticoNivelProvincial()
+    contextoGeneral = reporteEstadisticoAnual(None)
+    # Pasar los datos al template
+   
+    contexto = {
+        'contexto_24h': contexto24h,
+        'contexto_general': contextoGeneral
+    }
+    print(contexto)
+    return render(request, "visualizar_charts_especialistas.html", contexto)

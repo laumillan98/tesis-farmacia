@@ -15,6 +15,7 @@
             <div class="card-header">
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#filtroModal"><i class="fa-solid fa-file-arrow-down fa-bounce"></i> Exportar Medicamentos</button>
                 <a href="/realizar_cierre_farmacia" class="btn btn-md btn-danger" style="margin-left: 10px;">Realizar Cierre <i class="fa-solid fa-person-walking-arrow-right"></i></a>
+                <a href="{% url 'venta_grafica_farmacia' farmacia_id %}" class="btn btn-md btn-success" style="margin-left: 10px;">Gráfico de ventas <i class="fa-solid fa-chart-simple"></i></a>
             </div>
             <div class="card-body">
                 <div class="table-responsive">

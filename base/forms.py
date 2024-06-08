@@ -172,8 +172,8 @@ class FarmaUserUpdateForm(UserChangeForm):
 
 
 class FarmaUpdateForm(forms.ModelForm):
-    nombre = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Nombre no válido')], label="Nombre", required=True)
-    direccion = forms.CharField(validators=[RegexValidator('[A-Za-z ]{3,50}', message='Dirección no válida')], label="Dirección", required=True)
+    nombre = forms.CharField(validators=[RegexValidator(regex=r'^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]{3,50}$', message='Nombre no válido')], label="Nombre", required=True)
+    direccion = forms.CharField(validators=[RegexValidator(regex=r'^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s/\.]{3,100}$', message='Dirección no válida')], label="Dirección", required=True)
     telefono = forms.CharField(validators=[RegexValidator(regex=r'^7\d{7}$', message='El teléfono debe comenzar con 7 y tener exactamente 8 dígitos.')], label="Teléfono", required=True)
     
     class Meta:

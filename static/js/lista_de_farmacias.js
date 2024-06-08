@@ -38,6 +38,9 @@ $.getScript("/static/js/datatables.spanish.js", function () {
                               </button>&nbsp
                               <button id='verMapa' class='btn btn-sm btn-info' data-lat='${row.latitud}' data-lng='${row.longitud}' data-id='${row.id}'>
                                   <i class="fa-solid fa-location-dot fa-flip"></i>
+                              </button>&nbsp
+                              <button id='verEstadisticaDeFarmacia' class='btn btn-sm btn-warning' data-id='${row.id}'>
+                                <i class="fa-solid fa-chart-simple"></i>
                               </button>`
               return editButton
             }
@@ -52,6 +55,12 @@ $.getScript("/static/js/datatables.spanish.js", function () {
     $("#miTabla").on("click", "#editar", function () {
       let idFarma = $(this).data("id")
       cargarInformacionFarmacia(idFarma)
+    })
+
+    //Evento de click en ver Grafico venta en Provincia
+    $("#miTabla").on("click", "#verEstadisticaDeFarmacia", function () {
+      let idFarma = $(this).data("id")
+      window.location.href = "/venta_grafica_farmacia/"+idFarma;
     })
 
     function cargarInformacionFarmacia(id) {
@@ -230,12 +239,14 @@ $.getScript("/static/js/datatables.spanish.js", function () {
         nombre: {
           required: true,
           minlength: 3,
-          pattern: /^[A-Za-z0-9\s]+(?:[A-Za-z][A-Za-z0-9\s]*)?$/,
+          maxlength: 50,
+          pattern: /^[A-Za-z0-9\sáéíóúÁÉÍÓÚ]+$/,
         },
         direccion: {
           required: true,
           minlength: 5,
-          pattern: /^[A-Za-z0-9\s]+(?:[A-Za-z][A-Za-z0-9\s]*)?$/,
+          maxlength: 100,
+          pattern: /^[A-Za-z0-9\sáéíóúÁÉÍÓÚ]+$/,
         },
         telefono: {
           required: true,
@@ -247,11 +258,13 @@ $.getScript("/static/js/datatables.spanish.js", function () {
         nombre: {
           required: "Este campo es obligatorio.",
           minlength: "Por favor, introduce al menos 3 caracteres.",
+          maxlength: "Por favor, no introduzca más de 50 caracteres.",
           pattern: "Por favor introduce al menos una letra, puede contener números.",
         },
         direccion: {
           required: "Este campo es obligatorio.",
           minlength: "Por favor, introduce al menos 5 caracteres.",
+          maxlength: "Por favor, no introduzca más de 100 caracteres.",
           pattern: "Por favor introduce al menos una letra, puede contener números.",
         },
         telefono: {

@@ -17,6 +17,9 @@
             <div class="card-header">
                 <a href="/registrar_farmacia" class="btn btn-md btn-success"><i class="fa-solid fa-plus"></i> Registrar Nueva Farmacia</a>
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#filtroModal" style="margin-left: 10px;"><i class="fa-solid fa-file-arrow-down fa-bounce"></i> Exportar Farmacias</button>
+                <a href="/venta_grafica_provincia/" class='btn btn-md btn-warning' style="margin-left: 10px;">
+                    Gráficos de ventas <i class="fa-solid fa-chart-simple"></i>
+                 </a>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -36,7 +39,7 @@
                                 <th>Tipo</th>
                                 <th>Turno</th>
                                 <th>Farmacéutico</th>
-                                <th>Opciones</th>
+                                <th style="width: 12%;">Opciones</th>
                             </tr>
                         </thead>
                     </table>
@@ -65,11 +68,11 @@
                                 <input type="text" class="form-control" id="id" hidden name="id">
                             </div>
                             <div class="form-group">
-                                <label for="name">Direccion</label>
+                                <label for="name">Dirección</label>
                                 <input type="text" class="form-control" id="direccion" name="direccion" placeholder="Direccion">
                             </div>
                             <div class="form-group">
-                                <label for="name">Telefono</label>
+                                <label for="name">Teléfono</label>
                                 <input type="text" class="form-control" id="telefono" name="telefono" placeholder="Telefono">
                             </div>
                             <div class="form-group">
