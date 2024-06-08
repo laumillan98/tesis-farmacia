@@ -38,6 +38,9 @@ $.getScript("/static/js/datatables.spanish.js", function () {
                               </button>&nbsp
                               <button id='verMapa' class='btn btn-sm btn-info' data-lat='${row.latitud}' data-lng='${row.longitud}' data-id='${row.id}'>
                                   <i class="fa-solid fa-location-dot fa-flip"></i>
+                              </button>&nbsp
+                              <button id='verEstadisticaDeFarmacia' class='btn btn-sm btn-warning' data-id='${row.id}'>
+                                <i class="fa-solid fa-chart-simple"></i>
                               </button>`
               return editButton
             }
@@ -52,6 +55,11 @@ $.getScript("/static/js/datatables.spanish.js", function () {
     $("#miTabla").on("click", "#editar", function () {
       let idFarma = $(this).data("id")
       cargarInformacionFarmacia(idFarma)
+    })
+
+    $("#miTabla").on("click", "#verEstadisticaDeFarmacia", function () {
+      let idFarma = $(this).data("id")
+      window.location.href = "/venta_grafica_farmacia/"+idFarma;
     })
 
     function cargarInformacionFarmacia(id) {

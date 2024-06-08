@@ -1,7 +1,7 @@
-{% extends template %}
+{% extends "./index_especialista.html" %}
 {% load static %}
 
-{% block mytitle %}Visualizar Gráficos{% endblock %}
+{% block mytitle %}Visualizar Gráficos Nivel Provincial{% endblock %}
 
 {% load static %}
 
@@ -19,7 +19,7 @@
 </style>
 {% endblock %}
 
-{% block title %}Visualizar Gráficos{% endblock %}
+{% block title %}Visualizar Gráficos Nivel Provincial{% endblock %}
 
 {% block content_root %}
 <!-- Info boxes -->
@@ -74,8 +74,8 @@
                 <span class="info-box-icon bg-warning elevation-1"><i class="fa-solid fa-cart-flatbed" style="color:white;"></i></span>
 
                 <div class="info-box-content">
-                <span class="info-box-text">Total de medicamentos</span>
-                <span class="info-box-number">{{contexto_24h.total_entradas}}</span>
+                <span class="info-box-text">Total de medicamentos - Provincial</span>
+                <span class="info-box-number">{{contexto_24h.total_entradas}} /u</span>
                 </div>
                 <!-- /.info-box-content -->
             </div>
@@ -101,12 +101,12 @@
             <div class="card mr-2">
                 <div class="card-body">
             <p class="text-center">
-            <strong>Top 5 más vendidos</strong>
+            <strong>Top 5 más vendidos - Histórico</strong>
             </p>
 
             {% for item in contexto_24h.top_vendidos %}
             <div class="progress-group">
-                {{item.medicamento}}
+                {{item.medicamento}} - {{item.farmacia}}
                 <span class="float-right"><b>{{item.vendidos}}</b>/{{item.existencia|add:item.vendidos}}</span>
                 <div class="progress progress-sm">
                 <div class="progress-bar bg-primary" style="width: {{item.porciento}}"></div>

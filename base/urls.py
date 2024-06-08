@@ -11,7 +11,6 @@ urlpatterns = [
      path('salir/', views.salir),
      path('acceder/', views.autenticar, name='acceder'),
      path('activate/<uidb64>/<token>', views.activate, name='activate'),
-     path('activate/<uidb64>/<token>', views.activate, name='activate'),
      path('registrar/', views.registrar),
      path("cambiarPass", views.cambiarPass, name="cambiarPass"),
      path("solicitar_restablecer_pass", views.restablecerPass, name="solicitar_restablecer_pass"),
@@ -136,6 +135,7 @@ urlpatterns = [
      # Graficos
      path('visualizar_charts/', views.visualizarCharts),
      path('usuarios_xgrupos_chart/', views.usuariosXGruposChart, name='usuarios_xgrupos_chart'),
-     path('venta_grafica_farmacia/<farmacia_id>/', views.ventaGraficaFarmaciaV2, name='venta_grafica_farmacia'),
+     path('venta_grafica_farmacia/<farmacia_id>/', views.ventaGraficaFarmacia, name='venta_grafica_farmacia'),
+     path('venta_grafica_provincia/', views.ventaGraficaGeneral, name='venta_grafica_provincia'),
 ]
 

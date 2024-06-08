@@ -253,6 +253,7 @@
     <!-- Main content -->
     <section class="content">
       <div class="container-fluid">
+        {% block content_root %}{% endblock %}
         <!-- Main row -->
         <div class="row">{% block content %}{% endblock %}</div>
         <!-- /.row (main row) -->
